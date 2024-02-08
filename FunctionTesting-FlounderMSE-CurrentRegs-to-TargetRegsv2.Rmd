@@ -1,0 +1,971 @@
+---
+title: "FlounderMSE-CurrentRegs-to-TargetRegs-FunctionTesting-v2"
+author: "Kamran Walsh"
+output: html_notebook
+---
+
+```{r}
+fluke <- readRDS("/Users/kam-macpro/Downloads/state_lookup.rds")
+#View(fluke)
+library(dplyr)
+library(data.table)
+flukecatch <- tibble(fluke)
+```
+
+```{r}
+#Regs
+#state = "NY"
+bag = 4
+minlen = 18.5
+seasonlen = 161
+
+```
+
+Expected Catch:
+```{r}
+functioncatch_commonreg <- function(flukecatch, State, Bag, MinLen, SeasonLen){
+  flukecatch %>%
+    group_by(State) %>%
+    filter(
+      Bag == bag,
+      MinLen == minlen,
+      SeasonLen == max(SeasonLen[SeasonLen <= seasonlen])
+    )
+}
+catchallstates_commonreg <- functioncatch_commonreg(flukecatch, State, land)
+catchallstates_commonreg
+```
+
+Determine Target Catch via Control Rule Settings: 
+```{r} 
+       #-10, +10, -20, +20, -40, +40
+y <- c(0.9, 1.1, 0.8, 1.2, 0.6, 1.4)
+catchallstates_commonreg$landminus10 = catchallstates_commonreg$land*y[1]
+catchallstates_commonreg$landplus10 = catchallstates_commonreg$land*y[2]
+catchallstates_commonreg$landminus20 = catchallstates_commonreg$land*y[3]
+catchallstates_commonreg$landplus20 = catchallstates_commonreg$land*y[4]
+catchallstates_commonreg$landminus40 = catchallstates_commonreg$land*y[5]
+catchallstates_commonreg$landplus40 = catchallstates_commonreg$land*y[6]
+catchallstates_commonreg
+```
+
+Lookup + Return Regs: 
+
+Change SeasonLen:
+```{r}
+# -10% = 7
+# +10% = 8 
+# -20% = 9 
+# +20% = 10
+# -40% = 11
+# +40% = 12
+
+for (x in 7:12) {
+NCcatch_common <- catchallstates_commonreg[[x]][catchallstates_commonreg$State=="NC"]
+DEcatch_common <- catchallstates_commonreg[[x]][catchallstates_commonreg$State=="DE"]
+MAcatch_common <- catchallstates_commonreg[[x]][catchallstates_commonreg$State=="MA"]
+RIcatch_common <- catchallstates_commonreg[[x]][catchallstates_commonreg$State=="RI"]
+NYcatch_common <- catchallstates_commonreg[[x]][catchallstates_commonreg$State=="NY"]
+MDcatch_common <- catchallstates_commonreg[[x]][catchallstates_commonreg$State=="MD"]
+CTcatch_common <- catchallstates_commonreg[[x]][catchallstates_commonreg$State=="CT"]
+VAcatch_common <- catchallstates_commonreg[[x]][catchallstates_commonreg$State=="VA"]
+NJcatch_common <- catchallstates_commonreg[[x]][catchallstates_commonreg$State=="NJ"]
+
+# North Carolina
+functioncatchNC_seasonlen <- function(flukecatch, State, land){
+  flukecatch %>% 
+    group_by(State=="NC") %>% 
+    filter(
+      State=="NC",
+      Bag == bag,
+      MinLen == minlen) %>%
+   filter(
+   land == max(land[land <= NCcatch_common])) 
+}
+NC_seasonlen <- functioncatchNC_seasonlen(flukecatch, State, land)
+NC_seasonlen <- NC_seasonlen %>% mutate(TargetMet = "TRUE")
+
+NC_if <- function(flukecatch, State, land){if(nrow(NC_seasonlen)==0){
+    flukecatch %>% 
+    group_by(State=="NC") %>% 
+    filter(
+      State=="NC",
+      Bag == bag,
+      MinLen == minlen) %>%
+    filter(abs(land - NCcatch_common) == min(abs(land - NCcatch_common)))
+}
+}
+NC_seasonlen2 <- NC_if(flukecatch, State, land)
+
+#Delaware
+functioncatchDE_seasonlen <- function(flukecatch, State, land){
+  flukecatch %>% 
+    group_by(State=="DE") %>% 
+    filter(
+      State=="DE",
+      Bag == bag,
+      MinLen == minlen) %>%
+   filter(
+   land == max(land[land <= DEcatch_common])) 
+}
+DE_seasonlen <- functioncatchDE_seasonlen(flukecatch, State, land)
+DE_seasonlen <- DE_seasonlen %>% mutate(TargetMet = "TRUE")
+
+
+DE_if <- function(flukecatch, State, land){if(nrow(DE_seasonlen)==0){
+    flukecatch %>% 
+    group_by(State=="DE") %>% 
+    filter(
+      State=="DE",
+      Bag == bag,
+      MinLen == minlen) %>%
+    filter(abs(land - DEcatch_common) == min(abs(land - DEcatch_common)))
+}
+}
+DE_seasonlen2 <- DE_if(flukecatch, State, land)
+
+#Massachusetts
+functioncatchMA_seasonlen <- function(flukecatch, State, land){
+  flukecatch %>% 
+    group_by(State=="MA") %>% 
+    filter(
+      State=="MA",
+      Bag == bag,
+      MinLen == minlen) %>%
+   filter(
+   land == max(land[land <= MAcatch_common])) 
+}
+MA_seasonlen <- functioncatchMA_seasonlen(flukecatch, State, land)
+MA_seasonlen <- MA_seasonlen %>% mutate(TargetMet = "TRUE")
+
+MA_if <- function(flukecatch, State, land){if(nrow(MA_seasonlen)==0){
+    flukecatch %>% 
+    group_by(State=="MA") %>% 
+    filter(
+      State=="MA",
+      Bag == bag,
+      MinLen == minlen) %>%
+    filter(abs(land - MAcatch_common) == min(abs(land - MAcatch_common)))
+}
+}
+MA_seasonlen2 <- MA_if(flukecatch, State, land)
+
+#Rhode Island
+functioncatchRI_seasonlen <- function(flukecatch, State, land){
+  flukecatch %>% 
+    group_by(State=="RI") %>% 
+    filter(
+      State=="RI",
+      Bag == bag,
+      MinLen == minlen) %>%
+    filter(
+      land == max(land[land <= RIcatch_common]))
+}
+RI_seasonlen <- functioncatchRI_seasonlen(flukecatch, State, land)
+RI_seasonlen <- RI_seasonlen %>% mutate(TargetMet = "TRUE")
+
+RI_if <- function(flukecatch, State, land){if(nrow(RI_seasonlen)==0){
+    flukecatch %>% 
+    group_by(State=="RI") %>% 
+    filter(
+      State=="RI",
+      Bag == bag,
+      MinLen == minlen) %>%
+    filter(abs(land - RIcatch_common) == min(abs(land - RIcatch_common)))
+}
+}
+RI_seasonlen2 <- RI_if(flukecatch, State, land)
+
+#New York
+functioncatchNY_seasonlen <- function(flukecatch, State, land){
+  flukecatch %>% 
+    group_by(State=="NY") %>% 
+    filter(
+      State=="NY",
+      Bag == bag,
+      MinLen == minlen) %>%
+    filter(
+      land == max(land[land <= NYcatch_common]))
+}
+NY_seasonlen <- functioncatchNY_seasonlen(flukecatch, State, land)
+NY_seasonlen <- NY_seasonlen %>% mutate(TargetMet = "TRUE")
+
+NY_if <- function(flukecatch, State, land){if(nrow(NY_seasonlen)==0){
+    flukecatch %>% 
+    group_by(State=="NY") %>% 
+    filter(
+      State=="NY",
+      Bag == bag,
+      MinLen == minlen) %>%
+    filter(abs(land - NYcatch_common) == min(abs(land - NYcatch_common)))
+}
+}
+NY_seasonlen2 <- NY_if(flukecatch, State, land)
+
+#Maryland
+functioncatchMD_seasonlen <- function(flukecatch, State, land){
+  flukecatch %>% 
+    group_by(State=="MD") %>% 
+    filter(
+      State=="MD",
+      Bag == bag,
+      MinLen == minlen) %>%
+    filter(
+      land == max(land[land <= MDcatch_common]))
+}
+MD_seasonlen <- functioncatchMD_seasonlen(flukecatch, State, land)
+MD_seasonlen <- MD_seasonlen %>% mutate(TargetMet = "TRUE")
+
+MD_if <- function(flukecatch, State, land){if(nrow(MD_seasonlen)==0){
+    flukecatch %>% 
+    group_by(State=="MD") %>% 
+    filter(
+      State=="MD",
+      Bag == bag,
+      MinLen == minlen) %>%
+    filter(abs(land - MDcatch_common) == min(abs(land - MDcatch_common)))
+}
+}
+MD_seasonlen2 <- MD_if(flukecatch, State, land)
+
+#Connecticut 
+functioncatchCT_seasonlen <- function(flukecatch, State, land){
+  flukecatch %>% 
+    group_by(State=="CT") %>% 
+    filter(
+      State=="CT",
+      Bag == bag,
+      MinLen == minlen) %>%
+    filter(
+      land == max(land[land <= CTcatch_common]))
+}
+CT_seasonlen <- functioncatchCT_seasonlen(flukecatch, State, land)
+CT_seasonlen <- CT_seasonlen %>% mutate(TargetMet = "TRUE")
+
+CT_if <- function(flukecatch, State, land){if(nrow(CT_seasonlen)==0){
+    flukecatch %>% 
+    group_by(State=="CT") %>% 
+    filter(
+      State=="CT",
+      Bag == bag,
+      MinLen == minlen) %>%
+    filter(abs(land - CTcatch_common) == min(abs(land - CTcatch_common)))
+}
+}
+CT_seasonlen2 <- CT_if(flukecatch, State, land)
+
+#Virginia
+functioncatchVA_seasonlen <- function(flukecatch, State, land){
+  flukecatch %>% 
+    group_by(State=="VA") %>% 
+    filter(
+      State=="VA",
+      Bag == bag,
+      MinLen == minlen) %>%
+    filter(
+      land == max(land[land <= VAcatch_common]))
+}
+VA_seasonlen <- functioncatchVA_seasonlen(flukecatch, State, land)
+VA_seasonlen <- VA_seasonlen %>% mutate(TargetMet = "TRUE")
+
+VA_if <- function(flukecatch, State, land){if(nrow(VA_seasonlen)==0){
+    flukecatch %>% 
+    group_by(State=="VA") %>% 
+    filter(
+      State=="VA",
+      Bag == bag,
+      MinLen == minlen) %>%
+    filter(abs(land - VAcatch_common) == min(abs(land - VAcatch_common)))
+}
+}
+VA_seasonlen2 <- VA_if(flukecatch, State, land)
+
+# New Jersey 
+functioncatchNJ_seasonlen<- function(flukecatch, State, land){
+  flukecatch %>% 
+    group_by(State=="NJ") %>% 
+    filter(
+      State=="NJ",
+      Bag == bag,
+      MinLen == minlen) %>%
+    filter(
+      land == max(land[land <= NJcatch_common]))
+}
+NJ_seasonlen <- functioncatchNJ_seasonlen(flukecatch, State, land)
+NJ_seasonlen <- NJ_seasonlen %>% mutate(TargetMet = "TRUE")
+
+NJ_if <- function(flukecatch, State, land){if(nrow(NJ_seasonlen)==0){
+    flukecatch %>% 
+    group_by(State=="NJ") %>% 
+    filter(
+      State=="NJ",
+      Bag == bag,
+      MinLen == minlen) %>%
+    filter(abs(land - NJcatch_common) == min(abs(land - NJcatch_common)))
+}
+}
+NJ_seasonlen2 <- NJ_if(flukecatch, State, land)
+
+if(nrow(NC_seasonlen)==0){NC_seasonlen <- NC_seasonlen2 %>%  mutate(TargetMet = "FALSE")}
+if(nrow(DE_seasonlen)==0){DE_seasonlen <- DE_seasonlen2 %>%  mutate(TargetMet = "FALSE")}
+if(nrow(MA_seasonlen)==0){MA_seasonlen <- MA_seasonlen2 %>% mutate(TargetMet = "FALSE")}
+if(nrow(RI_seasonlen)==0){RI_seasonlen <- RI_seasonlen2 %>% mutate(TargetMet = "FALSE")}
+if(nrow(NY_seasonlen)==0){NY_seasonlen <- NY_seasonlen2 %>% mutate(TargetMet = "FALSE")}
+if(nrow(NJ_seasonlen)==0){NJ_seasonlen <- NJ_seasonlen2 %>% mutate(TargetMet = "FALSE")}
+if(nrow(MD_seasonlen)==0){MD_seasonlen <- MD_seasonlen2 %>% mutate(TargetMet = "FALSE")}
+if(nrow(CT_seasonlen)==0){CT_seasonlen <- CT_seasonlen2 %>% mutate(TargetMet = "FALSE")}
+if(nrow(VA_seasonlen)==0){VA_seasonlen <- VA_seasonlen2 %>% mutate(TargetMet = "FALSE")}
+
+targetcatchregs_seasonlen <- list(NC_seasonlen, VA_seasonlen, MD_seasonlen, DE_seasonlen, NJ_seasonlen, NY_seasonlen, CT_seasonlen, RI_seasonlen, MA_seasonlen)
+targetcatchregs_seasonlen_ <- rbindlist(targetcatchregs_seasonlen, fill = TRUE, )
+targetcatchregs_seasonlen_ = subset(targetcatchregs_seasonlen_, select = c(State, Bag, MinLen, SeasonLen, land, disc, TargetMet))
+
+#targetcatchregs_seasonlen_ <- as.data.frame(targetcatchregs_seasonlen_)
+#if(nrow(targetcatchregs_seasonlen_)==0){ #targetcatchregs_seasonlen_[nrow(targetcatchregs_seasonlen_)+1,] <- NA }
+
+if (x==7){targetcatchregsminus10_seasonlen <- targetcatchregs_seasonlen_}
+if (x==8){targetcatchregsplus10_seasonlen <- targetcatchregs_seasonlen_}
+if (x==9){targetcatchregsminus20_seasonlen <- targetcatchregs_seasonlen_}
+if (x==10){targetcatchregsplus20_seasonlen <- targetcatchregs_seasonlen_}
+if (x==11){targetcatchregsminus40_seasonlen <- targetcatchregs_seasonlen_}
+if (x==12){targetcatchregsplus40_seasonlen <- targetcatchregs_seasonlen_}
+}
+
+
+```
+
+```{r}
+targetcatchregsminus10_seasonlen_ <- data.frame(targetcatchregsminus10_seasonlen, "-10%")
+targetcatchregsplus10_seasonlen_ <- data.frame(targetcatchregsplus10_seasonlen, "+10%")
+targetcatchregsminus20_seasonlen_ <- data.frame(targetcatchregsminus20_seasonlen, "-20%")
+targetcatchregsplus20_seasonlen_ <- data.frame(targetcatchregsplus20_seasonlen, "+20%")
+targetcatchregsminus40_seasonlen_ <- data.frame(targetcatchregsminus40_seasonlen, "-40%")
+targetcatchregsplus40_seasonlen_ <- data.frame(targetcatchregsplus40_seasonlen, "+40%")
+
+names(targetcatchregsminus10_seasonlen_)[8] = "Mortality"
+names(targetcatchregsplus10_seasonlen_)[8] = "Mortality"
+names(targetcatchregsminus20_seasonlen_)[8] = "Mortality"
+names(targetcatchregsplus20_seasonlen_)[8] = "Mortality"
+names(targetcatchregsminus40_seasonlen_)[8] = "Mortality"
+names(targetcatchregsplus40_seasonlen_)[8] = "Mortality"
+
+targetcatchregstest1 <- rbind(targetcatchregsminus10_seasonlen_, targetcatchregsplus10_seasonlen_, targetcatchregsminus20_seasonlen_, targetcatchregsplus20_seasonlen_, targetcatchregsminus40_seasonlen_, targetcatchregsplus40_seasonlen_)
+targetcatchregstest1
+```
+
+Change MinLen:
+
+```{r}
+# -10% = 7
+# +10% = 8 
+# -20% = 9 
+# +20% = 10
+# -40% = 11
+# +40% = 12
+
+for (x in 7:12){
+NCcatch_common <- catchallstates_commonreg[[x]][catchallstates_commonreg$State=="NC"]
+DEcatch_common <- catchallstates_commonreg[[x]][catchallstates_commonreg$State=="DE"]
+MAcatch_common <- catchallstates_commonreg[[x]][catchallstates_commonreg$State=="MA"]
+RIcatch_common <- catchallstates_commonreg[[x]][catchallstates_commonreg$State=="RI"]
+NYcatch_common <- catchallstates_commonreg[[x]][catchallstates_commonreg$State=="NY"]
+MDcatch_common <- catchallstates_commonreg[[x]][catchallstates_commonreg$State=="MD"]
+CTcatch_common <- catchallstates_commonreg[[x]][catchallstates_commonreg$State=="CT"]
+VAcatch_common <- catchallstates_commonreg[[x]][catchallstates_commonreg$State=="VA"]
+NJcatch_common <- catchallstates_commonreg[[x]][catchallstates_commonreg$State=="NJ"]
+
+#North Carolina
+functioncatchNC_common_minlen <- function(flukecatch, State, land){
+  flukecatch %>% 
+    group_by(State=="NC") %>% 
+    filter(
+      State=="NC",
+      Bag == bag,
+      SeasonLen == max(SeasonLen[SeasonLen <= seasonlen])) %>%
+    filter(
+      land == max(land[land <= NCcatch_common]))
+}
+NC_common_minlen <- functioncatchNC_common_minlen(flukecatch, State, land)
+NC_common_minlen <- NC_common_minlen %>% mutate(TargetMet = "TRUE")
+
+NC_if_minlen <- function(flukecatch, State, land){if(nrow(NC_common_minlen)==0){
+    flukecatch %>% 
+    group_by(State=="NC") %>% 
+    filter(
+      State=="NC",
+      Bag == bag,
+      SeasonLen == max(SeasonLen[SeasonLen <= seasonlen])) %>%
+    filter(abs(land - NCcatch_common) == min(abs(land - NCcatch_common)))
+}
+}
+NC_common_minlen2 <- NC_if_minlen(flukecatch, State, land)
+
+#Delaware
+functioncatchDE_common_minlen <- function(flukecatch, State, land){
+  flukecatch %>% 
+    group_by(State=="DE") %>% 
+    filter(
+      State =="DE",
+      Bag == bag,
+      SeasonLen == max(SeasonLen[SeasonLen <= seasonlen])) %>%
+    filter(
+      land == max(land[land <= DEcatch_common]))
+}
+DE_common_minlen <- functioncatchDE_common_minlen(flukecatch, State, land)
+DE_common_minlen <- DE_common_minlen %>% mutate(TargetMet = "TRUE")
+
+DE_if_minlen <- function(flukecatch, State, land){if(nrow(DE_common_minlen)==0){
+    flukecatch %>% 
+    group_by(State=="DE") %>% 
+    filter(
+      State=="DE",
+      Bag == bag,
+      SeasonLen == max(SeasonLen[SeasonLen <= seasonlen])) %>%
+    filter(abs(land - DEcatch_common) == min(abs(land - DEcatch_common)))
+}
+}
+DE_common_minlen2 <- DE_if_minlen(flukecatch, State, land)
+
+#Massachusetts
+functioncatchMA_common_minlen <- function(flukecatch, State, land){
+  flukecatch %>% 
+    group_by(State=="MA") %>% 
+    filter(
+      State=="MA",
+      Bag == bag,
+      SeasonLen == max(SeasonLen[SeasonLen <= seasonlen])) %>%
+    filter(
+      land == max(land[land <= MAcatch_common]))
+}
+MA_common_minlen <- functioncatchMA_common_minlen(flukecatch, State, land)
+MA_common_minlen <- MA_common_minlen %>% mutate(TargetMet = "TRUE")
+
+MA_if_minlen <- function(flukecatch, State, land){if(nrow(MA_common_minlen)==0){
+    flukecatch %>% 
+    group_by(State=="MA") %>% 
+    filter(
+      State=="MA",
+      Bag == bag,
+      SeasonLen == max(SeasonLen[SeasonLen <= seasonlen])) %>%
+    filter(abs(land - MAcatch_common) == min(abs(land - MAcatch_common)))
+}
+}
+MA_common_minlen2 <- MA_if_minlen(flukecatch, State, land)
+
+#Rhode Island
+functioncatchRI_common_minlen <- function(flukecatch, State, land){
+  flukecatch %>% 
+    group_by(State=="RI") %>% 
+    filter(
+      State=="RI",
+      Bag == bag,
+      SeasonLen == max(SeasonLen[SeasonLen <= seasonlen])) %>%
+    filter(
+      land == max(land[land <= RIcatch_common]))
+}
+RI_common_minlen <- functioncatchRI_common_minlen(flukecatch, State, land)
+RI_common_minlen <- RI_common_minlen %>% mutate(TargetMet = "TRUE")
+
+RI_if_minlen <- function(flukecatch, State, land){if(nrow(RI_common_minlen)==0){
+    flukecatch %>% 
+    group_by(State=="RI") %>% 
+    filter(
+      State=="RI",
+      Bag == bag,
+      SeasonLen == max(SeasonLen[SeasonLen <= seasonlen])) %>%
+    filter(abs(land - RIcatch_common) == min(abs(land - RIcatch_common)))
+}
+}
+RI_common_minlen2 <- RI_if_minlen(flukecatch, State, land)
+
+#New York
+functioncatchNY_common_minlen <- function(flukecatch, State, land){
+  flukecatch %>% 
+    group_by(State=="NY") %>% 
+    filter(
+      State=="NY",
+      Bag == bag,
+      SeasonLen == max(SeasonLen[SeasonLen <= seasonlen])) %>%
+    filter(
+      land == max(land[land <= NYcatch_common]))
+}
+NY_common_minlen <- functioncatchNY_common_minlen(flukecatch, State, land)
+NY_common_minlen <- NY_common_minlen %>% mutate(TargetMet = "TRUE")
+
+NY_if_minlen <- function(flukecatch, State, land){if(nrow(NY_common_minlen)==0){
+    flukecatch %>% 
+    group_by(State=="NY") %>% 
+    filter(
+      State=="NY",
+      Bag == bag,
+      SeasonLen == max(SeasonLen[SeasonLen <= seasonlen])) %>%
+    filter(abs(land - NYcatch_common) == min(abs(land - NYcatch_common)))
+}
+}
+NY_common_minlen2 <- NY_if_minlen(flukecatch, State, land)
+
+#Maryland
+functioncatchMD_common_minlen <- function(flukecatch, State, land){
+  flukecatch %>% 
+    group_by(State=="MD") %>% 
+    filter(
+      State=="MD",
+      Bag == bag,
+      SeasonLen == max(SeasonLen[SeasonLen <= seasonlen])) %>%
+    filter(
+      land == max(land[land <= MDcatch_common]))
+}
+MD_common_minlen <- functioncatchMD_common_minlen(flukecatch, State, land)
+MD_common_minlen <- MD_common_minlen %>% mutate(TargetMet = "TRUE")
+
+MD_if_minlen <- function(flukecatch, State, land){if(nrow(MD_common_minlen)==0){
+    flukecatch %>% 
+    group_by(State=="MD") %>% 
+    filter(
+      State=="MD",
+      Bag == bag,
+      SeasonLen == max(SeasonLen[SeasonLen <= seasonlen])) %>%
+    filter(abs(land - MDcatch_common) == min(abs(land - MDcatch_common)))
+}
+}
+MD_common_minlen2 <- MD_if_minlen(flukecatch, State, land)
+
+#Connecticut
+functioncatchCT_common_minlen <- function(flukecatch, State, land){
+  flukecatch %>% 
+    group_by(State=="CT") %>% 
+    filter(
+      State=="CT",
+      Bag == bag,
+      SeasonLen == max(SeasonLen[SeasonLen <= seasonlen])) %>%
+    filter(
+      land == max(land[land <= CTcatch_common]))
+}
+CT_common_minlen <- functioncatchCT_common_minlen(flukecatch, State, land)
+CT_common_minlen <- CT_common_minlen %>% mutate(TargetMet = "TRUE")
+
+CT_if_minlen <- function(flukecatch, State, land){if(nrow(CT_common_minlen)==0){
+    flukecatch %>% 
+    group_by(State=="CT") %>% 
+    filter(
+      State=="CT",
+      Bag == bag,
+      SeasonLen == max(SeasonLen[SeasonLen <= seasonlen])) %>%
+    filter(abs(land - CTcatch_common) == min(abs(land - CTcatch_common)))
+}
+}
+CT_common_minlen2 <- CT_if_minlen(flukecatch, State, land)
+
+#Virginia
+functioncatchVA_common_minlen <- function(flukecatch, State, land){
+  flukecatch %>% 
+    group_by(State=="VA") %>% 
+    filter(
+      State=="VA",
+      Bag == bag,
+      SeasonLen == max(SeasonLen[SeasonLen <= seasonlen])) %>%
+    filter(
+      land == max(land[land <= VAcatch_common]))
+}
+VA_common_minlen <- functioncatchVA_common_minlen(flukecatch, State, land)
+VA_common_minlen <- VA_common_minlen %>% mutate(TargetMet = "TRUE")
+
+VA_if_minlen <- function(flukecatch, State, land){if(nrow(VA_common_minlen)==0){
+    flukecatch %>% 
+    group_by(State=="VA") %>% 
+    filter(
+      State=="VA",
+      Bag == bag,
+      SeasonLen == max(SeasonLen[SeasonLen <= seasonlen])) %>%
+    filter(abs(land - VAcatch_common) == min(abs(land - VAcatch_common)))
+}
+}
+VA_common_minlen2 <- VA_if_minlen(flukecatch, State, land)
+
+#New Jersey
+functioncatchNJ_common_minlen <- function(flukecatch, State, land){
+  flukecatch %>% 
+    group_by(State=="NJ") %>% 
+    filter(
+      State=="NJ",
+      Bag == bag,
+      SeasonLen == max(SeasonLen[SeasonLen <= seasonlen])) %>%
+    filter(
+      land == max(land[land <= NJcatch_common]))
+}
+NJ_common_minlen <- functioncatchNJ_common_minlen(flukecatch, State, land)
+NJ_common_minlen <- NJ_common_minlen %>% mutate(TargetMet = "TRUE")
+
+NJ_if_minlen <- function(flukecatch, State, land){if(nrow(NJ_common_minlen)==0){
+    flukecatch %>% 
+    group_by(State=="NJ") %>% 
+    filter(
+      State=="NJ",
+      Bag == bag,
+      SeasonLen == max(SeasonLen[SeasonLen <= seasonlen])) %>%
+    filter(abs(land - NJcatch_common) == min(abs(land - NJcatch_common)))
+}
+}
+NJ_common_minlen2 <- NJ_if_minlen(flukecatch, State, land)
+
+if(nrow(NC_common_minlen)==0){NC_common_minlen <- NC_common_minlen2 %>%  mutate(TargetMet = "FALSE")}
+if(nrow(DE_common_minlen)==0){DE_common_minlen <- DE_common_minlen2 %>%  mutate(TargetMet = "FALSE")}
+if(nrow(MA_common_minlen)==0){MA_common_minlen <- MA_common_minlen2 %>% mutate(TargetMet = "FALSE")}
+if(nrow(RI_common_minlen)==0){RI_common_minlen <- RI_common_minlen2 %>% mutate(TargetMet = "FALSE")}
+if(nrow(NY_common_minlen)==0){NY_common_minlen <- NY_common_minlen2 %>% mutate(TargetMet = "FALSE")}
+if(nrow(NJ_common_minlen)==0){NJ_common_minlen <- NJ_common_minlen2 %>% mutate(TargetMet = "FALSE")}
+if(nrow(MD_common_minlen)==0){MD_common_minlen <- MD_common_minlen2 %>% mutate(TargetMet = "FALSE")}
+if(nrow(CT_common_minlen)==0){CT_common_minlen <- CT_common_minlen2 %>% mutate(TargetMet = "FALSE")}
+if(nrow(VA_common_minlen)==0){VA_common_minlen <- VA_common_minlen2 %>% mutate(TargetMet = "FALSE")}
+
+targetcatchregs_common_minlen <- list(NC_common_minlen, VA_common_minlen, MD_common_minlen, DE_common_minlen, NJ_common_minlen, NY_common_minlen, CT_common_minlen, RI_common_minlen, MA_common_minlen)
+targetcatchregs_common_minlen_ <- rbindlist(targetcatchregs_common_minlen, fill = TRUE, )
+targetcatchregs_common_minlen_ = subset(targetcatchregs_common_minlen_, select = c(State, Bag, MinLen, SeasonLen, land, disc, TargetMet))
+
+#targetcatchregs_common_minlen_ <- as.data.frame(targetcatchregs_common_minlen_)
+#if(nrow(targetcatchregs_common_minlen_)==0){ #targetcatchregs_common_minlen_[nrow(targetcatchregs_common_minlen_)+1,] <- NA }
+
+if (x==7){targetcatchregsminus10_minlen <- targetcatchregs_common_minlen_}
+if (x==8){targetcatchregsplus10_minlen <- targetcatchregs_common_minlen_}
+if (x==9){targetcatchregsminus20_minlen <- targetcatchregs_common_minlen_}
+if (x==10){targetcatchregsplus20_minlen <- targetcatchregs_common_minlen_}
+if (x==11){targetcatchregsminus40_minlen <- targetcatchregs_common_minlen_}
+if (x==12){targetcatchregsplus40_minlen <- targetcatchregs_common_minlen_}
+}
+```
+
+```{r}
+targetcatchregsminus10_minlen_ <- data.frame(targetcatchregsminus10_minlen, "-10%")
+targetcatchregsplus10_minlen_ <- data.frame(targetcatchregsplus10_minlen, "+10%")
+targetcatchregsminus20_minlen_ <- data.frame(targetcatchregsminus20_minlen, "-20%")
+targetcatchregsplus20_minlen_ <- data.frame(targetcatchregsplus20_minlen, "+20%")
+targetcatchregsminus40_minlen_ <- data.frame(targetcatchregsminus40_minlen, "-40%")
+targetcatchregsplus40_minlen_ <- data.frame(targetcatchregsplus40_minlen, "+40%")
+
+names(targetcatchregsminus10_minlen_)[8] = "Mortality"
+names(targetcatchregsplus10_minlen_)[8] = "Mortality"
+names(targetcatchregsminus20_minlen_)[8] = "Mortality"
+names(targetcatchregsplus20_minlen_)[8] = "Mortality"
+names(targetcatchregsminus40_minlen_)[8] = "Mortality"
+names(targetcatchregsplus40_minlen_)[8] = "Mortality"
+
+targetcatchregstest2 <- rbind(targetcatchregsminus10_minlen_, targetcatchregsplus10_minlen_, targetcatchregsminus20_minlen_, targetcatchregsplus20_minlen_, targetcatchregsminus40_minlen_, targetcatchregsplus40_minlen_)
+targetcatchregstest2
+
+```
+
+Change Bag:
+
+```{r}
+# -10% = 7
+# +10% = 8 
+# -20% = 9 
+# +20% = 10
+# -40% = 11
+# +40% = 12
+
+for (x in 7:12){
+NCcatch_common <- catchallstates_commonreg[[x]][catchallstates_commonreg$State=="NC"]
+DEcatch_common <- catchallstates_commonreg[[x]][catchallstates_commonreg$State=="DE"]
+MAcatch_common <- catchallstates_commonreg[[x]][catchallstates_commonreg$State=="MA"]
+RIcatch_common <- catchallstates_commonreg[[x]][catchallstates_commonreg$State=="RI"]
+NYcatch_common <- catchallstates_commonreg[[x]][catchallstates_commonreg$State=="NY"]
+MDcatch_common <- catchallstates_commonreg[[x]][catchallstates_commonreg$State=="MD"]
+CTcatch_common <- catchallstates_commonreg[[x]][catchallstates_commonreg$State=="CT"]
+VAcatch_common <- catchallstates_commonreg[[x]][catchallstates_commonreg$State=="VA"]
+NJcatch_common <- catchallstates_commonreg[[x]][catchallstates_commonreg$State=="NJ"]
+
+#North Carolina
+functioncatchNC_common <- function(flukecatch, State, land){
+  flukecatch %>% 
+    group_by(State=="NC") %>% 
+    filter(
+      State=="NC",
+      SeasonLen == max(SeasonLen[SeasonLen <= seasonlen]),
+      MinLen == minlen) %>%
+    filter(
+      land == max(land[land <= NCcatch_common]))
+}
+NC_common <- functioncatchNC_common(flukecatch, State, land)
+NC_common <- NC_common %>% mutate(TargetMet = "TRUE")
+
+NC_if_common <- function(flukecatch, State, land){if(nrow(NC_common)==0){
+    flukecatch %>% 
+    group_by(State=="NC") %>% 
+    filter(
+      State=="NC",
+      SeasonLen == max(SeasonLen[SeasonLen <= seasonlen]),
+      MinLen == minlen) %>%
+    filter(abs(land - NCcatch_common) == min(abs(land - NCcatch_common)))
+}
+}
+NC_common2 <- NC_if_common(flukecatch, State, land)
+
+#Delaware
+functioncatchDE_common <- function(flukecatch, State, land){
+  flukecatch %>% 
+    group_by(State=="DE") %>% 
+    filter(
+      State =="DE",
+      SeasonLen == max(SeasonLen[SeasonLen <= seasonlen]),
+      MinLen == minlen) %>%
+    filter(
+      land == max(land[land <= DEcatch_common]))
+}
+DE_common <- functioncatchDE_common(flukecatch, State, land)
+DE_common <- DE_common %>% mutate(TargetMet = "TRUE")
+
+DE_if_common <- function(flukecatch, State, land){if(nrow(DE_common)==0){
+    flukecatch %>% 
+    group_by(State=="DE") %>% 
+    filter(
+      State=="DE",
+      SeasonLen == max(SeasonLen[SeasonLen <= seasonlen]),
+      MinLen == minlen) %>%
+    filter(abs(land - DEcatch_common) == min(abs(land - DEcatch_common)))
+}
+}
+DE_common2 <- DE_if_common(flukecatch, State, land)
+
+#Massachusetts
+functioncatchMA_common <- function(flukecatch, State, land){
+  flukecatch %>% 
+    group_by(State=="MA") %>% 
+    filter(
+      State=="MA",
+      SeasonLen == max(SeasonLen[SeasonLen <= seasonlen]),
+      MinLen == minlen) %>%
+    filter(
+      land == max(land[land <= MAcatch_common]))
+}
+MA_common <- functioncatchMA_common(flukecatch, State, land)
+MA_common <- MA_common %>% mutate(TargetMet = "TRUE")
+
+MA_if_common <- function(flukecatch, State, land){if(nrow(MA_common)==0){
+    flukecatch %>% 
+    group_by(State=="MA") %>% 
+    filter(
+      State=="MA",
+      SeasonLen == max(SeasonLen[SeasonLen <= seasonlen]),
+      MinLen == minlen) %>%
+    filter(abs(land - MAcatch_common) == min(abs(land - MAcatch_common)))
+}
+}
+MA_common2 <- MA_if_common(flukecatch, State, land)
+
+#Rhode Island
+functioncatchRI_common <- function(flukecatch, State, land){
+  flukecatch %>% 
+    group_by(State=="RI") %>% 
+    filter(
+      State=="RI",
+      SeasonLen == max(SeasonLen[SeasonLen <= seasonlen]),
+      MinLen == minlen) %>%
+    filter(
+      land == max(land[land <= RIcatch_common]))
+}
+RI_common <- functioncatchRI_common(flukecatch, State, land)
+RI_common <- RI_common %>% mutate(TargetMet = "TRUE")
+
+RI_if_common <- function(flukecatch, State, land){if(nrow(RI_common)==0){
+    flukecatch %>% 
+    group_by(State=="RI") %>% 
+    filter(
+      State=="RI",
+      SeasonLen == max(SeasonLen[SeasonLen <= seasonlen]),
+      MinLen == minlen) %>%
+    filter(abs(land - RIcatch_common) == min(abs(land - RIcatch_common)))
+}
+}
+RI_common2 <- RI_if_common(flukecatch, State, land)
+
+#New York
+functioncatchNY_common <- function(flukecatch, State, land){
+  flukecatch %>% 
+    group_by(State=="NY") %>% 
+    filter(
+      State=="NY",
+      SeasonLen == max(SeasonLen[SeasonLen <= seasonlen]),
+      MinLen == minlen) %>%
+    filter(
+      land == max(land[land <= NYcatch_common]))
+}
+NY_common <- functioncatchNY_common(flukecatch, State, land)
+NY_common <- NY_common %>% mutate(TargetMet = "TRUE")
+
+NY_if_common <- function(flukecatch, State, land){if(nrow(NY_common)==0){
+    flukecatch %>% 
+    group_by(State=="NY") %>% 
+    filter(
+      State=="NY",
+      SeasonLen == max(SeasonLen[SeasonLen <= seasonlen]),
+      MinLen == minlen) %>%
+    filter(abs(land - NYcatch_common) == min(abs(land - NYcatch_common)))
+}
+}
+NY_common2 <- NY_if_common(flukecatch, State, land)
+
+#Maryland
+functioncatchMD_common <- function(flukecatch, State, land){
+  flukecatch %>% 
+    group_by(State=="MD") %>% 
+    filter(
+      State=="MD",
+      SeasonLen == max(SeasonLen[SeasonLen <= seasonlen]),
+      MinLen == minlen) %>%
+    filter(
+      land == max(land[land <= MDcatch_common]))
+}
+MD_common <- functioncatchMD_common(flukecatch, State, land)
+MD_common <- MD_common %>% mutate(TargetMet = "TRUE")
+
+MD_if_common <- function(flukecatch, State, land){if(nrow(MD_common)==0){
+    flukecatch %>% 
+    group_by(State=="MD") %>% 
+    filter(
+      State=="MD",
+      SeasonLen == max(SeasonLen[SeasonLen <= seasonlen]),
+      MinLen == minlen) %>%
+    filter(abs(land - MDcatch_common) == min(abs(land - MDcatch_common)))
+}
+}
+MD_common2 <- MD_if_common(flukecatch, State, land)
+
+#Connecticut
+functioncatchCT_common <- function(flukecatch, State, land){
+  flukecatch %>% 
+    group_by(State=="CT") %>% 
+    filter(
+      State=="CT",
+      SeasonLen == max(SeasonLen[SeasonLen <= seasonlen]),
+      MinLen == minlen) %>%
+    filter(
+      land == max(land[land <= CTcatch_common]))
+}
+CT_common <- functioncatchCT_common(flukecatch, State, land)
+CT_common <- CT_common %>% mutate(TargetMet = "TRUE")
+
+CT_if_common <- function(flukecatch, State, land){if(nrow(CT_common)==0){
+    flukecatch %>% 
+    group_by(State=="CT") %>% 
+    filter(
+      State=="CT",
+      SeasonLen == max(SeasonLen[SeasonLen <= seasonlen]),
+      MinLen == minlen) %>%
+    filter(abs(land - CTcatch_common) == min(abs(land - CTcatch_common)))
+}
+}
+CT_common2 <- CT_if_common(flukecatch, State, land)
+
+#Virginia
+functioncatchVA_common <- function(flukecatch, State, land){
+  flukecatch %>% 
+    group_by(State=="VA") %>% 
+    filter(
+      State=="VA",
+      SeasonLen == max(SeasonLen[SeasonLen <= seasonlen]),
+      MinLen == minlen) %>%
+    filter(
+      land == max(land[land <= VAcatch_common]))
+}
+VA_common <- functioncatchVA_common(flukecatch, State, land)
+VA_common <- VA_common %>% mutate(TargetMet = "TRUE")
+
+VA_if_common <- function(flukecatch, State, land){if(nrow(VA_common)==0){
+    flukecatch %>% 
+    group_by(State=="VA") %>% 
+    filter(
+      State=="VA",
+      SeasonLen == max(SeasonLen[SeasonLen <= seasonlen]),
+      MinLen == minlen) %>%
+    filter(abs(land - VAcatch_common) == min(abs(land - VAcatch_common)))
+}
+}
+VA_common2 <- VA_if_common(flukecatch, State, land)
+
+#New Jersey
+functioncatchNJ_common <- function(flukecatch, State, land){
+  flukecatch %>% 
+    group_by(State=="NJ") %>% 
+    filter(
+      State=="NJ",
+      SeasonLen == max(SeasonLen[SeasonLen <= seasonlen]),
+      MinLen == minlen) %>%
+    filter(
+      land == max(land[land <= NJcatch_common]))
+}
+NJ_common <- functioncatchNJ_common(flukecatch, State, land)
+NJ_common <- NJ_common %>% mutate(TargetMet = "TRUE")
+
+NJ_if_common <- function(flukecatch, State, land){if(nrow(NJ_common)==0){
+    flukecatch %>% 
+    group_by(State=="NJ") %>% 
+    filter(
+      State=="NJ",
+      SeasonLen == max(SeasonLen[SeasonLen <= seasonlen]),
+      MinLen == minlen) %>%
+    filter(abs(land - NJcatch_common) == min(abs(land - NJcatch_common)))
+}
+}
+NJ_common2 <- NJ_if_common(flukecatch, State, land)
+
+if(nrow(NC_common)==0){NC_common <- NC_common2 %>%  mutate(TargetMet = "FALSE")}
+if(nrow(DE_common)==0){DE_common <- DE_common2 %>%  mutate(TargetMet = "FALSE")}
+if(nrow(MA_common)==0){MA_common <- MA_common2 %>% mutate(TargetMet = "FALSE")}
+if(nrow(RI_common)==0){RI_common <- RI_common2 %>% mutate(TargetMet = "FALSE")}
+if(nrow(NY_common)==0){NY_common <- NY_common2 %>% mutate(TargetMet = "FALSE")}
+if(nrow(NJ_common)==0){NJ_common <- NJ_common2 %>% mutate(TargetMet = "FALSE")}
+if(nrow(MD_common)==0){MD_common <- MD_common2 %>% mutate(TargetMet = "FALSE")}
+if(nrow(CT_common)==0){CT_common <- CT_common2 %>% mutate(TargetMet = "FALSE")}
+if(nrow(VA_common)==0){VA_common <- VA_common2 %>% mutate(TargetMet = "FALSE")}
+
+targetcatchregs_common <- list(NC_common, VA_common, MD_common, DE_common, NJ_common, NY_common, CT_common, RI_common, MA_common)
+targetcatchregs_common_ <- rbindlist(targetcatchregs_common, fill = TRUE, )
+targetcatchregs_common_ = subset(targetcatchregs_common_, select = c(State, Bag, MinLen, SeasonLen, land, disc, TargetMet))
+
+#targetcatchregs_common_ <- as.data.frame(targetcatchregs_common_)
+#if(nrow(targetcatchregs_common_)==0){ #targetcatchregs_common_[nrow(targetcatchregs_common_)+1,] <- NA }
+
+if (x==7){targetcatchregsminus10 <- targetcatchregs_common_}
+if (x==8){targetcatchregsplus10 <- targetcatchregs_common_}
+if (x==9){targetcatchregsminus20 <- targetcatchregs_common_}
+if (x==10){targetcatchregsplus20 <- targetcatchregs_common_}
+if (x==11){targetcatchregsminus40 <- targetcatchregs_common_}
+if (x==12){targetcatchregsplus40 <- targetcatchregs_common_}
+ }
+```
+
+```{r}
+
+targetcatchregsminus10_ <- data.frame(targetcatchregsminus10, "-10%")
+targetcatchregsplus10_ <- data.frame(targetcatchregsplus10, "+10%")
+targetcatchregsminus20_ <- data.frame(targetcatchregsminus20, "-20%")
+targetcatchregsplus20_ <- data.frame(targetcatchregsplus20, "+20%")
+targetcatchregsminus40_ <- data.frame(targetcatchregsminus40, "-40%")
+targetcatchregsplus40_ <- data.frame(targetcatchregsplus40, "+40%")
+
+names(targetcatchregsminus10_)[8] = "Mortality"
+names(targetcatchregsplus10_)[8] = "Mortality"
+names(targetcatchregsminus20_)[8] = "Mortality"
+names(targetcatchregsplus20_)[8] = "Mortality"
+names(targetcatchregsminus40_)[8] = "Mortality"
+names(targetcatchregsplus40_)[8] = "Mortality"
+
+targetcatchregstest3 <- rbind(targetcatchregsminus10_, targetcatchregsplus10_, targetcatchregsminus20_, targetcatchregsplus20_, targetcatchregsminus40_, targetcatchregsplus40_)
+targetcatchregstest3
+```
+
+```{r}
+targetcatchregstest_seasonlength <- data.frame(targetcatchregstest1, "Season Change")
+targetcatchregstest_minlength <- data.frame(targetcatchregstest2, "Length Change")
+targetcatchregstest_baglimit <- data.frame(targetcatchregstest3, "Bag Change")
+
+names(targetcatchregstest_seasonlength)[9] = "Reg Changed"
+names(targetcatchregstest_minlength)[9] = "Reg Changed"
+names(targetcatchregstest_baglimit)[9] = "Reg Changed"
+
+finaltable <- rbind(targetcatchregstest_seasonlength, targetcatchregstest_minlength, targetcatchregstest_baglimit)
+finaltable
+#saveRDS(finaltable, file = "CatchTable_NYRegs")
+#CatchTable_NYRegs <- readRDS("CatchTable_NYRegs")
+```
