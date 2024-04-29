@@ -1,0 +1,225 @@
+---
+title: "InputTableGenerator"
+author: "Kamran Walsh"
+date: "2024-04-01"
+output: html_document
+---
+Creates blank tables in format of regulations_option1 for feeding into regdistinct_sandbox_kam_diffseasons to inform with new regulations
+
+North Carolina:
+```{r}
+inputtable <- readRDS('regulations_option1.rds')
+
+NCinput <- inputtable$NC
+period <- c(1:24)
+fluke_bag <- rep(NA, each = 24)
+fluke_min <- rep(NA, each = 24)
+fluke_max <- rep(100, each = 24)
+state <- rep("NC", each = 24)
+dtrip2019 <- c(NA,NA,NA,NA,NA,NA,NA, NCinput$dtrip_2019[1:10], NA, NA, NCinput$dtrip_2019[11],NA,NA,NA, NA)
+bsb_bag <- c(NA,NA,NA,NA,NA,NA,NA, NCinput$bsb_bag[1:10],NA,NA,NCinput$bsb_bag[11], NA,NA, NA, NA)
+bsb_min <- c(NA,NA,NA,NA,NA,NA,NA, NCinput$bsb_min[1:10],NA,NA,NCinput$bsb_min[11],NA,NA, NA, NA)
+scup_bag <- c(NA,NA,NA,NA,NA,NA,NA, NCinput$scup_bag[1:10],NA,NA,NCinput$scup_bag[11],NA,NA, NA, NA)
+scup_min <- c(NA,NA,NA,NA,NA,NA,NA, NCinput$scup_min[1:10],NA,NA,NCinput$scup_min[11], NA,NA, NA, NA)
+wf_bag <- c(NA,NA,NA,NA,NA,NA,NA, NCinput$wf_bag[1:10],NA,NA,NCinput$wf_bag[11], NA,NA, NA, NA)
+wf_min <- c(NA,NA,NA,NA,NA,NA,NA, NCinput$wf_min[1:10],NA,NA,NCinput$wf_min[11],NA,NA,NA, NA)
+rd_bag <- c(NA,NA,NA,NA,NA,NA,NA, NCinput$rd_bag[1:10],NA,NA,NCinput$rd_bag[11],NA,NA,NA, NA)
+rd_min <- c(NA,NA,NA,NA,NA,NA,NA, NCinput$rd_min[1:10],NA,NA,NCinput$rd_min[11],NA,NA,NA, NA)
+rd_max <- c(NA,NA,NA,NA,NA,NA,NA, NCinput$rd_max[1:10],NA,NA,NCinput$rd_max[11],NA,NA,NA, NA)
+pd_multiplier <- rep(1, each = 24)
+NCinput2 <- data.frame(dtrip2019, period, state, fluke_bag, fluke_min, fluke_max, bsb_bag, bsb_min, scup_bag, scup_min, wf_bag, wf_min, rd_bag, rd_min, rd_max, pd_multiplier)
+```
+
+New Jersey:
+```{r}
+NJinput <- inputtable$NJ
+period <- c(1:24)
+fluke_bag <- rep(NA, each = 24)
+fluke_min <- rep(NA, each = 24)
+fluke_max <- rep(100, each = 24)
+state <- rep("NJ", each = 24)
+dtrip2019 <- c(NA,NA,NA,NA,NA,NA,NA, NJinput$dtrip_2019[1:15], NA, NA)
+bsb_bag <- c(NA,NA,NA,NA,NA,NA,NA, NJinput$bsb_bag[1:15],NA,NA)
+bsb_min <- c(NA,NA,NA,NA,NA,NA,NA, NJinput$bsb_min[1:15],NA,NA)
+scup_bag <- c(NA,NA,NA,NA,NA,NA,NA, NJinput$scup_bag[1:15], NA, NA)
+scup_min <- c(NA,NA,NA,NA,NA,NA,NA, NJinput$scup_min[1:15],NA,NA)
+wf_bag <- c(NA,NA,NA,NA,NA,NA,NA, NJinput$wf_bag[1:15],NA,NA)
+wf_min <- c(NA,NA,NA,NA,NA,NA,NA, NJinput$wf_min[1:15],NA,NA)
+rd_bag <- c(NA,NA,NA,NA,NA,NA,NA, NJinput$rd_bag[1:15],NA,NA)
+rd_min <- c(NA,NA,NA,NA,NA,NA,NA, NJinput$rd_min[1:15],NA,NA)
+rd_max <- c(NA,NA,NA,NA,NA,NA,NA, NJinput$rd_max[1:15],NA,NA)
+pd_multiplier <- rep(1, each = 24)
+NJinput2 <- data.frame(dtrip2019, period, state, fluke_bag, fluke_min, fluke_max, bsb_bag, bsb_min, scup_bag, scup_min, wf_bag, wf_min, rd_bag, rd_min, rd_max, pd_multiplier)
+```
+
+New York:
+```{r}
+NYinput <- inputtable$NY
+period <- c(1:24)
+fluke_bag <- rep(NA, each = 24)
+fluke_min <- rep(NA, each = 24)
+fluke_max <- rep(100, each = 24)
+state <- rep("NY", each = 24)
+dtrip2019 <- c(NA,NA,NA,NA,NA, NYinput$dtrip_2019[1:15], NA, NA, NA,NA)
+bsb_bag <- c(NA,NA,NA,NA,NA, NYinput$bsb_bag[1:15],NA, NA, NA,NA)
+bsb_min <- c(NA,NA,NA,NA,NA, NYinput$bsb_min[1:15],NA, NA, NA,NA)
+scup_bag <- c(NA,NA,NA,NA,NA, NYinput$scup_bag[1:15], NA, NA, NA,NA)
+scup_min <- c(NA,NA,NA,NA,NA, NYinput$scup_min[1:15],NA, NA, NA,NA)
+wf_bag <- c(NA,NA,NA,NA,NA, NYinput$wf_bag[1:15],NA, NA, NA,NA)
+wf_min <- c(NA,NA,NA,NA,NA,NYinput$wf_min[1:15],NA, NA, NA,NA)
+rd_bag <- c(NA,NA,NA,NA,NA, NYinput$rd_bag[1:15],NA, NA, NA,NA)
+rd_min <- c(NA,NA,NA,NA,NA, NYinput$rd_min[1:15],NA, NA, NA,NA)
+rd_max <- c(NA,NA,NA,NA,NA,NYinput$rd_max[1:15],NA, NA, NA,NA)
+pd_multiplier <- rep(1, each = 24)
+NYinput2 <- data.frame(dtrip2019, period, state, fluke_bag, fluke_min, fluke_max, bsb_bag, bsb_min, scup_bag, scup_min, wf_bag, wf_min, rd_bag, rd_min, rd_max, pd_multiplier)
+```
+
+Rhode Island
+```{r}
+RIinput <- inputtable$RI
+period <- c(1:24)
+fluke_bag <- rep(NA, each = 24)
+fluke_min <- rep(NA, each = 24)
+fluke_max <- rep(100, each = 24)
+state <- rep("RI", each = 24)
+dtrip2019 <- c(NA,NA,NA,NA,NA,NA,NA,NA,RIinput$dtrip_2019[1:11], NA, RIinput$dtrip_2019[12], NA, NA,NA)
+bsb_bag <- c(NA,NA,NA,NA,NA,NA,NA,NA,RIinput$bsb_bag[1:11], NA, RIinput$bsb_bag[12], NA, NA,NA)
+bsb_min <- c(NA,NA,NA,NA,NA,NA,NA,NA,RIinput$bsb_min[1:11], NA, RIinput$bsb_min[12], NA, NA,NA)
+scup_bag <- c(NA,NA,NA,NA,NA,NA,NA,NA, RIinput$scup_bag[1:11], NA, RIinput$scup_bag[12], NA, NA,NA)
+scup_min <- c(NA,NA,NA,NA,NA,NA,NA,NA, RIinput$scup_min[1:11], NA, RIinput$scup_min[12], NA, NA,NA)
+wf_bag <- c(NA,NA,NA,NA,NA,NA,NA,NA, RIinput$wf_bag[1:11], NA, RIinput$wf_bag[12], NA, NA,NA)
+wf_min <- c(NA,NA,NA,NA,NA,NA,NA,NA,RIinput$wf_min[1:11], NA, RIinput$wf_min[12], NA, NA,NA)
+rd_bag <- c(NA,NA,NA,NA,NA,NA,NA,NA,  RIinput$rd_bag[1:11], NA, RIinput$rd_bag[12], NA, NA,NA)
+rd_min <- c(NA,NA,NA,NA,NA,NA,NA,NA,  RIinput$rd_min[1:11], NA, RIinput$rd_min[12], NA, NA,NA)
+rd_max <- c(NA,NA,NA,NA,NA,NA,NA,NA, RIinput$rd_max[1:11], NA, RIinput$rd_max[12], NA, NA,NA)
+pd_multiplier <- rep(1, each = 24)
+RIinput2 <- data.frame(dtrip2019, period, state, fluke_bag, fluke_min, fluke_max, bsb_bag, bsb_min, scup_bag, scup_min, wf_bag, wf_min, rd_bag, rd_min, rd_max, pd_multiplier)
+```
+
+Maryland
+```{r}
+MDinput <- inputtable$MD
+period <- c(1:24)
+fluke_bag <- rep(NA, each = 24)
+fluke_min <- rep(NA, each = 24)
+fluke_max <- rep(100, each = 24)
+state <- rep("MD", each = 24)
+dtrip2019 <- c(NA,NA,NA,NA,NA,NA, MDinput$dtrip_2019[1:15], NA, NA,NA)
+bsb_bag <- c(NA,NA,NA,NA,NA,NA, MDinput$bsb_bag[1:15],NA, NA, NA)
+bsb_min <- c(NA,NA,NA,NA,NA,NA, MDinput$bsb_min[1:15],NA, NA, NA)
+scup_bag <- c(NA,NA,NA,NA,NA,NA, MDinput$scup_bag[1:15], NA, NA, NA)
+scup_min <- c(NA,NA,NA,NA,NA,NA, MDinput$scup_min[1:15],NA, NA, NA)
+wf_bag <- c(NA,NA,NA,NA,NA,NA, MDinput$wf_bag[1:15],NA, NA, NA)
+wf_min <- c(NA,NA,NA,NA,NA,NA,MDinput$wf_min[1:15],NA, NA, NA)
+rd_bag <- c(NA,NA,NA,NA,NA,NA,MDinput$rd_bag[1:15],NA, NA, NA)
+rd_min <- c(NA,NA,NA,NA,NA,NA,MDinput$rd_min[1:15],NA, NA, NA)
+rd_max <- c(NA,NA,NA,NA,NA,NA,MDinput$rd_max[1:15],NA, NA, NA)
+pd_multiplier <- rep(1, each = 24)
+MDinput2 <- data.frame(dtrip2019, period, state, fluke_bag, fluke_min, fluke_max, bsb_bag, bsb_min, scup_bag, scup_min, wf_bag, wf_min, rd_bag, rd_min, rd_max, pd_multiplier)
+```
+
+Virginia
+```{r}
+VAinput <- inputtable$VA
+period <- c(1:24)
+fluke_bag <- rep(NA, each = 24)
+fluke_min <- rep(NA, each = 24)
+fluke_max <- rep(100, each = 24)
+state <- rep("VA", each = 24)
+dtrip2019 <- c(NA,NA,NA,NA,NA,NA, VAinput$dtrip_2019[1:16], NA, NA)
+bsb_bag <- c(NA,NA,NA,NA,NA,NA, VAinput$bsb_bag[1:16],NA, NA)
+bsb_min <- c(NA,NA,NA,NA,NA,NA, VAinput$bsb_min[1:16],NA, NA)
+scup_bag <- c(NA,NA,NA,NA,NA,NA, VAinput$scup_bag[1:16], NA, NA)
+scup_min <- c(NA,NA,NA,NA,NA,NA, VAinput$scup_min[1:16],NA, NA)
+wf_bag <- c(NA,NA,NA,NA,NA,NA, VAinput$wf_bag[1:16],NA, NA)
+wf_min <- c(NA,NA,NA,NA,NA,NA,VAinput$wf_min[1:16],NA, NA)
+rd_bag <- c(NA,NA,NA,NA,NA,NA,VAinput$rd_bag[1:16],NA, NA)
+rd_min <- c(NA,NA,NA,NA,NA,NA,VAinput$rd_min[1:16],NA, NA)
+rd_max <- c(NA,NA,NA,NA,NA,NA,VAinput$rd_max[1:16],NA, NA)
+pd_multiplier <- rep(1, each = 24)
+VAinput2 <- data.frame(dtrip2019, period, state, fluke_bag, fluke_min, fluke_max, bsb_bag, bsb_min, scup_bag, scup_min, wf_bag, wf_min, rd_bag, rd_min, rd_max, pd_multiplier)
+```
+
+Connecticut
+```{r}
+CTinput <- inputtable$CT
+period <- c(1:24)
+fluke_bag <- rep(NA, each = 24)
+fluke_min <- rep(NA, each = 24)
+fluke_max <- rep(100, each = 24)
+state <- rep("CT", each = 24)
+dtrip2019 <- c(NA,NA,NA,NA,NA,NA,NA,NA,CTinput$dtrip_2019[1:12], NA, NA, NA,NA)
+bsb_bag <- c(NA,NA,NA,NA,NA,NA,NA,NA,CTinput$bsb_bag[1:12],  NA, NA, NA,NA)
+bsb_min <- c(NA,NA,NA,NA,NA,NA,NA,NA,CTinput$bsb_min[1:12], NA, NA, NA,NA)
+scup_bag <- c(NA,NA,NA,NA,NA,NA,NA,NA, CTinput$scup_bag[1:12], NA, NA, NA,NA)
+scup_min <- c(NA,NA,NA,NA,NA,NA,NA,NA, CTinput$scup_min[1:12], NA, NA, NA,NA)
+wf_bag <- c(NA,NA,NA,NA,NA,NA,NA,NA, CTinput$wf_bag[1:12], NA, NA, NA,NA)
+wf_min <- c(NA,NA,NA,NA,NA,NA,NA,NA, CTinput$wf_min[1:12], NA, NA, NA,NA)
+rd_bag <- c(NA,NA,NA,NA,NA,NA,NA,NA, CTinput$rd_bag[1:12], NA, NA, NA,NA)
+rd_min <- c(NA,NA,NA,NA,NA,NA,NA,NA, CTinput$rd_min[1:12], NA, NA, NA,NA)
+rd_max <- c(NA,NA,NA,NA,NA,NA,NA,NA, CTinput$rd_max[1:12], NA, NA, NA,NA)
+pd_multiplier <- rep(1, each = 24)
+CTinput2 <- data.frame(dtrip2019, period, state, fluke_bag, fluke_min, fluke_max, bsb_bag, bsb_min, scup_bag, scup_min, wf_bag, wf_min, rd_bag, rd_min, rd_max, pd_multiplier)
+```
+
+Delaware
+```{r}
+DEinput <- inputtable$DE
+period <- c(1:24)
+fluke_bag <- rep(NA, each = 24)
+fluke_min <- rep(NA, each = 24)
+fluke_max <- rep(100, each = 24)
+state <- rep("DE", each = 24)
+dtrip2019 <- c(NA,NA,NA,NA,NA,DEinput$dtrip_2019[1:16], NA, NA, NA)
+bsb_bag <- c(NA,NA,NA,NA,NA, DEinput$bsb_bag[1:16],NA, NA, NA)
+bsb_min <- c(NA,NA,NA,NA,NA, DEinput$bsb_min[1:16],NA, NA, NA)
+scup_bag <- c(NA,NA,NA,NA,NA, DEinput$scup_bag[1:16], NA, NA, NA)
+scup_min <- c(NA,NA,NA,NA,NA, DEinput$scup_min[1:16],NA, NA, NA)
+wf_bag <- c(NA,NA,NA,NA,NA, DEinput$wf_bag[1:16],NA, NA, NA)
+wf_min <- c(NA,NA,NA,NA,NA,DEinput$wf_min[1:16],NA, NA, NA)
+rd_bag <- c(NA,NA,NA,NA,NA, DEinput$rd_bag[1:16],NA, NA, NA)
+rd_min <- c(NA,NA,NA,NA,NA,DEinput$rd_min[1:16],NA, NA, NA)
+rd_max <- c(NA,NA,NA,NA,NA,DEinput$rd_max[1:16],NA, NA, NA)
+pd_multiplier <- rep(1, each = 24)
+DEinput2 <- data.frame(dtrip2019, period, state, fluke_bag, fluke_min, fluke_max, bsb_bag, bsb_min, scup_bag, scup_min, wf_bag, wf_min, rd_bag, rd_min, rd_max, pd_multiplier)
+```
+
+Massachusetts
+```{r}
+MAinput <- inputtable$MA
+period <- c(1:24)
+fluke_bag <- rep(NA, each = 24)
+fluke_min <- rep(NA, each = 24)
+fluke_max <- rep(100, each = 24)
+state <- rep("MA", each = 24)
+dtrip2019 <- c(NA,NA,NA,NA,NA,NA,NA, NA, NA, MAinput$dtrip_2019[1:11], NA,NA,NA,NA)
+bsb_bag <- c(NA,NA,NA,NA,NA,NA,NA,NA, NA, MAinput$bsb_bag[1:11],NA,NA,NA,NA)
+bsb_min <- c(NA,NA,NA,NA,NA,NA,NA,NA, NA, MAinput$bsb_min[1:11],NA,NA,NA,NA)
+scup_bag <- c(NA,NA,NA,NA,NA,NA,NA,NA, NA, MAinput$scup_bag[1:11],NA,NA,NA,NA)
+scup_min <- c(NA,NA,NA,NA,NA,NA,NA,NA, NA, MAinput$scup_min[1:11],NA,NA,NA,NA)
+wf_bag <- c(NA,NA,NA,NA,NA,NA,NA,NA, NA, MAinput$wf_bag[1:11],NA,NA,NA,NA)
+wf_min <- c(NA,NA,NA,NA,NA,NA,NA,NA, NA, MAinput$wf_min[1:11],NA,NA,NA,NA)
+rd_bag <- c(NA,NA,NA,NA,NA,NA,NA,NA,NA,  MAinput$rd_bag[1:11],NA,NA,NA,NA)
+rd_min <- c(NA,NA,NA,NA,NA,NA,NA,NA, NA, MAinput$rd_min[1:11],NA,NA,NA,NA)
+rd_max <- c(NA,NA,NA,NA,NA,NA,NA,NA, NA, MAinput$rd_max[1:11],NA,NA,NA,NA)
+pd_multiplier <- rep(1, each = 24)
+MAinput2 <- data.frame(dtrip2019, period, state, fluke_bag, fluke_min, fluke_max, bsb_bag, bsb_min, scup_bag, scup_min, wf_bag, wf_min, rd_bag, rd_min, rd_max, pd_multiplier)
+```
+
+Aggregate
+```{r}
+blankinputtables <- list(
+ NJinput2 = NJinput2,
+ NYinput2 = NYinput2,
+ DEinput2 = DEinput2,
+ VAinput2 = VAinput2,
+ MDinput2 = MDinput2,
+ NCinput2 = NCinput2,
+ MAinput2 = MAinput2,
+ RIinput2 = RIinput2,
+ CTinput2 = CTinput2
+)
+
+#saveRDS(blankinputtables, file = "blankinputtables.rds")
+#readRDS("blankinputtables.rds")
+```
