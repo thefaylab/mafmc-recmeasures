@@ -31,6 +31,7 @@ Alternative = "Table1"
 #Table 1 = Percent Change Approach
 #Table 2 = Biological Reference Point Approach
 #Table 3 = Biomass Based Matrix Approach
+#Table 4 = Overfishing Based Matrix Approach 
 ```
 
 Determine Expected Catch Given Current Regulations from Lookup Table:
@@ -287,6 +288,38 @@ catchallstates_commonreg_HCR
 
 ```
 
+Overfishing Based Matrix Approach
+```{r}
+
+#Liberalization/Reduction Measures
+Bin1 <- 1.4
+Bin2 <- 1.2
+Bin3 <- 1.1
+Bin4 <- 1
+Bin5 <- 0.9
+Bin6 <- 0.8
+Bin7 <- 0.6
+
+if(Alternative=="Table4"){
+
+if(F > FMSY){Overfishing = "yes"}
+if(F <= FMSY){Overfishing = "no"}
+
+if(BBMSY >= 1.5 & Overfishing == "no"){x <- Bin1}
+if(BBMSY >= 1.5 & Overfishing == "yes"){x <- Bin4}
+if(BBMSY < 1.5 & BBMSY >= 1 & Overfishing == "no"){x <- Bin2}
+if(BBMSY < 1.5 & BBMSY >= 1 & Overfishing == "yes"){x <- Bin5}
+if(BBMSY < 1 & BBMSY >= 0.5 & Overfishing == "no"){x <- Bin3}
+if(BBMSY < 1 & BBMSY >= 0.5 & Overfishing == "yes"){x <- Bin6}
+if(BBMSY < 0.5){x <- Bin7}
+
+  # calculates target catch based off of degree of liberalization/reduction
+catchallstates_commonreg_HCR <- catchallstates_commonreg
+catchallstates_commonreg_HCR$land <- x*catchallstates_commonreg_HCR$land
+catchallstates_commonreg_HCR
+}
+
+```
 
 Lookup Expected Catch/Discards + Return Regs: 
 
@@ -1111,4 +1144,9 @@ if(Alternative == "Table3"){
 #BBM_BioInformed_CatchTable_NYRegs <- readRDS("BBM_BiologicallyInformed_CatchTable_NYRegs.rds")
 }
 
+#Overfishing Based Matrix Approach 
+if(Alternative == "Table4"){
+ #saveRDS(finaltable1, file = "OBM_BiologicallyInformed_CatchTable_NYRegs.rds")
+#BBM_BioInformed_CatchTable_NYRegs <- readRDS("OBM_BiologicallyInformed_CatchTable_NYRegs.rds")
+}
 ```
