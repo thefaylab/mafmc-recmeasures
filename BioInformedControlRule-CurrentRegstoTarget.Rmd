@@ -113,7 +113,7 @@ lowerCI_test
 Control Rules:
 
 Percent Change Approach Bin Structure:
-````{r}
+```{r}
 # Inputs 
 # For now I just left all of the relevant inputs in each chunk
 RHL <- 6350000 # I just pulled this RHL value off the internet for now
