@@ -1,0 +1,520 @@
+---
+title: "GAMPredictScale"
+author: "Kamran Walsh"
+date: "2024-04-29"
+output: html_document
+---
+
+```{r}
+setwd("/Users/kam-macpro/Desktop/FlounderMSE")
+fluke <- readRDS("/Users/kam-macpro/Desktop/FlounderMSE/state_lookup.rds")
+#View(fluke)
+library(dplyr)
+library(tidyr)
+library(data.table)
+flukecatch <- tibble(fluke)
+```
+
+```{r}
+
+len <- seq(10,28)
+#states <- c("DE", "MD", "NJ", "NY", "VA", "CT", "MA", "RI", "NC")
+#waves <- 2:6
+#Bag <- bag #9 calls to the gam with state constrained
+#MinLen <- minlen
+#SeasLen <- catchallstates_commonreg$SeasonLen[1]
+
+```
+
+Delaware
+No option for 365 day season, did number of days fished in regulations_option1 sheet
+```{r}
+#Regs
+len <- seq(10,28)
+waves <- 2:6
+Bag <- 4 #9 calls to the gam with state constrained
+MinLen <- 16.5
+SeasLen <-  245
+
+mround <- function(x,base){
+  base*round(x/base)
+}
+
+wave_seasons <- data.frame(seas = seq(60,300,15),
+                           w2 = c(rep(0,9),seq(15,60,15),rep(60,4)),
+                           w3 = c(rep(0,1),seq(15,60,15),rep(60,12)),
+                           w4 = rep(60,17),
+                           w5 = c(rep(0,5),seq(15,60,15),rep(60,8)),
+                           w6 = c(rep(0,13),seq(15,60,15)))
+ 
+ dat.all <- expand.grid(State = "DE",
+                           Length = len, 
+                           Bag = Bag,
+                           MinLen = MinLen,
+                           Wave = waves
+)
+dat.all$SeasonLen <- as.numeric(wave_seasons[wave_seasons$seas==as.integer(mround(as.numeric(SeasLen),15)),-1])[dat.all$Wave-1]
+
+# dat.all$SeasonLen <- SeasonLen[dat.all$Wave-1]
+library(mgcv)
+gamland <- readRDS("gam_land.rds")  
+summary(gamland)
+gamfit <- predict.gam(gamland, newdata = dat.all, type = "link" , se.fit = TRUE)
+
+#fit with log(x) ~ instead of x ~
+
+#lognormal CI
+upr <- exp(gamfit$fit + (1.96 * gamfit$se.fit))
+lwr <- exp(gamfit$fit - (1.96 * gamfit$se.fit))
+
+# Extract upper + lower CIs
+output2 = cbind(dat.all, gamfit, lwr, upr)
+
+expectedDE <- sum(exp(output2$fit))
+expectedDE
+
+#outputland <- sum(output2$fit)
+#outputland
+
+upperCI_testDE <- sum(output2$upr)
+upperCI_testDE
+lowerCI_testDE <- sum(output2$lwr)
+lowerCI_testDE
+```
+
+
+Maryland
+No option for 365 day season, did number of days fished in regulations_option1 sheet
+I assume no need to worry about the greater regulatory complexity, e.g. NJ, CT, and RI shore sites, NJ/DE Bay, PRFC
+```{r}
+#Regs
+len <- seq(10,28)
+waves <- 2:6
+Bag <- 4 #9 calls to the gam with state constrained
+MinLen <- 16.5
+SeasLen <- 229
+
+mround <- function(x,base){
+  base*round(x/base)
+}
+
+wave_seasons <- data.frame(seas = seq(60,300,15),
+                           w2 = c(rep(0,9),seq(15,60,15),rep(60,4)),
+                           w3 = c(rep(0,1),seq(15,60,15),rep(60,12)),
+                           w4 = rep(60,17),
+                           w5 = c(rep(0,5),seq(15,60,15),rep(60,8)),
+                           w6 = c(rep(0,13),seq(15,60,15)))
+ 
+ dat.all <- expand.grid(State = "MD",
+                           Length = len, 
+                           Bag = Bag,
+                           MinLen = MinLen,
+                           Wave = waves
+)
+dat.all$SeasonLen <- as.numeric(wave_seasons[wave_seasons$seas==as.integer(mround(as.numeric(SeasLen),15)),-1])[dat.all$Wave-1]
+
+# dat.all$SeasonLen <- SeasonLen[dat.all$Wave-1]
+gamfit <- predict.gam(gamland, newdata = dat.all, type = "link" , se.fit = TRUE)
+
+#lognormal CI
+upr <- exp(gamfit$fit + (1.96 * gamfit$se.fit))
+lwr <- exp(gamfit$fit - (1.96 * gamfit$se.fit))
+
+# Extract upper + lower CIs
+output2 = cbind(dat.all, gamfit, lwr, upr)
+
+expectedMD <- sum(exp(output2$fit))
+expectedMD
+
+#outputland <- sum(output2$fit)
+#outputland
+
+upperCI_testMD <- sum(output2$upr)
+upperCI_testMD
+lowerCI_testMD <- sum(output2$lwr)
+lowerCI_testMD
+```
+
+Virginia 
+No option for 365 day season, did number of days fished in regulations_option1 sheet
+```{r}
+#Regs
+len <- seq(10,28)
+waves <- 2:6
+Bag <- 4 #9 calls to the gam with state constrained
+MinLen <- 16.5
+SeasLen <- 244
+
+mround <- function(x,base){
+  base*round(x/base)
+}
+
+wave_seasons <- data.frame(seas = seq(60,300,15),
+                           w2 = c(rep(0,9),seq(15,60,15),rep(60,4)),
+                           w3 = c(rep(0,1),seq(15,60,15),rep(60,12)),
+                           w4 = rep(60,17),
+                           w5 = c(rep(0,5),seq(15,60,15),rep(60,8)),
+                           w6 = c(rep(0,13),seq(15,60,15)))
+ 
+ dat.all <- expand.grid(State = "VA",
+                           Length = len,
+                           Bag = Bag,
+                           MinLen = MinLen,
+                           Wave = waves
+)
+dat.all$SeasonLen <- as.numeric(wave_seasons[wave_seasons$seas==as.integer(mround(as.numeric(SeasLen),15)),-1])[dat.all$Wave-1]
+
+# dat.all$SeasonLen <- SeasonLen[dat.all$Wave-1]
+gamfit <- predict.gam(gamland, newdata = dat.all, type = "link" , se.fit = TRUE)
+
+#lognormal CI
+upr <- exp(gamfit$fit + (1.96 * gamfit$se.fit))
+lwr <- exp(gamfit$fit - (1.96 * gamfit$se.fit))
+
+# Extract upper + lower CIs
+output2 = cbind(dat.all, gamfit, lwr, upr)
+
+expectedVA <- sum(exp(output2$fit))
+expectedVA
+
+#outputland <- sum(output2$fit)
+#outputland
+
+upperCI_testVA <- sum(output2$upr)
+upperCI_testVA
+lowerCI_testVA <- sum(output2$lwr)
+lowerCI_testVA
+```
+
+North Carolina
+
+For here I did the open season since it allowed the GAM to produce estimates
+```{r}
+#Regs
+len <- seq(10,28)
+waves <- 2:6
+Bag <- 4 #9 calls to the gam with state constrained
+MinLen <- 15
+SeasLen <- 235
+
+mround <- function(x,base){
+  base*round(x/base)
+}
+
+wave_seasons <- data.frame(seas = seq(60,300,15),
+                           w2 = c(rep(0,9),seq(15,60,15),rep(60,4)),
+                           w3 = c(rep(0,1),seq(15,60,15),rep(60,12)),
+                           w4 = rep(60,17),
+                           w5 = c(rep(0,5),seq(15,60,15),rep(60,8)),
+                           w6 = c(rep(0,13),seq(15,60,15)))
+ 
+ dat.all <- expand.grid(State = "NC",
+                           Length = len, 
+                           Bag = Bag,
+                           MinLen = MinLen,
+                           Wave = waves
+)
+dat.all$SeasonLen <- as.numeric(wave_seasons[wave_seasons$seas==as.integer(mround(as.numeric(SeasLen),15)),-1])[dat.all$Wave-1]
+
+# dat.all$SeasonLen <- SeasonLen[dat.all$Wave-1]
+gamfit <- predict.gam(gamland, newdata = dat.all, type = "link" , se.fit = TRUE)
+
+#lognormal CI
+upr <- exp(gamfit$fit + (1.96 * gamfit$se.fit))
+lwr <- exp(gamfit$fit - (1.96 * gamfit$se.fit))
+
+# Extract upper + lower CIs
+output2 = cbind(dat.all, gamfit, lwr, upr)
+
+expectedNC <- sum(exp(output2$fit))
+expectedNC
+
+#outputland <- sum(output2$fit)
+#outputland
+
+upperCI_testNC <- sum(output2$upr)
+upperCI_testNC
+lowerCI_testNC <- sum(output2$lwr)
+lowerCI_testNC
+```
+
+Massachusetts
+```{r}
+#Regs
+len <- seq(10,28)
+waves <- 2:6
+Bag <- 5 #9 calls to the gam with state constrained
+MinLen <- 17
+SeasLen <- 140
+
+mround <- function(x,base){
+  base*round(x/base)
+}
+
+wave_seasons <- data.frame(seas = seq(60,300,15),
+                           w2 = c(rep(0,9),seq(15,60,15),rep(60,4)),
+                           w3 = c(rep(0,1),seq(15,60,15),rep(60,12)),
+                           w4 = rep(60,17),
+                           w5 = c(rep(0,5),seq(15,60,15),rep(60,8)),
+                           w6 = c(rep(0,13),seq(15,60,15)))
+ 
+ dat.all <- expand.grid(State = "MA",
+                           Length = len,
+                           Bag = Bag,
+                           MinLen = MinLen,
+                           Wave = waves
+)
+dat.all$SeasonLen <- as.numeric(wave_seasons[wave_seasons$seas==as.integer(mround(as.numeric(SeasLen),15)),-1])[dat.all$Wave-1]
+
+# dat.all$SeasonLen <- SeasonLen[dat.all$Wave-1]
+gamfit <- predict.gam(gamland, newdata = dat.all, type = "link" , se.fit = TRUE)
+
+#lognormal CI
+upr <- exp(gamfit$fit + (1.96 * gamfit$se.fit))
+lwr <- exp(gamfit$fit - (1.96 * gamfit$se.fit))
+
+# Extract upper + lower CIs
+output2 = cbind(dat.all, gamfit, lwr, upr)
+
+expectedMA <- sum(exp(output2$fit))
+expectedMA
+
+#outputland <- sum(output2$fit)
+#outputland
+
+upperCI_testMA <- sum(output2$upr)
+upperCI_testMA
+lowerCI_testMA <- sum(output2$lwr)
+lowerCI_testMA
+```
+
+Rhode Island 
+```{r}
+#Regs
+len <- seq(10,28)
+waves <- 2:6
+Bag <- 6 #9 calls to the gam with state constrained
+MinLen <- 19
+SeasLen <- 243
+
+mround <- function(x,base){
+  base*round(x/base)
+}
+
+wave_seasons <- data.frame(seas = seq(60,300,15),
+                           w2 = c(rep(0,9),seq(15,60,15),rep(60,4)),
+                           w3 = c(rep(0,1),seq(15,60,15),rep(60,12)),
+                           w4 = rep(60,17),
+                           w5 = c(rep(0,5),seq(15,60,15),rep(60,8)),
+                           w6 = c(rep(0,13),seq(15,60,15)))
+ 
+ dat.all <- expand.grid(State = "RI",
+                           Length = len,
+                           Bag = Bag,
+                           MinLen = MinLen,
+                           Wave = waves
+)
+dat.all$SeasonLen <- as.numeric(wave_seasons[wave_seasons$seas==as.integer(mround(as.numeric(SeasLen),15)),-1])[dat.all$Wave-1]
+
+# dat.all$SeasonLen <- SeasonLen[dat.all$Wave-1]
+gamfit <- predict.gam(gamland, newdata = dat.all, type = "link" , se.fit = TRUE)
+
+#lognormal CI
+upr <- exp(gamfit$fit + (1.96 * gamfit$se.fit))
+lwr <- exp(gamfit$fit - (1.96 * gamfit$se.fit))
+
+# Extract upper + lower CIs
+output2 = cbind(dat.all, gamfit, lwr, upr)
+
+expectedRI <- sum(exp(output2$fit))
+expectedRI
+
+#outputland <- sum(output2$fit)
+#outputland
+
+upperCI_testRI <- sum(output2$upr)
+upperCI_testRI
+lowerCI_testRI <- sum(output2$lwr)
+lowerCI_testRI
+```
+
+CT
+```{r}
+#Regs
+len <- seq(10,28)
+waves <- 2:6
+Bag <- 4 #9 calls to the gam with state constrained
+MinLen <- 19
+SeasLen <- 150
+
+mround <- function(x,base){
+  base*round(x/base)
+}
+
+wave_seasons <- data.frame(seas = seq(60,300,15),
+                           w2 = c(rep(0,9),seq(15,60,15),rep(60,4)),
+                           w3 = c(rep(0,1),seq(15,60,15),rep(60,12)),
+                           w4 = rep(60,17),
+                           w5 = c(rep(0,5),seq(15,60,15),rep(60,8)),
+                           w6 = c(rep(0,13),seq(15,60,15)))
+ 
+ dat.all <- expand.grid(State = "CT",
+                           Length = len, 
+                           Bag = Bag,
+                           MinLen = MinLen,
+                           Wave = waves
+)
+dat.all$SeasonLen <- as.numeric(wave_seasons[wave_seasons$seas==as.integer(mround(as.numeric(SeasLen),15)),-1])[dat.all$Wave-1]
+
+# dat.all$SeasonLen <- SeasonLen[dat.all$Wave-1]
+gamfit <- predict.gam(gamland, newdata = dat.all, type = "link" , se.fit = TRUE)
+
+#lognormal CI
+upr <- exp(gamfit$fit + (1.96 * gamfit$se.fit))
+lwr <- exp(gamfit$fit - (1.96 * gamfit$se.fit))
+
+# Extract upper + lower CIs
+output2 = cbind(dat.all, gamfit, lwr, upr)
+
+expectedCT <- sum(exp(output2$fit))
+expectedCT
+
+#outputland <- sum(output2$fit)
+#outputland
+
+upperCI_testCT <- sum(output2$upr)
+upperCI_testCT
+lowerCI_testCT <- sum(output2$lwr)
+lowerCI_testCT
+
+```
+
+New York 
+```{r}
+#Regs
+len <- seq(10,28)
+waves <- 2:6
+Bag <- 4 #9 calls to the gam with state constrained
+MinLen <- 19
+SeasLen <- 150
+
+mround <- function(x,base){
+  base*round(x/base)
+}
+
+wave_seasons <- data.frame(seas = seq(60,300,15),
+                           w2 = c(rep(0,9),seq(15,60,15),rep(60,4)),
+                           w3 = c(rep(0,1),seq(15,60,15),rep(60,12)),
+                           w4 = rep(60,17),
+                           w5 = c(rep(0,5),seq(15,60,15),rep(60,8)),
+                           w6 = c(rep(0,13),seq(15,60,15)))
+ 
+ dat.all <- expand.grid(State = "NY",
+                           Length = len, 
+                           Bag = Bag,
+                           MinLen = MinLen,
+                           Wave = waves
+)
+dat.all$SeasonLen <- as.numeric(wave_seasons[wave_seasons$seas==as.integer(mround(as.numeric(SeasLen),15)),-1])[dat.all$Wave-1]
+
+# dat.all$SeasonLen <- SeasonLen[dat.all$Wave-1]
+gamfit <- predict.gam(gamland, newdata = dat.all, type = "link" , se.fit = TRUE)
+
+#lognormal CI
+upr <- exp(gamfit$fit + (1.96 * gamfit$se.fit))
+lwr <- exp(gamfit$fit - (1.96 * gamfit$se.fit))
+
+# Extract upper + lower CIs
+output2 = cbind(dat.all, gamfit, lwr, upr)
+
+expectedNY <- sum(exp(output2$fit))
+expectedNY
+
+#outputland <- sum(output2$fit)
+#outputland
+
+upperCI_testNY <- sum(output2$upr)
+upperCI_testNY
+lowerCI_testNY <- sum(output2$lwr)
+lowerCI_testNY
+
+```
+
+New Jersey
+```{r}
+#Regs
+len <- seq(10,28)
+waves <- 2:6
+Bag <- 3 #9 calls to the gam with state constrained
+MinLen <- 18
+SeasLen <- 121
+
+mround <- function(x,base){
+  base*round(x/base)
+}
+
+wave_seasons <- data.frame(seas = seq(60,300,15),
+                           w2 = c(rep(0,9),seq(15,60,15),rep(60,4)),
+                           w3 = c(rep(0,1),seq(15,60,15),rep(60,12)),
+                           w4 = rep(60,17),
+                           w5 = c(rep(0,5),seq(15,60,15),rep(60,8)),
+                           w6 = c(rep(0,13),seq(15,60,15)))
+ 
+ dat.all <- expand.grid(State = "NJ",
+                           Length = len, 
+                           Bag = Bag,
+                           MinLen = MinLen,
+                           Wave = waves
+)
+dat.all$SeasonLen <- as.numeric(wave_seasons[wave_seasons$seas==as.integer(mround(as.numeric(SeasLen),15)),-1])[dat.all$Wave-1]
+
+# dat.all$SeasonLen <- SeasonLen[dat.all$Wave-1]
+gamfit <- predict.gam(gamland, newdata = dat.all, type = "link" , se.fit = TRUE)
+
+#lognormal CI
+upr <- exp(gamfit$fit + (1.96 * gamfit$se.fit))
+lwr <- exp(gamfit$fit - (1.96 * gamfit$se.fit))
+
+# Extract upper + lower CIs
+output2 = cbind(dat.all, gamfit, lwr, upr)
+
+expectedNJ <- sum(exp(output2$fit))
+expectedNJ
+
+#outputland <- sum(output2$fit)
+#outputland
+
+upperCI_testNJ <- sum(output2$upr)
+upperCI_testNJ
+lowerCI_testNJ <- sum(output2$lwr)
+lowerCI_testNJ
+```
+
+Sum
+```{r}
+# Coastwide expected landings 
+sumstates1 <- expectedDE + expectedMD + expectedVA + expectedNC + expectedMA + expectedRI + expectedCT + expectedNY +
+expectedNJ
+sumstates1
+
+#Rec demand estimates from Lou
+harvestrecdemand <- 8826699
+sdrecdemand <- 530839
+CVrecdemand <- 0.06
+
+#Scaling factor
+
+#I'm not sure if the RHL is supposed to be scaled up or down (e.g. is RHL on the scale of the rec demand or the GAM?)
+
+SFup <- harvestrecdemand/sumstates1 
+SFup
+
+SFdown <- sumstates1/harvestrecdemand
+SFdown
+
+#Notes from meeting:
+#scale the RHL from 2019 to now using scaling factor gained from comparing gam 2019 regulations predicted catch to rec demand model predicted catch 
+#multiply RHL by scaling factor when comparing to CI boundaries 
+
+```
+
