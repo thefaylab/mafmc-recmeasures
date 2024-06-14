@@ -1,5 +1,5 @@
 #Number of simulations
-1
+3
 #seed
 -284719
 -387251

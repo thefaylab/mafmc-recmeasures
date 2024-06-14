@@ -11,7 +11,7 @@
 #frequency of assessment, update RBC (every n yrs)
 2
 #tier rule
-62
+63
 #number of years to base allocation estimation on
 1
 #min catch in mt (ie if RBC = 0)
