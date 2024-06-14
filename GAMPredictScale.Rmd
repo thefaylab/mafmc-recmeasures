@@ -6,11 +6,17 @@ output: html_document
 ---
 
 ```{r}
+<<<<<<< HEAD
 #setwd("/Users/kam-macpro/Desktop/FlounderMSE")
 #fluke <- readRDS("/Users/kam-macpro/Desktop/FlounderMSE/state_lookup.rds")
 fluke <- readRDS("mse/state_lookup.rds")
 #View(fluke)
 
+=======
+setwd("/Users/kam-macpro/Desktop/FlounderMSE")
+fluke <- readRDS("/Users/kam-macpro/Desktop/FlounderMSE/state_lookup.rds")
+#View(fluke)
+>>>>>>> 2a1de337a2d1484806ef9e4d51bce7b8157ca000
 library(dplyr)
 library(tidyr)
 library(data.table)
@@ -25,9 +31,12 @@ len <- seq(10,28)
 #Bag <- bag #9 calls to the gam with state constrained
 #MinLen <- minlen
 #SeasLen <- catchallstates_commonreg$SeasonLen[1]
+<<<<<<< HEAD
 #separate prediction of 2019 catch from gam given 2019 regulations 
 #scale the RHL from 2019 to now using scaling factor gained from comparing gam 2019 regulations predicted catch to rec demand model predicted catch 
 # multiply RHL by scaling factor when comparing to CI boundaries 
+=======
+>>>>>>> 2a1de337a2d1484806ef9e4d51bce7b8157ca000
 
 ```
 
@@ -62,7 +71,11 @@ dat.all$SeasonLen <- as.numeric(wave_seasons[wave_seasons$seas==as.integer(mroun
 
 # dat.all$SeasonLen <- SeasonLen[dat.all$Wave-1]
 library(mgcv)
+<<<<<<< HEAD
 gamland <- readRDS("mse/gam_land.rds")  
+=======
+gamland <- readRDS("gam_land.rds")  
+>>>>>>> 2a1de337a2d1484806ef9e4d51bce7b8157ca000
 summary(gamland)
 gamfit <- predict.gam(gamland, newdata = dat.all, type = "link" , se.fit = TRUE)
 
@@ -502,17 +515,36 @@ sumstates1 <- expectedDE + expectedMD + expectedVA + expectedNC + expectedMA + e
 expectedNJ
 sumstates1
 
+<<<<<<< HEAD
 #Rec demand estimates
+=======
+#Rec demand estimates from Lou
+>>>>>>> 2a1de337a2d1484806ef9e4d51bce7b8157ca000
 harvestrecdemand <- 8826699
 sdrecdemand <- 530839
 CVrecdemand <- 0.06
 
 #Scaling factor
+<<<<<<< HEAD
 SF <- harvestrecdemand/sumstates1
 SF
 
 #scale the RHL from 2019 to now using scaling factor gained from comparing gam 2019 regulations predicted catch to rec demand model predicted catch 
 # multiply RHL by scaling factor when comparing to CI boundaries 
+=======
+
+#I'm not sure if the RHL is supposed to be scaled up or down (e.g. is RHL on the scale of the rec demand or the GAM?)
+
+SFup <- harvestrecdemand/sumstates1 
+SFup
+
+SFdown <- sumstates1/harvestrecdemand
+SFdown
+
+#Notes from meeting:
+#scale the RHL from 2019 to now using scaling factor gained from comparing gam 2019 regulations predicted catch to rec demand model predicted catch 
+#multiply RHL by scaling factor when comparing to CI boundaries 
+>>>>>>> 2a1de337a2d1484806ef9e4d51bce7b8157ca000
 
 ```
 
