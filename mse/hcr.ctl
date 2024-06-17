@@ -7,7 +7,7 @@
 #
 #########################################################################################
 #Number of years for projection
-26
+4 #26
 #frequency of assessment, update RBC (every n yrs)
 2
 #tier rule

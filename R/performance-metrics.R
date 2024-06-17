@@ -268,9 +268,10 @@ read_results <- function(scendir = "~/Dropbox/fluke-mse/07-01/",scen.name="mgmt_
                          fsim = 1) {
   
  # scendir <- "~/Dropbox/fluke-mse/sims/2022-07-25/01-01/"
- # scen.name="MP 1"
- # om.name = 1
- # fsim = 1
+  #scendir = "~/research/mafmc-recmeasures/sims/001/"
+  #scen.name="MP 1"
+  #om.name = 1
+  #fsim = 1
   print(scendir)
 
 spawbio <- read.table(paste0(scendir,"spawbio.out"), header = TRUE)
@@ -284,6 +285,7 @@ names(spawbio) <- str_sub(names(spawbio), start=2)
 names(totcatch) <- str_sub(names(totcatch), start=2)
 if(om.name!=1) names(sexcatch) <- str_sub(names(sexcatch), start=2)
 names(fout) <- str_sub(names(fout), start=2)
+nsim = length(unique(rbctrack[,1]))
 results <- spawbio %>% 
   as_tibble() %>% 
   rowid_to_column(var = "isim") %>% 
@@ -322,7 +324,7 @@ nyrs <- length(unique(recoutput[,2]))
 # recoutput <-  temp %>% 
 #   slice((1:(nsim*nyrs)))
 
-recoutput[,1] <- rep(1:100, each = 2*nyrs)
+recoutput[,1] <- rep(1:nsim, each = 2*nyrs)
 res3 <- recoutput[,1:4] %>% as_tibble()
 names(res3) <- c("isim", "year", "type", "number") #,"trips")
 res3 <- res3 %>% 
@@ -345,11 +347,11 @@ nyrs <- length(unique(recoutput2[,2]))
 # nsim <- floor(nrow(temp)/nyrs)
 # recoutput2 <-  temp %>% 
 #   slice((1:(nsim*nyrs*10)))
-recoutput2[,1] <- rep(1:100, each = 10*nyrs)
-# names(recoutput2) <- c("isim","year","state","n_keep","n_release","ntrips","nchoice","change_cs","cost",
-#                        "keep_one", "mulen_keep","mulen_release","trophy")
-names(recoutput2) <- c("isim","year","state","ntrips","nchoice","change_cs","cost",
-                       "keep_one", "mulen_keep","mulen_release","trophy")
+recoutput2[,1] <- rep(1:nsim, each = 10*nyrs)
+names(recoutput2) <- c("isim","year","state","n_keep","n_release","ntrips","nchoice","change_cs","cost",
+                        "keep_one", "mulen_keep","mulen_release","trophy")
+#names(recoutput2) <- c("isim","year","state","ntrips","nchoice","change_cs","cost",
+#                       "keep_one", "mulen_keep","mulen_release","trophy")
 coast_recoutput <- recoutput2 %>% 
   filter(state == 1)
 
@@ -371,10 +373,10 @@ rbc2 <- rbctrack %>%
   I()
 rbc2 <- rbctrack %>% 
   tibble() %>% 
-  select(1,2,4,15,9,10,11,12,18) %>% 
+  select(1,2,4,8,9,11,12,18,15:17) %>% 
   I()
 #names(rbc2) <- c("isim","year","abc","fmsy","est_ofl","true_ofl","rhl","bmsy","msy","fem_ssb")
-names(rbc2) <- c("isim","year","abc","fmsy","est_ofl","true_ofl","rhl","bmsy","msy")
+names(rbc2) <- c("isim","year","abc","fmsy","est_ofl","rhl","bmsy","exp_keep","seaslen","bag","minlen") #,"msy")
 rbc2 <- rbc2 %>% 
   mutate(year = 2019 + 2*year - 1) %>% 
   I()
@@ -388,7 +390,7 @@ results <- results %>%
 
 temp <- results %>% 
   filter(year!=2019) %>% 
-  fill("abc","fmsy","est_ofl","true_ofl","rhl","bmsy","msy")
+  fill("abc","fmsy","est_ofl",,"rhl","bmsy","exp_keep","seaslen","bag","minlen")
 
 results <- results %>% 
   filter(year==2019) %>% 
@@ -401,13 +403,14 @@ results <- results %>%
 # coast_results <- coast_results %>% 
 #   left_join(refpts)
 
-res4 <- fout %>% 
-  as_tibble() %>% 
-  rowid_to_column(var = "isim") %>% 
-  pivot_longer(cols= 2:ncol(.), names_to = "year", values_to = "frate") %>% 
-  mutate(year = as.integer(year)) %>% 
+# 2024-06-14 GF commenting out because F is coming from rbctrack.out file (currently estF)
+res4 <- fout %>%
+  as_tibble() %>%
+  rowid_to_column(var = "isim") %>%
+  pivot_longer(cols= 2:ncol(.), names_to = "year", values_to = "frate") %>%
+  mutate(year = as.integer(year)) %>%
   I()
-results <- results %>% 
+results <- results %>%
   left_join(res4)
 
 if(om.name!=1)  {
@@ -454,7 +457,8 @@ diag_ts <- results %>%
          "expense" = cost,
          cs_per_trip = change_cs/ntrips,
          rec_removals = keep_wt + release_wt,
-         keep_one = keep_one/ntrips)  %>% 
+         keep_one = keep_one/ntrips,
+         keep_to_exp = 1000*keep_num / (0.39*exp_keep))  %>% 
   select(om, scenario, isim, year, biomass, totcat_wt, rec_removals, keep_to_rel, "kept per trip", "rel per trip",
          "F/Fref", "B/Bref",
          mulen_keep,
@@ -465,7 +469,12 @@ diag_ts <- results %>%
          ntrips,
          keep_one,
          cs_per_trip,
-         prop_female
+         prop_female,
+         keep_to_exp,
+         bag,
+         minlen,
+         seaslen,
+         exp_keep
          ) %>% 
   rename("spawning biomass" = biomass,
          "total catch" = totcat_wt,
@@ -482,7 +491,12 @@ diag_ts <- results %>%
                       ntrips,
                       keep_one,
                       cs_per_trip,
-                      prop_female
+                      prop_female,
+                      keep_to_exp,
+                      bag,
+                      minlen,
+                      seaslen,
+                      exp_keep
                       ),names_to = "type", values_to = "value") %>% 
   I()
  return(diag_ts)
@@ -523,234 +537,41 @@ names(sexcatch) <- str_sub(names(sexcatch), start=2)
 #results <- read_results(scendir = "~/Dropbox/fluke-mse/07-01/",scen.name="mgmt_scenario_7")
 
 #change the folder names for the scenarios you want to summarize results for and give them a unique name
-# params <- list(
-# scendir <- c("~/Dropbox/fluke-mse/01-01/",
-#              "~/Dropbox/fluke-mse/04-01/",
-#              "~/Dropbox/fluke-mse/07-01/",
-#              "~/Dropbox/fluke-mse/sims/01-02/",
-#              "~/Dropbox/fluke-mse/sims/01-03/",
-#              #"~/Dropbox/fluke-mse/sims/01-04/",
-#              "~/Dropbox/fluke-mse/sims/04-02/",
-#              "~/Dropbox/fluke-mse/sims/04-03/",
-#              #"~/Dropbox/fluke-mse/sims/04-04/",
-#              "~/Dropbox/fluke-mse/sims/07-02/",
-#              "~/Dropbox/fluke-mse/sims/07-03/",
-#              "~/Dropbox/fluke-mse/mbp/01-04/",
-#              "~/Dropbox/fluke-mse/mbp/04-04/",
-#              "~/Dropbox/fluke-mse/mbp/07-04/"),
-# scen.name <- c("MP 1",
-#                "MP 4",
-#                "MP 7",
-#                "MP 1",
-#                "MP 1",
-#                "MP 4",
-#                "MP 4",
-#                "MP 7",
-#                "MP 7",
-#                "MP 1",
-#                "MP 4",
-#                "MP 7"),
-# fsim <- c(1, 1, 1, 26, 51,26, 51, 26, 51,76,76,76))
-# 
-# params <- list(
-#   scendir <- c("~/Dropbox/fluke-mse/01-01/",
-#                "~/Dropbox/fluke-mse/sims/01-02/",
-#                "~/Dropbox/fluke-mse/sims/01-03/",
-#                "~/Dropbox/fluke-mse/mbp/01-04/",
-#                "~/Dropbox/fluke-mse/sims/02-01/",
-#                "~/Dropbox/fluke-mse/sims/02-02/",
-#                "~/Dropbox/fluke-mse/sims/03-01/",
-#                "~/Dropbox/fluke-mse/sims/03-02/",
-#                "~/Dropbox/fluke-mse/sims/05-01/",
-#                "~/Dropbox/fluke-mse/sims/05-02/"),
-#   scen.name <- c("MP 1",
-#                  "MP 1",
-#                  "MP 1",
-#                  "MP 1",
-#                  "MP 2",
-#                  "MP 2",
-#                  "MP 3",
-#                  "MP 3",
-#                  "MP 5",
-#                  "MP 5"),
-#   fsim <- c(1,  26, 51,  76, 1, 26, 1, 26, 1, 26))
-# 
-# #change the folder names for the scenarios you want to summarize results for and give them a unique name
-# params <- list(
-#   scendir <- c("~/Dropbox/fluke-mse/01-01/",
-#                "~/Dropbox/fluke-mse/04-01/",
-#                "~/Dropbox/fluke-mse/07-01/",
-#                "~/Dropbox/fluke-mse/sims/01-02/",
-#                "~/Dropbox/fluke-mse/sims/01-03/",
-#                #"~/Dropbox/fluke-mse/sims/01-04/",
-#                "~/Dropbox/fluke-mse/sims/04-02/",
-#                "~/Dropbox/fluke-mse/sims/04-03/",
-#                #"~/Dropbox/fluke-mse/sims/04-04/",
-#                "~/Dropbox/fluke-mse/sims/07-02/",
-#                "~/Dropbox/fluke-mse/sims/07-03/",
-#                "~/Dropbox/fluke-mse/mbp/01-04/",
-#                "~/Dropbox/fluke-mse/mbp/04-04/",
-#                "~/Dropbox/fluke-mse/mbp/07-04/",
-#                "~/Dropbox/fluke-mse/sims/02-01/",
-#                "~/Dropbox/fluke-mse/sims/02-02/",
-#                "~/Dropbox/fluke-mse/sims/03-01/",
-#                "~/Dropbox/fluke-mse/sims/03-02/",
-#                "~/Dropbox/fluke-mse/sims/05-01/",
-#                "~/Dropbox/fluke-mse/sims/05-02/"),
-#   scen.name <- c("MP 1",
-#                  "MP 4",
-#                  "MP 7",
-#                  "MP 1",
-#                  "MP 1",
-#                  "MP 4",
-#                  "MP 4",
-#                  "MP 7",
-#                  "MP 7",
-#                  "MP 1",
-#                  "MP 4",
-#                  "MP 7",
-#                  "MP 2",
-#                  "MP 2",
-#                  "MP 3",
-#                  "MP 3",
-#                  "MP 5",
-#                  "MP 5"),
-#   fsim <- c(1, 1, 1, 26, 51,26, 51, 26, 51,76,76,76, 1, 26, 1, 26, 1, 26))
-
 params <- list(
-  scendir = c("~/Dropbox/fluke-mse/sims/2022-05-24/01-01/",
-               "~/Dropbox/fluke-mse/sims/2022-05-24/01-02/",
-               "~/Dropbox/fluke-mse/sims/2022-05-24/01-03/",
-               "~/Dropbox/fluke-mse/sims/2022-05-24/01-04/",
-               "~/Dropbox/fluke-mse/sims/2022-05-24/01-06/",
-               "~/Dropbox/fluke-mse/sims/2022-05-24/01-07/",
-               "~/Dropbox/fluke-mse/sims/2022-05-24/01-08/"),
+  scendir = c("~/research/mafmc-recmeasures/sims/113/",
+              "~/research/mafmc-recmeasures/sims/114/",
+              "~/research/mafmc-recmeasures/sims/115/",
+              "~/research/mafmc-recmeasures/sims/116/",
+              "~/research/mafmc-recmeasures/sims/117/",
+              "~/research/mafmc-recmeasures/sims/118/",
+              "~/research/mafmc-recmeasures/sims/119/",
+              "~/research/mafmc-recmeasures/sims/120/",
+              "~/research/mafmc-recmeasures/sims/121/",
+              "~/research/mafmc-recmeasures/sims/122/",
+              "~/research/mafmc-recmeasures/sims/123/",
+              "~/research/mafmc-recmeasures/sims/124/"),
   scen.name = c("MP 1",
-                 "MP 2",
-                 "MP 3",
-                 "MP 4",
-                 "MP 6",
-                 "MP 7",
-                 "MP 8"),
-  fsim = rep(1,7))
-
-params <- list(
-  scendir = c("~/Dropbox/fluke-mse/sims/2022-06-10/02-01/",
-               "~/Dropbox/fluke-mse/sims/2022-06-10/02-02/",
-               "~/Dropbox/fluke-mse/sims/2022-06-10/02-03/",
-               "~/Dropbox/fluke-mse/sims/2022-06-10/02-04/",
-               "~/Dropbox/fluke-mse/sims/2022-06-10/02-06/",
-               "~/Dropbox/fluke-mse/sims/2022-06-10/02-07/",
-               "~/Dropbox/fluke-mse/sims/2022-06-10/02-08/"),
-  scen.name = c("MP 1",
-                 "MP 2",
-                 "MP 3",
-                 "MP 4",
-                 "MP 6",
-                 "MP 7",
-                 "MP 8"),
-  om.name = rep(2,7),
-  fsim = rep(1,7))
-
-params <- list(
-  scendir = c("~/Dropbox/fluke-mse/sims/2022-06-10/03-01/",
-               "~/Dropbox/fluke-mse/sims/2022-06-10/03-02/",
-               "~/Dropbox/fluke-mse/sims/2022-06-10/03-03/",
-               "~/Dropbox/fluke-mse/sims/2022-06-10/03-04/",
-               "~/Dropbox/fluke-mse/sims/2022-06-10/03-06/",
-               "~/Dropbox/fluke-mse/sims/2022-06-10/03-07/",
-               "~/Dropbox/fluke-mse/sims/2022-06-10/03-08/"),
-  scen.name = c("MP 1",
-                 "MP 2",
-                 "MP 3",
-                 "MP 4",
-                 "MP 6",
-                 "MP 7",
-                 "MP 8"),
-  om.name = rep(3,7),
-  fsim = rep(1,7))
-
-rootdir <- "~/Dropbox/fluke-mse/sims/2022-07-25/"
-omdirs <- rep(c("01-","02-","03-"),each=7)
-mpdirs <- rep(paste0("0",c(1:4,6:8)),3)
-scendirs <- paste0(rootdir, omdirs, mpdirs, "/")
-
-params <- list(
-  scendir = scendirs,
-  # scendir = c("~/Dropbox/fluke-mse/sims/2022-06-10/03-01/",
-  #             "~/Dropbox/fluke-mse/sims/2022-06-10/03-02/",
-  #             "~/Dropbox/fluke-mse/sims/2022-06-10/03-03/",
-  #             "~/Dropbox/fluke-mse/sims/2022-06-10/03-04/",
-  #             "~/Dropbox/fluke-mse/sims/2022-06-10/03-06/",
-  #             "~/Dropbox/fluke-mse/sims/2022-06-10/03-07/",
-  #             "~/Dropbox/fluke-mse/sims/2022-06-10/03-08/"),
-  scen.name = rep(c("MP 1",
                 "MP 2",
                 "MP 3",
                 "MP 4",
+                "MP 5",
                 "MP 6",
                 "MP 7",
-                "MP 8"),3),
-  om.name = rep(1:3,each=7),
-  fsim = rep(1,21))
-
-
-
-params <- list(
-  scendir = c("~/Dropbox/fluke-mse/sims/2022-05-24/01-01/",
-              "~/Dropbox/fluke-mse/sims/2022-05-24/01-02/",
-              "~/Dropbox/fluke-mse/sims/2022-05-24/01-03/",
-              "~/Dropbox/fluke-mse/sims/2022-05-24/01-04/",
-              "~/Dropbox/fluke-mse/sims/2022-05-24/01-06/",
-              "~/Dropbox/fluke-mse/sims/2022-05-24/01-07/",
-              "~/Dropbox/fluke-mse/sims/2022-05-24/01-08/",
-              "~/Dropbox/fluke-mse/sims/2022-06-10/02-01/",
-              "~/Dropbox/fluke-mse/sims/2022-06-10/02-02/",
-              "~/Dropbox/fluke-mse/sims/2022-06-10/02-03/",
-              "~/Dropbox/fluke-mse/sims/2022-06-10/02-04/",
-              "~/Dropbox/fluke-mse/sims/2022-06-10/02-06/",
-              "~/Dropbox/fluke-mse/sims/2022-06-10/02-07/",
-              "~/Dropbox/fluke-mse/sims/2022-06-10/02-08/",
-              "~/Dropbox/fluke-mse/sims/2022-06-10/03-01/",
-              "~/Dropbox/fluke-mse/sims/2022-06-10/03-02/",
-              "~/Dropbox/fluke-mse/sims/2022-06-10/03-03/",
-              "~/Dropbox/fluke-mse/sims/2022-06-10/03-04/",
-              "~/Dropbox/fluke-mse/sims/2022-06-10/03-06/",
-              "~/Dropbox/fluke-mse/sims/2022-06-10/03-07/",
-              "~/Dropbox/fluke-mse/sims/2022-06-10/03-08/"),
-  scen.name = rep(c("MP 1",
-                "MP 2",
-                "MP 3",
-                "MP 4",
-                "MP 6",
-                "MP 7",
-                "MP 8"),3),
-  om.name = rep(1:3, each = 7),
-  fsim = rep(1,21))
-
-
-param2 <- list(
-  scendir = c("~/Dropbox/fluke-mse/sims/2022-06-20/01-01/",
-              "~/Dropbox/fluke-mse/sims/2022-06-20/01-02/",
-              "~/Dropbox/fluke-mse/sims/2022-06-20/01-03/",
-              "~/Dropbox/fluke-mse/sims/2022-06-20/01-04/",
-              "~/Dropbox/fluke-mse/sims/2022-06-20/01-06/",
-              "~/Dropbox/fluke-mse/sims/2022-06-20/01-07/",
-              "~/Dropbox/fluke-mse/sims/2022-06-20/01-08/"),
-  scen.name = rep(c("MP 1",
-                    "MP 2",
-                    "MP 3",
-                    "MP 4",
-                    "MP 6",
-                    "MP 7",
-                    "MP 8"),1))
+                "MP 8",
+                "MP 9",
+                "MP 10",
+                "MP 11",
+                "MP 12"),
+  fsim = rep(1,12))
 
 #summarize the output files
-all_results <- purrr::pmap_dfr(params,read_results)
+all_results <- purrr::pmap_dfr(params,read_results, om.name=5)
 
-#add prop female for om1
-om1_fem <- purrr::pmap_dfr(param2,get_om1_sexcatch) %>% 
-  pivot_longer(cols = c(prop_female), names_to = "type")
+# #add prop female for om1
+# param2 <- list(scendir = params$scendir,
+#                scen.name = params$scen.name)
+# om1_fem <- purrr::pmap_dfr(param2,get_om1_sexcatch) %>% 
+#   pivot_longer(cols = c(prop_female), names_to = "type")
   
 #generate time series of metrics
 diag_ts <- get_diag_ts(all_results) %>% 
@@ -759,73 +580,73 @@ diag_ts <- get_diag_ts(all_results) %>%
   filter(nurow==1) %>% 
   select(-nurow)
   
-#join
-diag_ts <- diag_ts %>% bind_rows(om1_fem)
+# #join
+# diag_ts <- diag_ts %>% bind_rows(om1_fem)
+# 
 
-
-# time series plots
-p1 <- diag_ts %>% 
-  filter(year != 2019) %>% 
-  mutate(type = fct_relevel(type,c("spawning biomass", "total catch"))) %>% 
-  filter(type %in% c("B/Bref","F/Fref"),
-         scenario %in% c("MP 1","MP 8")) %>% 
-  projection.plot()
+# # time series plots
+# p1 <- diag_ts %>% 
+#   filter(year != 2019) %>% 
+#   mutate(type = fct_relevel(type,c("spawning biomass", "total catch"))) %>% 
+#   filter(type %in% c("B/Bref","F/Fref"),
+#          scenario %in% c("MP 1","MP 2")) %>% 
+#   projection.plot()
 
 # join ref pts & F
 
 # add additional metrics
 
-# add boxplots
-p2 <- diag_ts %>% 
-  filter(year >= 2022) %>% 
-  ggplot() +
-  aes(x = scenario, y = value, fill = scenario) +
-  geom_boxplot(outlier.shape=NA) +
-  scale_fill_brewer(type = "qual", palette = 2) +
-  facet_wrap(~type, scale = "free_y") +
-  #ylim(0,NA) +
-  ylab("") +
-  xlab("") +
-  #coord_flip() +
-  theme_bw() +
-  theme(legend.position = "bottom",
-        #axis.text.y = element_blank(),
-        axis.text.x = element_blank()) +
-  labs(fill = "")
-
-# add table summaries
-
-#plots
-ggsave("trajectory-comparisons.png",p1,width=8,height=8)
-ggsave("boxplot-comparisons.png",p2,width=8,height=8)
-#ggsave("m2-5-trajectory-comparisons.png",p1,width=8,height=8)
-#ggsave("m2-5-boxplot-comparisons.png",p2,width=8,height=8)
-
-# # radar chart - not sure how to save this to file automagically
-# p3 <- diag_ts %>% 
+# # add boxplots
+# p2 <- diag_ts %>% 
 #   filter(year >= 2022) %>% 
-#   group_by(scenario, type) %>% 
-#   summarize(value = case_when(
-#     type == "F/Fref" ~ mean(value<1, na.rm=TRUE),
-#     type == "B/Bref" ~ mean(value>0.5, na.rm=TRUE),
-#     TRUE ~ mean(value, na.rm=TRUE))) %>% 
-#   distinct() %>%  #unsure what is happening, but this helps.
-#   rename(metric = type,
-#          mp = scenario) %>% 
-#   mutate(metric = case_when(
-#     metric == "F/Fref" ~ "not overfishing",
-#     metric == "B/Bref" ~ "not overfished",
-#     TRUE ~ metric)) %>% 
-#   select(metric,value,mp) %>% 
-#   do_radar_plot()
-# #ggsave("radarplot-comparisons.png",p3,width=8,height=8)
+#   ggplot() +
+#   aes(x = scenario, y = value, fill = scenario) +
+#   geom_boxplot(outlier.shape=NA) +
+#   scale_fill_brewer(type = "qual", palette = 2) +
+#   facet_wrap(~type, scale = "free_y") +
+#   #ylim(0,NA) +
+#   ylab("") +
+#   xlab("") +
+#   #coord_flip() +
+#   theme_bw() +
+#   theme(legend.position = "bottom",
+#         #axis.text.y = element_blank(),
+#         axis.text.x = element_blank()) +
+#   labs(fill = "")
+# 
+# # add table summaries
+# 
+# #plots
+# ggsave("trajectory-comparisons.png",p1,width=8,height=8)
+# ggsave("boxplot-comparisons.png",p2,width=8,height=8)
+# #ggsave("m2-5-trajectory-comparisons.png",p1,width=8,height=8)
+# #ggsave("m2-5-boxplot-comparisons.png",p2,width=8,height=8)
+# 
+# # # radar chart - not sure how to save this to file automagically
+# # p3 <- diag_ts %>% 
+# #   filter(year >= 2022) %>% 
+# #   group_by(scenario, type) %>% 
+# #   summarize(value = case_when(
+# #     type == "F/Fref" ~ mean(value<1, na.rm=TRUE),
+# #     type == "B/Bref" ~ mean(value>0.5, na.rm=TRUE),
+# #     TRUE ~ mean(value, na.rm=TRUE))) %>% 
+# #   distinct() %>%  #unsure what is happening, but this helps.
+# #   rename(metric = type,
+# #          mp = scenario) %>% 
+# #   mutate(metric = case_when(
+# #     metric == "F/Fref" ~ "not overfishing",
+# #     metric == "B/Bref" ~ "not overfished",
+# #     TRUE ~ metric)) %>% 
+# #   select(metric,value,mp) %>% 
+# #   do_radar_plot()
+# # #ggsave("radarplot-comparisons.png",p3,width=8,height=8)
 
 
 ######
 ###### summarizing metrics
 
 metrics <- diag_ts %>% 
-  filter(year >= 2036) %>% 
+  filter(year >= 2036) %>%   #2036 in original to get end of time series
   group_by(om, scenario, type, isim) %>% 
   summarize(value = case_when(
     type == "F/Fref" ~ mean(value<1, na.rm=TRUE),
@@ -839,62 +660,62 @@ metrics <- diag_ts %>%
     metric == "B/Bref" ~ "not overfished",
     TRUE ~ metric))
 
-# add boxplots
-p2 <- metrics %>% 
-  ggplot() +
-  aes(x = mp, y = value, fill = mp) +
-  geom_boxplot(outlier.shape=NA) +
-  scale_fill_brewer(type = "qual", palette = 2) +
-  facet_wrap(~metric, scale = "free_y") +
-  ylab("") +
-  xlab("") +
-  theme_bw() +
-  theme(legend.position = "bottom",
-        axis.text.x = element_blank()) +
-  labs(fill = "") +
-  guides(fill = guide_legend(nrow = 1))
-
-# add table summaries
-ggsave("boxplot-metrics.png",p2,width=8,height=8)
-#ggsave("boxplot-metrics-om2.png",p2,width=8,height=8)
-#ggsave("boxplot-metrics-om3.png",p2,width=8,height=8)
-#ggsave("boxplot-metrics-om1-slides.png",p2,width=9,height=5)
-#ggsave("boxplot-metrics-om2-slides.png",p2,width=9,height=5)
-#ggsave("boxplot-metrics-om3-slides.png",p2,width=9,height=5)
+# # add boxplots
+# p2 <- metrics %>% 
+#   ggplot() +
+#   aes(x = mp, y = value, fill = mp) +
+#   geom_boxplot(outlier.shape=NA) +
+#   scale_fill_brewer(type = "qual", palette = 2) +
+#   facet_wrap(~metric, scale = "free_y") +
+#   ylab("") +
+#   xlab("") +
+#   theme_bw() +
+#   theme(legend.position = "bottom",
+#         axis.text.x = element_blank()) +
+#   labs(fill = "") +
+#   guides(fill = guide_legend(nrow = 1))
+# 
+# # add table summaries
+# ggsave("boxplot-metrics.png",p2,width=8,height=8)
+# #ggsave("boxplot-metrics-om2.png",p2,width=8,height=8)
+# #ggsave("boxplot-metrics-om3.png",p2,width=8,height=8)
+# #ggsave("boxplot-metrics-om1-slides.png",p2,width=9,height=5)
+# #ggsave("boxplot-metrics-om2-slides.png",p2,width=9,height=5)
+# #ggsave("boxplot-metrics-om3-slides.png",p2,width=9,height=5)
 
 median_metrics <- metrics %>% 
   group_by(om, mp, metric) %>% 
   summarize(value = median(value, na.rm=TRUE))
 
-write_csv(median_metrics,file = "performance-metrics-median-over-sims.csv")
-#write_csv(median_metrics,file = "performance-metrics-median-over-sims-om2.csv")
-#write_csv(median_metrics,file = "performance-metrics-median-over-sims-om3.csv")
-minmax_metrics <- median_metrics %>% 
-  group_by(metric) %>% 
-  summarize(min_val = min(value),
-            max_val = max(value))  
-
-write_csv(minmax_metrics,file = "performance-metrics-minmax-of-medians.csv")
-#write_csv(minmax_metrics,file = "performance-metrics-minmax-of-medians-om2.csv")
-#write_csv(minmax_metrics,file = "performance-metrics-minmax-of-medians-om3.csv")
+# write_csv(median_metrics,file = "performance-metrics-median-over-sims.csv")
+# #write_csv(median_metrics,file = "performance-metrics-median-over-sims-om2.csv")
+# #write_csv(median_metrics,file = "performance-metrics-median-over-sims-om3.csv")
+# minmax_metrics <- median_metrics %>% 
+#   group_by(metric) %>% 
+#   summarize(min_val = min(value),
+#             max_val = max(value))  
+# 
+# write_csv(minmax_metrics,file = "performance-metrics-minmax-of-medians.csv")
+# #write_csv(minmax_metrics,file = "performance-metrics-minmax-of-medians-om2.csv")
+# #write_csv(minmax_metrics,file = "performance-metrics-minmax-of-medians-om3.csv")
 
 
 # radar chart - not sure how to save this to file automagically
-p3 <- median_metrics %>% 
-  mutate(mp = fct_recode(mp,
-                   "status quo" = "MP 1",
-                   "minsize-1" = "MP 2", 
-                   "season" = "MP 3", 
-                   "region" = "MP 4",
-                   #"c1@14" = "MP 5", 
-                   "3@17" = "MP 6",
-                   "1@16-19" = "MP 7",
-                   "slot" = "MP 8")) %>% 
-  #filter(!metric %in% c("change_cs", "cs_per_trip")) %>% 
-  #filter(!metric %in% c("expense","cs_per_trip","total catch")) %>% 
-  filter(metric %in% c("change_cs", "kept per trip", "kept:released", "not overfished", "not overfishing",
-                       "keep_one")) %>% 
-  do_small_radar_plot()
+# p3 <- median_metrics %>% 
+#   mutate(mp = fct_recode(mp,
+#                    "status quo" = "MP 1",
+#                    "minsize-1" = "MP 2", 
+#                    "season" = "MP 3", 
+#                    "region" = "MP 4",
+#                    #"c1@14" = "MP 5", 
+#                    "3@17" = "MP 6",
+#                    "1@16-19" = "MP 7",
+#                    "slot" = "MP 8")) %>% 
+#   #filter(!metric %in% c("change_cs", "cs_per_trip")) %>% 
+#   #filter(!metric %in% c("expense","cs_per_trip","total catch")) %>% 
+#   filter(metric %in% c("change_cs", "kept per trip", "kept:released", "not overfished", "not overfishing",
+#                        "keep_one")) %>% 
+#   do_small_radar_plot()
 
 
 
@@ -906,7 +727,8 @@ read_state_results <- function(scendir = "~/Dropbox/fluke-mse/07-01/",scen.name=
 
 recoutput2 <- read.table(paste0(scendir, "recoutput2.out"), header = FALSE, skip = 1) #TRUE)
 nyrs <- length(unique(recoutput2[,2]))
-recoutput2[,1] <- rep(1:100, each = 10*nyrs)
+nsim <- length(unique(recoutput2[,1]))
+recoutput2[,1] <- rep(1:nsim, each = 10*nyrs)
 names(recoutput2) <- c("isim","year","state","keep_num","rel_num","ntrips","nchoice","change_cs","cost",
                        "keep_one", "mulen_keep","mulen_release","trophy")
 state_recoutput <- recoutput2 %>% 
@@ -938,8 +760,8 @@ get_state_ts <- function(results) {
            #keep_to_rel, 
            "kept per trip", #"F/Fref", "B/Bref",
            "rel per trip", 
-           #mulen_keep,
-           #mulen_release,
+           mulen_keep,
+           mulen_release,
            trophy,
            expense,
            change_cs,
@@ -983,7 +805,7 @@ state_metrics <- get_state_ts(state_results) %>%
   #        nurow = ifelse(type == "B/Bref" & value == 0,0,nurow)) %>% 
   # filter(nurow==1) %>% 
   # select(-nurow)
-  filter(year >= 2036) %>% 
+  filter(year >= 2036) %>%   #2036 in original
   group_by(scenario, type, isim, state) %>% 
   summarize(#value = case_when(
     # type == "F/Fref" ~ mean(value<1, na.rm=TRUE),
@@ -998,57 +820,64 @@ state_metrics <- get_state_ts(state_results) %>%
   #   metric == "B/Bref" ~ "not overfished",
   #   TRUE ~ metric))
 
-state_metrics$om <- 3
+state_metrics$om <- 5.  #dummy value for 2024 rec measures modeling
 
-fulL_state_metrics <- fulL_state_metrics %>% 
-  bind_rows(state_metrics)
+#2024-06-14
 
-# add boxplots
-state_bp <- state_metrics %>% 
-  filter(metric %in% c("change_cs")) %>%  #c("kept per trip")) %>% 
-  ggplot() +
-  aes(x = mp, y = value, fill = mp) +
-  geom_boxplot(outlier.shape=NA) +
-  scale_fill_brewer(type = "qual", palette = 2) +
-  facet_wrap(~state, scale = "free_y") +
-  #facet_wrap(~metric, scale = "free_y") +
-  ylab("") +
-  xlab("") +
-  theme_bw() +
-  #ylim(0,5e+06) +
-  theme(legend.position = "bottom",
-        axis.text.x = element_blank()) +
-  labs(fill = "",
-       title = "change in consumer surplus (welfare)") + #kept per trip") +
-  guides(fill = guide_legend(nrow = 1))
-state_bp
-# add table summaries
-#ggsave("boxplot-metrics-om1-slides.png",p2,width=9,height=5)
+saveRDS(metrics,"sims/metrics.rds")
+saveRDS(median_metrics,"sims/median_metrics.rds")
+saveRDS(state_metrics,"sims/full_state_metrics.rds") 
 
 
-
-#############  looking across OMs
-
-full_metrics <- readRDS("all_results_medians.rds")
-full_metric_distrib <- readRDS("all_results_distrib.rds")
-
-
-
-summary <- full_metrics %>% 
-  mutate(om = factor(om),
-         om = fct_recode(om, "base" = "1","MRIP bias" = "2","shift" = "3")) %>% 
-  group_by(mp, metric) %>% 
-  mutate(val2 = value/max(value, na.rm=TRUE)) %>% 
-  filter(!metric %in% c("total catch", "expense", "cs_per_trip",
-                        "mulen_keep",
-                        "mulen_release",
-                        "not overfished",
-                        "prop_female")) %>% 
-  ggplot() +
-  aes(x = metric, y = val2, col = om, group = mp) +
-  geom_point() +
-  coord_flip() +
-  facet_grid(~mp) +
-  geom_hline(yintercept = 0, lty=2, alpha =0.5)
-summary
-
+# fulL_state_metrics <- fulL_state_metrics %>% 
+#   bind_rows(state_metrics)
+# 
+# # add boxplots
+# state_bp <- state_metrics %>% 
+#   filter(metric %in% c("change_cs")) %>%  #c("kept per trip")) %>% 
+#   ggplot() +
+#   aes(x = mp, y = value, fill = mp) +
+#   geom_boxplot(outlier.shape=NA) +
+#   scale_fill_brewer(type = "qual", palette = 2) +
+#   facet_wrap(~state, scale = "free_y") +
+#   #facet_wrap(~metric, scale = "free_y") +
+#   ylab("") +
+#   xlab("") +
+#   theme_bw() +
+#   #ylim(0,5e+06) +
+#   theme(legend.position = "bottom",
+#         axis.text.x = element_blank()) +
+#   labs(fill = "",
+#        title = "change in consumer surplus (welfare)") + #kept per trip") +
+#   guides(fill = guide_legend(nrow = 1))
+# state_bp
+# # add table summaries
+# #ggsave("boxplot-metrics-om1-slides.png",p2,width=9,height=5)
+# 
+# 
+# 
+# #############  looking across OMs
+# 
+# full_metrics <- readRDS("all_results_medians.rds")
+# full_metric_distrib <- readRDS("all_results_distrib.rds")
+# 
+# 
+# 
+# summary <- full_metrics %>% 
+#   mutate(om = factor(om),
+#          om = fct_recode(om, "base" = "1","MRIP bias" = "2","shift" = "3")) %>% 
+#   group_by(mp, metric) %>% 
+#   mutate(val2 = value/max(value, na.rm=TRUE)) %>% 
+#   filter(!metric %in% c("total catch", "expense", "cs_per_trip",
+#                         "mulen_keep",
+#                         "mulen_release",
+#                         "not overfished",
+#                         "prop_female")) %>% 
+#   ggplot() +
+#   aes(x = metric, y = val2, col = om, group = mp) +
+#   geom_point() +
+#   coord_flip() +
+#   facet_grid(~mp) +
+#   geom_hline(yintercept = 0, lty=2, alpha =0.5)
+# summary
+# 
