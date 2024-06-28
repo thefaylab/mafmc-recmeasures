@@ -475,14 +475,25 @@ VAcatch_common <- catchallstates_commonreg_HCR$land[catchallstates_commonreg$Sta
 NJcatch_common <- catchallstates_commonreg_HCR$land[catchallstates_commonreg$State=="NJ"]
 
 # GF generic functions
+#functioncatch_seasonlen <- function(flukecatch, state, bag, minlen, target){
+#  flukecatch %>% 
+    #group_by(State=="NC") %>% 
+ #   filter(
+  #    State== state, #"NC",
+   #   Bag == bag,
+    #  MinLen == minlen, #) %>%
+    #filter(
+   #   land == max(land[land <= target])) 
+#}
+
 functioncatch_seasonlen <- function(flukecatch, state, bag, minlen, target){
   flukecatch %>% 
     #group_by(State=="NC") %>% 
     filter(
       State== state, #"NC",
       Bag == bag,
-      MinLen == minlen, #) %>%
-    #filter(
+      MinLen == minlen) %>%
+    filter(
       land == max(land[land <= target])) 
 }
 
