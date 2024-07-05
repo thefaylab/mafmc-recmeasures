@@ -48,7 +48,8 @@ NewBin <- 0
 # seasonlen <- args[3]
 
 #Scale RHL so it is in same space as GAM model
-RHL <- 0.69*RHL
+#RHL <- 0.69*RHL
+RHL <- RHL/0.39
 
 #args<- NULL
 #args[4] <- 6
