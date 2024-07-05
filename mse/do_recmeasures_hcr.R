@@ -869,9 +869,9 @@ functioncatch_common_minlen <- function(flukecatch, state, bag, seasonlen, targe
     filter(
       State==state,
       Bag == bag,
-      SeasonLen == max(SeasonLen[SeasonLen <= seasonlen])) %>%
+      SeasonLen == RobustMax(SeasonLen[SeasonLen <= seasonlen])) %>%
     filter(
-      land == max(land[land <= target]))
+      land == RobustMax(land[land <= target]))
 }
 state_if_minlen <- function(flukecatch, state, bag, seasonlen, target, prev_result) {
   if(nrow(prev_result)==0){
@@ -880,7 +880,7 @@ state_if_minlen <- function(flukecatch, state, bag, seasonlen, target, prev_resu
     filter(
       State== state,
       Bag == bag,
-      SeasonLen == max(SeasonLen[SeasonLen <= seasonlen])) %>%
+      SeasonLen == RobustMax(SeasonLen[SeasonLen <= seasonlen])) %>%
     filter(abs(land - target) == min(abs(land - target)))
 }
 }
@@ -1242,10 +1242,10 @@ bag_common <- function(flukecatch, state, minlen, seasonlen, target){
     #group_by(State=="NC") %>% 
     filter(
       State== state,
-      SeasonLen == max(SeasonLen[SeasonLen <= seasonlen]),
+      SeasonLen == RobustMax(SeasonLen[SeasonLen <= seasonlen]),
       MinLen == minlen) %>%
     filter(
-      land == max(land[land <= target]))
+      land == RobustMax(land[land <= target]))
 }
 bag_if_common <- function(flukecatch, state, minlen, seasonlen, target, prev_result) {
   if(nrow(prev_result)==0){
@@ -1253,7 +1253,7 @@ bag_if_common <- function(flukecatch, state, minlen, seasonlen, target, prev_res
     #group_by(State=="NC") %>% 
     filter(
       State== state,
-      SeasonLen == max(SeasonLen[SeasonLen <= seasonlen]),
+      SeasonLen == RobustMax(SeasonLen[SeasonLen <= seasonlen]),
       MinLen == minlen) %>%
     filter(abs(land - target) == min(abs(land - target)))
 }
