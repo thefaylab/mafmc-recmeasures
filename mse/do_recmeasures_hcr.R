@@ -26,8 +26,6 @@ library(mgcv)
 fluke <- readRDS("state_lookup.rds")
 flukecatch <- tibble(fluke)
 
-
-
 #' 
 #' Inputs - Enter Current Regulations and Control Rule to be Tested
 ## -----------------------------------------------------------------------------
@@ -97,7 +95,7 @@ if (args[5]==3) reg_to_change <- "Season"
 ######################################
 
 #modify the expected landings based on the GLM calibration
-calib_glm <- readRDS("mse/calib_glm.rds")
+calib_glm <- readRDS("calib_glm.rds")
 nufluke <- tibble(
   pred = flukecatch$land,
   minlen = flukecatch$MinLen,
@@ -524,6 +522,7 @@ NJcatch_common <- catchallstates_commonreg_HCR$land[catchallstates_commonreg$Sta
     #filter(
    #   land == max(land[land <= target])) 
 #}
+RobustMax <- function(x) {if (length(x)>0) max(x) else -Inf}
 
 functioncatch_seasonlen <- function(flukecatch, state, bag, minlen, target){
   flukecatch %>% 
@@ -533,7 +532,7 @@ functioncatch_seasonlen <- function(flukecatch, state, bag, minlen, target){
       Bag == bag,
       MinLen == minlen) %>%
     filter(
-      land == max(land[land <= target])) 
+      land == RobustMax(land[land <= target])) 
 }
 
 state_if <- function(flukecatch, state, bag, minlen, target, prev_result) {
