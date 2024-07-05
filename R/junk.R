@@ -42,16 +42,25 @@ all_results %>%
   ylim(0,NA)
 
 all_results %>% 
-  mutate(ratio = 1000*keep_num / (0.39*exp_keep)) %>% 
+  mutate(ratio = 1000*keep_num / (0.39*exp_keep),
+         mp2 = fct_collapse(scenario,
+                            "rhl" = c("MP 4","MP 8", "MP 12"),
+                            "perc_change" = c("MP 1","MP 5","MP 9"), 
+                            "refpt" = c("MP 2", "MP 6","MP 10"),
+                            "bmatrix" = c("MP 3","MP 7","MP 11")),
+         mp3 = fct_collapse(scenario,
+                            "bag" = c("MP 4","MP 1","MP 2", "MP 3"),
+                            "minlen" = c("MP 8","MP 5","MP 6","MP 7"),
+                            "season" = c("MP 12","MP 9","MP 10","MP 11"))) %>% 
   ggplot() + 
-  aes(x = biomass, y = ratio, col = mulen_keep) + 
+  aes(x = biomass, y = ratio, col = minlen) + #col = mulen_keep) + 
   geom_point(alpha=0.1) + 
   #geom_abline(slope = 1, intercept = 0) + 
   geom_hline(yintercept = 1, lty=2) +
   geom_hline(yintercept = 2.564, lty=2) +
   scale_color_viridis_c() +
   ylim(0,NA) +
-  #facet_wrap(~scenario) +
+  facet_wrap(~mp3) +
   NULL
 
 
@@ -193,10 +202,294 @@ tempcat %>%
   NULL
 
 
+#######
+
+all_results %>% 
+  mutate(ratio = 1000*keep_num / (0.39*exp_keep),
+         mp2 = fct_collapse(scenario,
+                            "rhl" = c("MP 4","MP 8", "MP 12"),
+                            "perc_change" = c("MP 1","MP 5","MP 9"), 
+                            "refpt" = c("MP 2", "MP 6","MP 10"),
+                            "bmatrix" = c("MP 3","MP 7","MP 11")),
+         mp3 = fct_collapse(scenario,
+                            "bag" = c("MP 4","MP 1","MP 2", "MP 3"),
+                            "minlen" = c("MP 8","MP 5","MP 6","MP 7"),
+                            "season" = c("MP 12","MP 9","MP 10","MP 11"))) %>% 
+  ggplot() + 
+  aes(x = biomass, y = ratio, col = minlen) + #col = mulen_keep) + 
+  geom_point(alpha=0.1) + 
+  #geom_abline(slope = 1, intercept = 0) + 
+  geom_hline(yintercept = 1, lty=2) +
+  geom_hline(yintercept = 2.564, lty=2) +
+  scale_color_viridis_c() +
+  ylim(0,NA) +
+  facet_wrap(~mp3) +
+  NULL
 
 
 
+all_results %>% 
+  mutate(ratio = 1000*keep_num / (0.39*exp_keep),
+         mp2 = fct_collapse(scenario,
+                            "rhl" = c("MP 4","MP 8", "MP 12"),
+                            "perc_change" = c("MP 1","MP 5","MP 9"), 
+                            "refpt" = c("MP 2", "MP 6","MP 10"),
+                            "bmatrix" = c("MP 3","MP 7","MP 11")),
+         mp3 = fct_collapse(scenario,
+                            "bag" = c("MP 4","MP 1","MP 2", "MP 3"),
+                            "minlen" = c("MP 8","MP 5","MP 6","MP 7"),
+                            "season" = c("MP 12","MP 9","MP 10","MP 11"))) %>% 
+  ggplot() + 
+  aes(x = biomass, y = ratio, col = seaslen) + #col = mulen_keep) + 
+  geom_point(alpha=0.1) + 
+  #geom_abline(slope = 1, intercept = 0) + 
+  geom_hline(yintercept = 1, lty=2) +
+  geom_hline(yintercept = 2.564, lty=2) +
+  scale_color_viridis_c() +
+  ylim(0,NA) +
+  facet_wrap(~mp3) +
+  NULL
 
 
 
+all_results %>% 
+  mutate(ratio = 1000*keep_num / (0.39*exp_keep),
+         mp2 = fct_collapse(scenario,
+                            "rhl" = c("MP 4","MP 8", "MP 12"),
+                            "perc_change" = c("MP 1","MP 5","MP 9"), 
+                            "refpt" = c("MP 2", "MP 6","MP 10"),
+                            "bmatrix" = c("MP 3","MP 7","MP 11")),
+         mp3 = fct_collapse(scenario,
+                            "bag" = c("MP 4","MP 1","MP 2", "MP 3"),
+                            "minlen" = c("MP 8","MP 5","MP 6","MP 7"),
+                            "season" = c("MP 12","MP 9","MP 10","MP 11"))) %>% 
+  ggplot() + 
+  aes(x = biomass, y = ratio, col = bag) + #col = mulen_keep) + 
+  geom_point(alpha=0.1) + 
+  #geom_abline(slope = 1, intercept = 0) + 
+  geom_hline(yintercept = 1, lty=2) +
+  geom_hline(yintercept = 2.564, lty=2) +
+  scale_color_viridis_c() +
+  ylim(0,NA) +
+  facet_wrap(~mp3) +
+  NULL
+
+
+####
+
+all_results %>% 
+  mutate(ratio = 1000*keep_num / (0.39*exp_keep),
+         mp2 = fct_collapse(scenario,
+                            "rhl" = c("MP 4","MP 8", "MP 12"),
+                            "perc_change" = c("MP 1","MP 5","MP 9"), 
+                            "refpt" = c("MP 2", "MP 6","MP 10"),
+                            "bmatrix" = c("MP 3","MP 7","MP 11")),
+         mp3 = fct_collapse(scenario,
+                            "bag" = c("MP 4","MP 1","MP 2", "MP 3"),
+                            "minlen" = c("MP 8","MP 5","MP 6","MP 7"),
+                            "season" = c("MP 12","MP 9","MP 10","MP 11"))) %>% 
+  ggplot() + 
+  aes(x = 0.39*exp_keep, y = 1000*keep_num, size = biomass, col = biomass) + #col = mulen_keep) + 
+  geom_point(alpha=0.1) + 
+  geom_abline(slope = 1, intercept = 0) + 
+  geom_smooth(method = "glm", formula = y ~ x, method.args = list(family = "poisson"), col ="blue") +
+  #geom_hline(yintercept = 1, lty=2) +
+  #geom_hline(yintercept = 2.564, lty=2) +
+  scale_color_viridis_c() +
+  ylim(0,NA) +
+  facet_wrap(~mp3) +
+  labs(    y = "harvest number from RDM",
+           x = "expected harvest from GAM") +
+  NULL
+
+all_results %>% 
+  mutate(ratio = 1000*keep_num / (0.39*exp_keep),
+         mp2 = fct_collapse(scenario,
+                            "rhl" = c("MP 4","MP 8", "MP 12"),
+                            "perc_change" = c("MP 1","MP 5","MP 9"), 
+                            "refpt" = c("MP 2", "MP 6","MP 10"),
+                            "bmatrix" = c("MP 3","MP 7","MP 11")),
+         mp3 = fct_collapse(scenario,
+                            "bag" = c("MP 4","MP 1","MP 2", "MP 3"),
+                            "minlen" = c("MP 8","MP 5","MP 6","MP 7"),
+                            "season" = c("MP 12","MP 9","MP 10","MP 11"))) %>% 
+  ggplot() + 
+  aes(x = 0.39*exp_keep, y = 1000*keep_num, col = bag) + #col = mulen_keep) + 
+  geom_point(alpha=0.1) + 
+  geom_abline(slope = 1, intercept = 0) + 
+  #geom_hline(yintercept = 1, lty=2) +
+  #geom_hline(yintercept = 2.564, lty=2) +
+  scale_color_viridis_c() +
+  ylim(0,NA) +
+  facet_wrap(~mp3) +
+  NULL
+
+all_results %>% 
+  mutate(ratio = 1000*keep_num / (0.39*exp_keep),
+         mp2 = fct_collapse(scenario,
+                            "rhl" = c("MP 4","MP 8", "MP 12"),
+                            "perc_change" = c("MP 1","MP 5","MP 9"), 
+                            "refpt" = c("MP 2", "MP 6","MP 10"),
+                            "bmatrix" = c("MP 3","MP 7","MP 11")),
+         mp3 = fct_collapse(scenario,
+                            "bag" = c("MP 4","MP 1","MP 2", "MP 3"),
+                            "minlen" = c("MP 8","MP 5","MP 6","MP 7"),
+                            "season" = c("MP 12","MP 9","MP 10","MP 11"))) %>% 
+  ggplot() + 
+  aes(x = 0.39*exp_keep, y = 1000*keep_num, col = seaslen) + #col = mulen_keep) + 
+  geom_point(alpha=0.1) + 
+  geom_abline(slope = 1, intercept = 0) + 
+  #geom_hline(yintercept = 1, lty=2) +
+  #geom_hline(yintercept = 2.564, lty=2) +
+  scale_color_viridis_c() +
+  ylim(0,NA) +
+  facet_wrap(~mp3) +
+  NULL
+
+
+glm1 <- all_results %>% 
+  mutate(kept = 1000*keep_num,
+         pred = 0.39*exp_keep) %>% 
+  #glm(formula = log(kept) ~ pred + biomass + bag + seaslen,data =., family = "poisson") # 
+  glm(formula = log(kept) ~ pred + biomass + bag + seaslen,data =.) #, family = "poisson") # 
+library(broom)
+bob <- augment(glm1, type.predict = "response")
+bob %>% 
+  janitor::clean_names() %>% 
+  select(-biomass,-bag,-seaslen) %>% 
+  bind_cols(all_results %>% slice(as.integer(bob$.rownames))) %>% 
+  ggplot() +
+  aes(x = log_kept, y = fitted, col = seaslen) + #biomass) +
+  geom_point(alpha = 0.2) +
+  scale_color_viridis_c() +
+  facet_wrap(~minlen, scales = "free") +
+  geom_abline(slope = 1, intercept = 0) + 
+  NULL
+
+
+glm2 <- all_results %>% 
+  mutate(kept = 1000*keep_num,
+         pred = 0.39*exp_keep) %>% 
+  #glm(formula = log(kept) ~ pred + biomass + bag + seaslen,data =., family = "poisson") # 
+  lm(formula = log(kept) ~ log(pred)*minlen + biomass + seaslen, data =.) #, family = "poisson") # 
+library(broom)
+bob <- augment(glm2, type.predict = "response")
+p2 <- bob %>% 
+  janitor::clean_names() %>% 
+  select(-biomass,-minlen, -seaslen) %>% 
+  bind_cols(all_results %>% slice(as.integer(bob$.rownames))) %>% 
+  ggplot() +
+  #aes(x = log_kept, y = fitted, col = biomass) +
+  aes(x = exp(log_kept), y = exp(fitted), col = biomass) +
+  geom_point(alpha = 0.2) +
+  scale_color_viridis_c() +
+  #facet_wrap(~minlen, scales = "free") +
+  geom_abline(slope = 1, intercept = 0) + 
+  #ylim(0, 6e+07) +
+  NULL
+
+p1 <- bob %>% 
+  janitor::clean_names() %>% 
+  select(-biomass,-minlen, -seaslen) %>% 
+  bind_cols(all_results %>% slice(as.integer(bob$.rownames))) %>% 
+  ggplot() +
+  aes(x = exp(log_kept), y = exp(log_pred), col = biomass) +
+  #aes(x = exp(log_kept), y = exp(fitted), col = biomass) +
+  geom_point(alpha = 0.2) +
+  scale_color_viridis_c() +
+  #facet_wrap(~minlen, scales = "free") +
+  geom_abline(slope = 1, intercept = 0) + 
+  #ylim(0, 6e+07) +
+  NULL
+
+p1+p2
+
+df_use <-  all_results %>% 
+  mutate(kept = 1000*keep_num,
+         pred = 0.39*exp_keep)
+df_use %>% 
+  ggplot() +
+  aes(x = pred, y = kept, col = minlen, group = as.factor(minlen)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  geom_abline(slope = 1, intercept = 0) +
+  NULL
+
+
+glm3 <- all_results %>% 
+  mutate(kept = 1000*keep_num,
+         pred = 0.39*exp_keep) %>% 
+  #glm(formula = log(kept) ~ pred + biomass + bag + seaslen,data =., family = "poisson") # 
+  lm(formula = log(kept) ~ log(pred) + biomass, data =.) #, family = "poisson") # 
+bob <- augment(glm3, type.predict = "response")
+p3 <- bob %>% 
+  janitor::clean_names() %>% 
+  select(-biomass) %>% 
+  bind_cols(all_results %>% slice(as.integer(bob$.rownames))) %>% 
+  ggplot() +
+  #aes(x = log_kept, y = fitted, col = biomass) +
+  aes(x = exp(log_kept), y = exp(fitted), col = biomass) +
+  geom_point(alpha = 0.2) +
+  scale_color_viridis_c() +
+  #facet_wrap(~minlen, scales = "free") +
+  geom_abline(slope = 1, intercept = 0) + 
+  #ylim(0, 6e+07) +
+  NULL
+
+p2 + p3  
+  
+glm4 <- all_results %>% 
+  mutate(kept = 1000*keep_num,
+         pred = exp_keep) %>% 
+  glm(formula = kept ~ pred + minlen + biomass + seaslen + bag, data =., family = "poisson") # 
+  #lm(formula = log(kept) ~ log(pred) + biomass, data =.) #, family = "poisson") # 
+bob <- augment(glm4, type.predict = "response")
+p4 <- bob %>% 
+  janitor::clean_names() %>% 
+  select(-biomass, -seaslen, -minlen, -bag) %>% 
+  bind_cols(all_results %>% slice(as.integer(bob$.rownames))) %>% 
+  ggplot() +
+  #aes(x = log_kept, y = fitted, col = biomass) +
+  aes(x = kept, y = fitted, col = biomass) +
+  geom_point(alpha = 0.2) +
+  scale_color_viridis_c() +
+  #facet_wrap(~minlen, scales = "free") +
+  #facet_wrap(~bag, scales = "free") +
+  geom_abline(slope = 1, intercept = 0) + 
+  ylim(0, 5000000) +
+  xlim(0, 5000000) +
+  labs(x = "RDM",
+       y = "fitted from GAM") +
+  NULL
+p4
+100*with(summary(glm4), 1 - deviance/null.deviance)
+
+
+  
+  
+#bag + seaslen 
+glm5 <- all_results %>% 
+  mutate(kept = 1000*keep_num,
+         pred = 0.39*exp_keep) %>% 
+  glm(formula = kept ~ pred + minlen + seaslen + bag, data =., family = "poisson") # 
+#lm(formula = log(kept) ~ log(pred) + biomass, data =.) #, family = "poisson") # 
+bob <- augment(glm5, type.predict = "response")
+p5 <- bob %>% 
+  janitor::clean_names() %>% 
+  select(-seaslen, -minlen, -bag) %>% 
+  #select(-biomass, -minlen) %>% 
+  bind_cols(all_results %>% slice(as.integer(bob$.rownames))) %>% 
+  ggplot() +
+  #aes(x = log_kept, y = fitted, col = biomass) +
+  aes(x = kept, y = fitted, col = biomass) +
+  geom_point(alpha = 0.2) +
+  scale_color_viridis_c() +
+  #facet_wrap(~minlen, scales = "free") +
+  #facet_wrap(~bag, scales = "free") +
+  geom_abline(slope = 1, intercept = 0) + 
+  #ylim(0, 6e+07) +
+  NULL
+p5
+100*with(summary(glm5), 1 - deviance/null.deviance)
+100*with(summary(glm4), 1 - deviance/null.deviance)
 

@@ -26,6 +26,8 @@ library(mgcv)
 fluke <- readRDS("state_lookup.rds")
 flukecatch <- tibble(fluke)
 
+
+
 #' 
 #' Inputs - Enter Current Regulations and Control Rule to be Tested
 ## -----------------------------------------------------------------------------
@@ -39,7 +41,7 @@ RecTrend <- as.numeric(args[9]) #= 0.9
 BTrend <- as.numeric(args[10]) #= 0.9
 FFMSY <- as.numeric(args[8]) #= 1.1
 OldBin <- as.numeric(args[11]) #= 3
-
+SSB <- as.numeric(args[12])
 
 NewBin <- 0
 # put inputs into arguments eventually
@@ -47,9 +49,10 @@ NewBin <- 0
 # minlen <- args[2]
 # seasonlen <- args[3]
 
+#scaling no longer needed as 'calibration GLM' now being applied
 #Scale RHL so it is in same space as GAM model
 #RHL <- 0.69*RHL
-RHL <- RHL/0.39
+#RHL <- RHL/0.39
 
 #args<- NULL
 #args[4] <- 6
@@ -90,6 +93,21 @@ if (args[5]==3) reg_to_change <- "Season"
 # Bin4 <- 0.9
 # Bin5 <- 0.8
 # Bin6 <- 0.6
+
+######################################
+
+#modify the expected landings based on the GLM calibration
+calib_glm <- readRDS("mse/calib_glm.rds")
+nufluke <- tibble(
+  pred = flukecatch$land,
+  minlen = flukecatch$MinLen,
+  seaslen = flukecatch$SeasonLen,
+  bag = flukecatch$Bag,
+  biomass = SSB
+)
+pred_landings <- predict(calib_glm, newdata = nufluke, type = "response")
+#update the lookup table values
+flukecatch$land <- as.numeric(pred_landings)
 
 ######################################
 
@@ -164,6 +182,26 @@ upperCI_test
 lowerCI_test <- sum(output2$lwr)
 lowerCI_test
 
+
+#add the calibration adjustment
+#calib_glm <- readRDS("mse/calib_glm.rds")
+nudata <- tibble(
+  pred = c(outputland, upperCI_test, lowerCI_test),
+  #pred = c(4000000,4800000,3200000),
+  minlen = minlen,
+  seaslen = seasonlen,
+  bag = bag,
+  biomass = SSB
+)
+pred_harvest <- predict(calib_glm, newdata = nudata, 
+                        se.fit=TRUE, type = "link")
+#pred_harvest <- predict(calib_glm, newdata = nudata, 
+ #                       se.fit=TRUE, type = "response")
+
+expectedharvest <- exp(pred_harvest$fit[1])
+upperCI <- exp(pred_harvest$fit[2] + (1.96 * pred_harvest$se.fit[2]))
+lowerCI <- exp(pred_harvest$fit[3] - (1.96 * pred_harvest$se.fit[3]))
+
 #Rec demand model expected harvest, sd, CV
 #harvestrecdemand <- 8826699
 #sdrecdemand <- 530839
@@ -182,9 +220,9 @@ lowerCI_test
 # Inputs 
 # For now I just left all of the relevant inputs in each chunk
 #RHL <- 6350000 # I just pulled this RHL value off the internet for now
-expectedharvest <- sum(catchallstates_commonreg$land) 
-upperCI <- upperCI_test
-lowerCI <- lowerCI_test
+# expectedharvest <- sum(catchallstates_commonreg$land) 
+# upperCI <- upperCI_test
+# lowerCI <- lowerCI_test
 
 
  if (Alternative == "Table1"){
