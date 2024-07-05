@@ -58,10 +58,12 @@ if(args[4] == 11) Alternative = "Table0"
 if(args[4] == 6) Alternative = "Table1"
 if(args[4] == 8) Alternative = "Table2"
 if(args[4] == 10) Alternative = "Table3"
+if(args[4] == 12) Alternative = "Table4" 
 #Table 0 = No Change
 #Table 1 = Percent Change Approach
 #Table 2 = Biological Reference Point Approach
 #Table 3 = Biomass Based Matrix Approach
+#Table 4 = Simplified Percent Change Approach
 
 #args[5] <- 1
 # REgulation that is being changed during the HCR
@@ -218,6 +220,43 @@ catchallstates_commonreg_HCR <- catchallstates_commonreg
 catchallstates_commonreg_HCR$land <- x*catchallstates_commonreg_HCR$land
 #catchallstates_commonreg_HCR
 }
+
+#' Simplified Percent Change Approach 
+## -----------------------------------------------------------------------------
+
+ if (Alternative == "Table4"){
+#1.1
+if(RHL > upperCI & BBMSY >= 1.5){x <- 1.4}
+  
+#1.2
+if(RHL > upperCI & BBMSY >= 1 & BBMSY < 1.5){x <- 1.2}
+  
+#1.3
+if(RHL > upperCI & BBMSY < 1){x <- 1.1}
+  
+#2.1 
+if(between(RHL, lowerCI, upperCI) & BBMSY >= 1.5){x <- 1.1} 
+  
+#2.2
+if(between(RHL, lowerCI, upperCI) & BBMSY >= 1 & BBMSY < 1.5){x <- 1} 
+  
+#2.3
+if(between(RHL, lowerCI, upperCI) & BBMSY < 1){x <- 0.9} 
+  
+#3.1
+if(RHL < lowerCI & BBMSY >= 1.5){x <- 0.9} 
+  
+#3.2
+if(RHL < lowerCI & BBMSY >= 1 & BBMSY < 1.5){x <-  0.8}
+  
+#3.3
+if(RHL < lowerCI & BBMSY < 1){x <- 0.6}
+
+   # calculates target catch based off of degree of liberalization/reduction
+catchallstates_commonreg_HCR <- catchallstates_commonreg
+catchallstates_commonreg_HCR$land <- x*catchallstates_commonreg_HCR$land
+#catchallstates_commonreg_HCR
+ }
 
 #' Biological Reference Point Approach
 ## -----------------------------------------------------------------------------
@@ -437,14 +476,25 @@ VAcatch_common <- catchallstates_commonreg_HCR$land[catchallstates_commonreg$Sta
 NJcatch_common <- catchallstates_commonreg_HCR$land[catchallstates_commonreg$State=="NJ"]
 
 # GF generic functions
+#functioncatch_seasonlen <- function(flukecatch, state, bag, minlen, target){
+#  flukecatch %>% 
+    #group_by(State=="NC") %>% 
+ #   filter(
+  #    State== state, #"NC",
+   #   Bag == bag,
+    #  MinLen == minlen, #) %>%
+    #filter(
+   #   land == max(land[land <= target])) 
+#}
+
 functioncatch_seasonlen <- function(flukecatch, state, bag, minlen, target){
   flukecatch %>% 
     #group_by(State=="NC") %>% 
     filter(
       State== state, #"NC",
       Bag == bag,
-      MinLen == minlen, #) %>%
-    #filter(
+      MinLen == minlen) %>%
+    filter(
       land == max(land[land <= target])) 
 }
 
