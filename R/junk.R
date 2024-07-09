@@ -30,16 +30,22 @@ projection.plot <- function(project.results) {
 
 
 all_results %>% 
+  #filter(bag == 4, seaslen == 150) %>% 
+  drop_na() %>% 
   ggplot() + 
-  aes(y = 1000*keep_num, x = 0.39*exp_keep, col = biomass) + 
-  geom_point(alpha=0.1) + 
+  aes(y = 1000*keep_num, x = exp_keep, col = biomass) + 
+  #geom_point(alpha=0.2) + 
+  geom_point() + 
   geom_abline(slope = 1, intercept = 0) + 
   scale_color_viridis_c() +
   labs(
     y = "harvest number from RDM",
-    x = "expected harvest from GAM"
+    x = "expected harvest from HCR"
   ) +
-  ylim(0,NA)
+  #facet_wrap(~bag) +
+  ylim(0,NA) +
+  xlim(0,NA) +
+  NULL
 
 all_results %>% 
   mutate(ratio = 1000*keep_num / (0.39*exp_keep),
@@ -466,30 +472,100 @@ p4
 
 
   
-  
-#bag + seaslen 
+
 glm5 <- all_results %>% 
   mutate(kept = 1000*keep_num,
-         pred = 0.39*exp_keep) %>% 
-  glm(formula = kept ~ pred + minlen + seaslen + bag, data =., family = "poisson") # 
+         pred = exp_keep) %>% 
+  glm(formula = kept ~ pred + biomass, data =., family = "poisson") # 
 #lm(formula = log(kept) ~ log(pred) + biomass, data =.) #, family = "poisson") # 
 bob <- augment(glm5, type.predict = "response")
+nudata <- expand.grid(pred = seq(0,1e+07,by=100), biomass = seq(20000,60000,by=5000)) %>% 
+  tibble()
+nudata$est <- predict(glm5, newdata = nudata, type = "response")
+
 p5 <- bob %>% 
   janitor::clean_names() %>% 
-  select(-seaslen, -minlen, -bag) %>% 
+  select(-biomass) %>% 
   #select(-biomass, -minlen) %>% 
   bind_cols(all_results %>% slice(as.integer(bob$.rownames))) %>% 
+  #filter(seaslen == 150, minlen == 17.5) %>% 
   ggplot() +
-  #aes(x = log_kept, y = fitted, col = biomass) +
-  aes(x = kept, y = fitted, col = biomass) +
+  aes(y = kept, x = pred, col = biomass) +
+  #aes(x = kept, y = fitted, col = bag) +
   geom_point(alpha = 0.2) +
+  geom_line(data = nudata, aes(x = pred, y = est, group = biomass, col=biomass)) +
   scale_color_viridis_c() +
   #facet_wrap(~minlen, scales = "free") +
-  #facet_wrap(~bag, scales = "free") +
+  #facet_wrap(~bag) + #, scales = "free") +
   geom_abline(slope = 1, intercept = 0) + 
   #ylim(0, 6e+07) +
   NULL
 p5
 100*with(summary(glm5), 1 - deviance/null.deviance)
 100*with(summary(glm4), 1 - deviance/null.deviance)
+
+
+
+# gam5 <- all_results %>% 
+#   mutate(kept = 1000*keep_num,
+#          pred = exp_keep) %>% 
+#   gam(formula = kept ~ pred + s(biomass), data =., family = "poisson") # 
+# summary(gam5)
+# gratia::draw(gam5)
+
+p6 <- bob %>% 
+  janitor::clean_names() %>% 
+  select(-biomass) %>% 
+  #select(-biomass, -minlen) %>% 
+  bind_cols(all_results %>% slice(as.integer(bob$.rownames))) %>% 
+  #filter(seaslen == 150, minlen == 17.5) %>% 
+  ggplot() +
+  aes(y = kept, x = pred, col = biomass) +
+  #aes(x = kept, y = fitted, col = bag) +
+  geom_point(alpha = 0.2) +
+  #geom_point(aes(y = fitted),col = "orange", alpha = 0.2) +
+  scale_color_viridis_c() +
+  #facet_wrap(~minlen, scales = "free") +
+  #facet_wrap(~bag, scales = "free") +
+  geom_abline(slope = 1, intercept = 0) + 
+  #ylim(0, 6e+07) +
+  NULL
+p6
+p6 + p5
+
+p7 <- bob %>% 
+  janitor::clean_names() %>% 
+  select(-biomass) %>% 
+  #select(-biomass, -minlen) %>% 
+  bind_cols(all_results %>% slice(as.integer(bob$.rownames))) %>% 
+  filter(seaslen == 150, minlen == 17.5) %>% 
+  ggplot() +
+#  aes(y = kept, group = bag) +
+#  geom_boxplot()
+  aes(x = fitted, y = kept, col = biomass) +
+  #aes(x = kept, y = fitted, col = bag) +
+  geom_point(alpha = 0.2) +
+  scale_color_viridis_c() +
+  #facet_wrap(~minlen, scales = "free") +
+  facet_wrap(~bag) + #, scales = "free") +
+  geom_abline(slope = 1, intercept = 0) + 
+  #ylim(0, 6e+07) +
+  NULL
+p7
+
+dat_use <- flukecatch %>% 
+  janitor::clean_names() %>% 
+  group_by(bag, min_len, season_len) %>% 
+  summarize(land = sum(land),
+            disc = sum(disc), .groups = "drop")
+dat_use
+
+dat_use %>% 
+  ggplot() + 
+  aes(x = min_len, y = land, group = season_len, col = season_len) +
+  geom_line() +
+  facet_wrap(~bag) +
+  scale_color_viridis_c() +
+  theme_bw() + 
+  NULL
 

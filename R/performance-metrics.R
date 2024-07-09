@@ -564,6 +564,68 @@ params <- list(
                 "MP 12"),
   fsim = rep(1,12))
 
+# base runs with recalobrated expected landings in the HCR
+params <- list(
+  scendir = c("~/research/mafmc-recmeasures/sims/125/",
+              "~/research/mafmc-recmeasures/sims/126/",
+              "~/research/mafmc-recmeasures/sims/127/",
+              "~/research/mafmc-recmeasures/sims/128/",
+              "~/research/mafmc-recmeasures/sims/129/",
+              "~/research/mafmc-recmeasures/sims/130/",
+              "~/research/mafmc-recmeasures/sims/131/",
+              "~/research/mafmc-recmeasures/sims/132/",
+              "~/research/mafmc-recmeasures/sims/133/",
+              "~/research/mafmc-recmeasures/sims/134/",
+              "~/research/mafmc-recmeasures/sims/135/",
+              "~/research/mafmc-recmeasures/sims/136/"),
+  scen.name = c("MP 1",
+                "MP 2",
+                "MP 3",
+                "MP 4",
+                "MP 5",
+                "MP 6",
+                "MP 7",
+                "MP 8",
+                "MP 9",
+                "MP 10",
+                "MP 11",
+                "MP 12"),
+  fsim = rep(1,12))
+
+# initial stock status ~2BMSY with recalibrated expected landings in the HCR
+params <- list(
+  scendir = c("~/research/mafmc-recmeasures/sims/137/",
+              "~/research/mafmc-recmeasures/sims/138/",
+              "~/research/mafmc-recmeasures/sims/139/",
+              "~/research/mafmc-recmeasures/sims/140/",
+              "~/research/mafmc-recmeasures/sims/141/",
+              "~/research/mafmc-recmeasures/sims/142/",
+              "~/research/mafmc-recmeasures/sims/143/",
+              "~/research/mafmc-recmeasures/sims/144/",
+              "~/research/mafmc-recmeasures/sims/145/",
+              "~/research/mafmc-recmeasures/sims/146/",
+              "~/research/mafmc-recmeasures/sims/147/",
+              "~/research/mafmc-recmeasures/sims/148/"),
+  scen.name = c("MP 1",
+                "MP 2",
+                "MP 3",
+                "MP 4",
+                "MP 5",
+                "MP 6",
+                "MP 7",
+                "MP 8",
+                "MP 9",
+                "MP 10",
+                "MP 11",
+                "MP 12"),
+  fsim = rep(1,12))
+
+
+params <- list(
+  scendir = c("~/research/mafmc-recmeasures/mse/"),
+  scen.name = c("MP 1"),
+  fsim = rep(1,1))
+
 #summarize the output files
 all_results <- purrr::pmap_dfr(params,read_results, om.name=5)
 
@@ -827,6 +889,18 @@ state_metrics$om <- 5.  #dummy value for 2024 rec measures modeling
 saveRDS(metrics,"sims/metrics.rds")
 saveRDS(median_metrics,"sims/median_metrics.rds")
 saveRDS(state_metrics,"sims/full_state_metrics.rds") 
+
+#2024-07-08
+
+saveRDS(metrics,"sims/metrics_2024-07-07.rds")
+saveRDS(median_metrics,"sims/median_metrics_2024-07-07.rds")
+saveRDS(state_metrics,"sims/full_state_metrics_2024-07-07.rds") 
+
+saveRDS(metrics,"sims/metrics_2BMSY_2024-07-08.rds")
+saveRDS(median_metrics,"sims/median_metrics_2BMSY_2024-07-08.rds")
+saveRDS(state_metrics,"sims/full_state_metrics_2BMSY_2024-07-08.rds") 
+
+
 
 
 # fulL_state_metrics <- fulL_state_metrics %>% 
