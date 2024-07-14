@@ -13,6 +13,7 @@ library(tidyverse)
 library(ggdist)
 library(scales)
 library(fmsb)
+library(googlesheets4)
 ```
 
 _Gavin Fay_   
@@ -37,6 +38,23 @@ median_metrics <- readRDS("sims/median_metrics.rds")
 state_metrics <- readRDS("sims/full_state_metrics.rds") %>%
   mutate(state = fct_relevel(state,
                              c("MA","RI","CT","NY","NJ","DE","MD","VA","NC")))
+
+# base results with GLM calibration
+metrics <- readRDS("sims/metrics_2024-07-07.rds")
+median_metrics <- readRDS("sims/median_metrics_2024-07-07.rds")
+state_metrics <- readRDS("sims/full_state_metrics_2024-07-07.rds") %>%
+  mutate(state = fct_relevel(state,
+                             c("MA","RI","CT","NY","NJ","DE","MD","VA","NC")))
+
+# 2BMSY results with GLM calibration
+metrics <- readRDS("sims/metrics_2BMSY_2024-07-08.rds")
+median_metrics <- readRDS("sims/median_metrics_2BMSY_2024-07-08.rds")
+state_metrics <- readRDS("sims/full_state_metrics_2BMSY_2024-07-08.rds") %>%
+  mutate(state = fct_relevel(state,
+                             c("MA","RI","CT","NY","NJ","DE","MD","VA","NC")))
+
+
+
 #metrics
 #median_metrics
 # state_metrics <- state_metrics %>% 
@@ -454,22 +472,30 @@ state_medians <- state_metrics %>%
 <!--                                             )))  -->
 
 <!-- ``` -->
+```{r}
+scen_lookup <- read_sheet("https://docs.google.com/spreadsheets/d/17PZz1vlJDw8lMd0aewDkYD_zWsAfLMQWPUb--1imqGk/edit?gid=0#gid=0") %>% 
+  janitor::clean_names() %>% 
+  rename(mp = run_number)
+scen_lookup
+```
 
 
 ```{r}
 metrics2 <- metrics %>% 
+  left_join(scen_lookup) %>% 
   mutate(om = factor(om),
          om = fct_recode(om, "Base" = "1","MRIP Bias" = "2","Shift" = "3"),
-         mp2 = fct_collapse(mp,
-                          "rhl" = c("MP 4","MP 8", "MP 12"),
-                          "perc_change" = c("MP 1","MP 5","MP 9"), 
-                          "refpt" = c("MP 2", "MP 6","MP 10"),
-                          "bmatrix" = c("MP 3","MP 7","MP 11")),
-         mp3 = fct_collapse(mp,
-                          "bag" = c("MP 4","MP 1","MP 2", "MP 3"),
-                          "minlen" = c("MP 8","MP 5","MP 6","MP 7"),
-                          "season" = c("MP 12","MP 9","MP 10","MP 11")),
-         value = ifelse(metric == "exp_keep", 0.39*value, value),
+         mp2 = fct_recode(factor(hcr),
+                          "rhl" = "11",
+                          "perc_change" = "6", 
+                          "refpt" = "8",
+                          "bmatrix" = "10"),
+         mp3 = fct_collapse(factor(reg_to_change),
+                          "bag" = "1",
+                          "season" = "3",
+                          "minlen" = "2"),
+         mp3 = fct_relevel(mp3, "bag", "season"),
+         #value = ifelse(metric == "exp_keep", 0.39*value, value),
          metric = factor(metric, levels = c("keep_one",
                                             "kept per trip", #_mp1",
                                             "cs_per_trip",

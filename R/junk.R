@@ -33,9 +33,9 @@ all_results %>%
   #filter(bag == 4, seaslen == 150) %>% 
   drop_na() %>% 
   ggplot() + 
-  aes(y = 1000*keep_num, x = exp_keep, col = biomass) + 
-  #geom_point(alpha=0.2) + 
-  geom_point() + 
+  aes(y = 1000*keep_num, x = exp_keep, col = minlen) + 
+  geom_point(alpha=0.1) + 
+  #geom_point() + 
   geom_abline(slope = 1, intercept = 0) + 
   scale_color_viridis_c() +
   labs(
@@ -43,8 +43,8 @@ all_results %>%
     x = "expected harvest from HCR"
   ) +
   #facet_wrap(~bag) +
-  ylim(0,NA) +
-  xlim(0,NA) +
+  xlim(0,1e+07) +
+  ylim(0,1e+07) +
   NULL
 
 all_results %>% 
@@ -490,14 +490,14 @@ p5 <- bob %>%
   bind_cols(all_results %>% slice(as.integer(bob$.rownames))) %>% 
   #filter(seaslen == 150, minlen == 17.5) %>% 
   ggplot() +
-  aes(y = kept, x = pred, col = biomass) +
-  #aes(x = kept, y = fitted, col = bag) +
-  geom_point(alpha = 0.2) +
+  #aes(y = kept, x = pred, col = biomass) +
+  #aes(x = exp_keep, y = fitted, col = bag) +
+  #geom_point(alpha = 0.2) +
   geom_line(data = nudata, aes(x = pred, y = est, group = biomass, col=biomass)) +
   scale_color_viridis_c() +
   #facet_wrap(~minlen, scales = "free") +
   #facet_wrap(~bag) + #, scales = "free") +
-  geom_abline(slope = 1, intercept = 0) + 
+  #geom_abline(slope = 1, intercept = 0) + 
   #ylim(0, 6e+07) +
   NULL
 p5
@@ -567,5 +567,6 @@ dat_use %>%
   facet_wrap(~bag) +
   scale_color_viridis_c() +
   theme_bw() + 
+  ylim(0,NA) +
   NULL
 

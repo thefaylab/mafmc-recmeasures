@@ -378,6 +378,7 @@ rbc2 <- rbctrack %>%
 #names(rbc2) <- c("isim","year","abc","fmsy","est_ofl","true_ofl","rhl","bmsy","msy","fem_ssb")
 names(rbc2) <- c("isim","year","abc","fmsy","est_ofl","rhl","bmsy","exp_keep","seaslen","bag","minlen") #,"msy")
 rbc2 <- rbc2 %>% 
+  mutate(exp_keep = as.numeric(ifelse(exp_keep == "******************",NA,exp_keep))) %>% 
   mutate(year = 2019 + 2*year - 1) %>% 
   I()
 results <- results %>% 
@@ -620,11 +621,66 @@ params <- list(
                 "MP 12"),
   fsim = rep(1,12))
 
-
+# base runs with recalobrated expected landings in the HCR
 params <- list(
-  scendir = c("~/research/mafmc-recmeasures/mse/"),
-  scen.name = c("MP 1"),
-  fsim = rep(1,1))
+  scendir = c("~/research/mafmc-recmeasures/sims/225/",
+              "~/research/mafmc-recmeasures/sims/226/",
+              "~/research/mafmc-recmeasures/sims/227/",
+              "~/research/mafmc-recmeasures/sims/228/",
+              "~/research/mafmc-recmeasures/sims/229/",
+              "~/research/mafmc-recmeasures/sims/230/",
+              "~/research/mafmc-recmeasures/sims/231/",
+              "~/research/mafmc-recmeasures/sims/232/",
+              "~/research/mafmc-recmeasures/sims/233/",
+              "~/research/mafmc-recmeasures/sims/234/",
+              "~/research/mafmc-recmeasures/sims/235/",
+              "~/research/mafmc-recmeasures/sims/236/"),
+  scen.name = c("MP 1",
+                "MP 2",
+                "MP 3",
+                "MP 4",
+                "MP 5",
+                "MP 6",
+                "MP 7",
+                "MP 8",
+                "MP 9",
+                "MP 10",
+                "MP 11",
+                "MP 12"),
+  fsim = rep(1,12))
+
+#
+dirs <- 225:236
+params <- list(
+  scendir = paste0("~/research/mafmc-recmeasures/sims/",dirs,"/"),
+  scen.name = dirs,
+  fsim = rep(1,length(dirs)))
+
+#
+dirs <- 237:248
+params <- list(
+  scendir = paste0("~/research/mafmc-recmeasures/sims/",dirs,"/"),
+  scen.name = dirs,
+  fsim = rep(1,length(dirs)))
+
+#
+dirs <- 249:260
+params <- list(
+  scendir = paste0("~/research/mafmc-recmeasures/sims/",dirs,"/"),
+  scen.name = dirs,
+  fsim = rep(1,length(dirs)))
+
+dirs <- c(264:266,252:260)
+params <- list(
+  scendir = paste0("~/research/mafmc-recmeasures/sims/",dirs,"/"),
+  scen.name = dirs,
+  fsim = rep(1,length(dirs)))
+
+
+# params <- list(
+#   scendir = c("~/research/mafmc-recmeasures/mse/"),
+#   scen.name = c("MP 1"),
+#   fsim = rep(1,1))
 
 #summarize the output files
 all_results <- purrr::pmap_dfr(params,read_results, om.name=5)
@@ -892,15 +948,17 @@ saveRDS(state_metrics,"sims/full_state_metrics.rds")
 
 #2024-07-08
 
-saveRDS(metrics,"sims/metrics_2024-07-07.rds")
-saveRDS(median_metrics,"sims/median_metrics_2024-07-07.rds")
-saveRDS(state_metrics,"sims/full_state_metrics_2024-07-07.rds") 
+# saveRDS(metrics,"sims/metrics_2024-07-07.rds")
+# saveRDS(median_metrics,"sims/median_metrics_2024-07-07.rds")
+# saveRDS(state_metrics,"sims/full_state_metrics_2024-07-07.rds") 
+# 
+saveRDS(metrics,"sims/metrics_2BMSY.rds")
+saveRDS(median_metrics,"sims/median_metrics_2BMSY.rds")
+saveRDS(state_metrics,"sims/full_state_metrics_2BMSY.rds") 
 
-saveRDS(metrics,"sims/metrics_2BMSY_2024-07-08.rds")
-saveRDS(median_metrics,"sims/median_metrics_2BMSY_2024-07-08.rds")
-saveRDS(state_metrics,"sims/full_state_metrics_2BMSY_2024-07-08.rds") 
-
-
+saveRDS(metrics,"sims/metrics_halfBMSY.rds")
+saveRDS(median_metrics,"sims/median_metrics_halfBMSY.rds")
+saveRDS(state_metrics,"sims/full_state_metrics_halfBMSY.rds") 
 
 
 # fulL_state_metrics <- fulL_state_metrics %>% 
