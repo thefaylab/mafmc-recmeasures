@@ -1,0 +1,115 @@
+ sim #            1
+
+
+
+
+  0.34999999999999998       0.39777343749999999     
+   0.0000000000000000     
+   0.0000000000000000     
+  0.50660000000000005     
+ EstOFL    15553.854314259717     
+   2157.4605248327548        1158193.0000000000     
+   275.00000000000000        4.0000000000000000        17.500000000000000     
+   Rscript do_recmeasures_hcr.R  4 17.5 275  8 2    1158193   0.226   0.200   1.000   1.000 3        
+[1] 6534037
+[1] 7961377
+[1] 5388459
+   4.0000000000000000        21.000000000000000        270.00000000000000     
+ OM Length structure
+ Rscript prediction-wrapper.R 2020                                                                   
+[[1]]
+[1] "tidyr"     "stats"     "graphics"  "grDevices" "utils"     "datasets" 
+[7] "methods"   "base"     
+
+[[2]]
+[1] "magrittr"  "tidyr"     "stats"     "graphics"  "grDevices" "utils"    
+[7] "datasets"  "methods"   "base"     
+
+[[3]]
+ [1] "dplyr"     "magrittr"  "tidyr"     "stats"     "graphics"  "grDevices"
+ [7] "utils"     "datasets"  "methods"   "base"     
+
+[[4]]
+ [1] "rlist"     "dplyr"     "magrittr"  "tidyr"     "stats"     "graphics" 
+ [7] "grDevices" "utils"     "datasets"  "methods"   "base"     
+
+[[5]]
+ [1] "copula"    "rlist"     "dplyr"     "magrittr"  "tidyr"     "stats"    
+ [7] "graphics"  "grDevices" "utils"     "datasets"  "methods"   "base"     
+
+[[6]]
+ [1] "data.table" "copula"     "rlist"      "dplyr"      "magrittr"  
+ [6] "tidyr"      "stats"      "graphics"   "grDevices"  "utils"     
+[11] "datasets"   "methods"    "base"      
+
+[[7]]
+ [1] "conflicted" "data.table" "copula"     "rlist"      "dplyr"     
+ [6] "magrittr"   "tidyr"      "stats"      "graphics"   "grDevices" 
+[11] "utils"      "datasets"   "methods"    "base"      
+
+   6663.5729841000002     
+ OM Length structure
+ Rscript prediction-wrapper.R 2021                                                                   
+[[1]]
+[1] "tidyr"     "stats"     "graphics"  "grDevices" "utils"     "datasets" 
+[7] "methods"   "base"     
+
+[[2]]
+[1] "magrittr"  "tidyr"     "stats"     "graphics"  "grDevices" "utils"    
+[7] "datasets"  "methods"   "base"     
+
+[[3]]
+ [1] "dplyr"     "magrittr"  "tidyr"     "stats"     "graphics"  "grDevices"
+ [7] "utils"     "datasets"  "methods"   "base"     
+
+[[4]]
+ [1] "rlist"     "dplyr"     "magrittr"  "tidyr"     "stats"     "graphics" 
+ [7] "grDevices" "utils"     "datasets"  "methods"   "base"     
+
+[[5]]
+ [1] "copula"    "rlist"     "dplyr"     "magrittr"  "tidyr"     "stats"    
+ [7] "graphics"  "grDevices" "utils"     "datasets"  "methods"   "base"     
+
+[[6]]
+ [1] "data.table" "copula"     "rlist"      "dplyr"      "magrittr"  
+ [6] "tidyr"      "stats"      "graphics"   "grDevices"  "utils"     
+[11] "datasets"   "methods"    "base"      
+
+[[7]]
+ [1] "conflicted" "data.table" "copula"     "rlist"      "dplyr"     
+ [6] "magrittr"   "tidyr"      "stats"      "graphics"   "grDevices" 
+[11] "utils"      "datasets"   "methods"    "base"      
+
+   6663.5729841000002     
+ OM Length structure
+ Rscript prediction-wrapper.R 2022                                                                   
+[[1]]
+[1] "tidyr"     "stats"     "graphics"  "grDevices" "utils"     "datasets" 
+[7] "methods"   "base"     
+
+[[2]]
+[1] "magrittr"  "tidyr"     "stats"     "graphics"  "grDevices" "utils"    
+[7] "datasets"  "methods"   "base"     
+
+[[3]]
+ [1] "dplyr"     "magrittr"  "tidyr"     "stats"     "graphics"  "grDevices"
+ [7] "utils"     "datasets"  "methods"   "base"     
+
+[[4]]
+ [1] "rlist"     "dplyr"     "magrittr"  "tidyr"     "stats"     "graphics" 
+ [7] "grDevices" "utils"     "datasets"  "methods"   "base"     
+
+[[5]]
+ [1] "copula"    "rlist"     "dplyr"     "magrittr"  "tidyr"     "stats"    
+ [7] "graphics"  "grDevices" "utils"     "datasets"  "methods"   "base"     
+
+[[6]]
+ [1] "data.table" "copula"     "rlist"      "dplyr"      "magrittr"  
+ [6] "tidyr"      "stats"      "graphics"   "grDevices"  "utils"     
+[11] "datasets"   "methods"    "base"      
+
+[[7]]
+ [1] "conflicted" "data.table" "copula"     "rlist"      "dplyr"     
+ [6] "magrittr"   "tidyr"      "stats"      "graphics"   "grDevices" 
+[11] "utils"      "datasets"   "methods"    "base"      
+
