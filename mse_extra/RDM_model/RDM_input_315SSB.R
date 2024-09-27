@@ -482,28 +482,28 @@ for (x in 1:315){
   Nlen <- 42 
   Nlengthbin <- bigdatalist[[x]]$Nsim[1]
   om_length_cm <-  
-    if(Nlengthbin %in% seq(1,315, by = 15)){scan("~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMinputAttempt1/sim_storelength/om-length2020.dat",n=Nlen+1)} else #28781.11
+    if(Nlengthbin %in% seq(1,315, by = 15)){scan("~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMinputAttempt1/sim_storelength/om-length2020.dat",n=Nlen+1)} else #29781.11
       if(Nlengthbin %in% seq(2,315, by = 15)){scan("~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMinputAttempt1/sim_storelength/om-length2021.dat",n=Nlen+1)} else #42332.81
         if(Nlengthbin %in% seq(3,315, by = 15)){scan("~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMinputAttempt1/sim_storelength/om-length2022.dat",n=Nlen+1)} else #56688.65
-          if(Nlengthbin %in% seq(4,315, by = 15)){scan("~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMinputAttempt1/sim_storelength/om-length2039.dat",n=Nlen+1)} else #61616.96
+          if(Nlengthbin %in% seq(4,315, by = 15)){scan("~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMinputAttempt1/sim_storelength/om-length2039.dat",n=Nlen+1)} else #64506.83 
             if(Nlengthbin %in% seq(5,315, by = 15)){scan("~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMinputAttempt1/sim_storelength/om-length2024.dat",n=Nlen+1)} else  #76233.42        
               if(Nlengthbin %in% seq(6,315, by = 15)){scan("~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMinputAttempt1/sim_storelength/om-length2027.dat",n=Nlen+1)} else #86364.19
-                if(Nlengthbin %in% seq(7,315, by = 15)){scan("~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMinputAttempt1/sim_storelength/om-length2045.dat",n=Nlen+1)} else #92265.6 
+                if(Nlengthbin %in% seq(7,315, by = 15)){scan("~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMinputAttempt1/sim_storelength/om-length2045.dat",n=Nlen+1)} else #92265.67 
                   if(Nlengthbin %in% seq(8,315, by = 15)){scan("~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMinputAttempt1/sim_storelength_contrast/om-length2025.dat",n=Nlen+1)} else #101915.23 2025
-                    if(Nlengthbin %in% seq(9,315, by = 15)){scan("~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMinputAttempt1/sim_storelength_contrast/om-length2025.dat",n=Nlen+1)} else #110281.24 2045
-                      if(Nlengthbin %in% seq(10,315, by = 15)){scan("~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMinputAttempt1/sim_storelength_contrast/om-length2025.dat",n=Nlen+1)} else #152473.71 2037 
+                    if(Nlengthbin %in% seq(9,315, by = 15)){scan("~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMinputAttempt1/sim_storelength_contrast/om-length2045.dat",n=Nlen+1)} else #110281.24 2045
+                      if(Nlengthbin %in% seq(10,315, by = 15)){scan("~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMinputAttempt1/sim_storelength_contrast/om-length2037.dat",n=Nlen+1)} else #152473.71 2037 
                         if(Nlengthbin %in% seq(11,315, by = 15)){scan("~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMinputAttempt1/sim_storelength_contrast/om-length2032.dat",n=Nlen+1)} else #167042.76 2032
                           if(Nlengthbin %in% seq(12,315, by = 15)){scan("~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMinputAttempt1/sim_storelength_contrast/om-length2026.dat",n=Nlen+1)} else #181257.26 2026  
                             if(Nlengthbin %in% seq(13,315, by = 15)){scan("~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMinputAttempt1/sim_storelength_contrast/om-length2027.dat",n=Nlen+1)} else #210394.15 2027
                               if(Nlengthbin %in% seq(14,315, by = 15)){scan("~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMinputAttempt1/sim_storelength_contrast/om-length2028.dat",n=Nlen+1)} else #225460.28 2028 
                                 if(Nlengthbin %in% seq(15,315, by = 15)){scan("~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMinputAttempt1/sim_storelength_contrast/om-length2034.dat",n=Nlen+1)} #254612.89 2034
-  SSB[x] <- if(Nlengthbin %in% seq(1,315, by = 15)){SSB <- 28781.11} else #28781.11
+  SSB[x] <- if(Nlengthbin %in% seq(1,315, by = 15)){SSB <- 29781.11} else #29781.11
     if(Nlengthbin %in% seq(2,315, by = 15)){SSB <- 42332.81} else #42332.81
       if(Nlengthbin %in% seq(3,315, by = 15)){SSB <- 56688.65} else #56688.65
-        if(Nlengthbin %in% seq(4,315, by = 15)){SSB <- 61616.96} else #61616.96
+        if(Nlengthbin %in% seq(4,315, by = 15)){SSB <- 64506.83} else #64506.83
           if(Nlengthbin %in% seq(5,315, by = 15)){SSB <- 76233.42 } else  #76233.42        
             if(Nlengthbin %in% seq(6,315, by = 15)){SSB <- 86364.19} else #86364.19
-              if(Nlengthbin %in% seq(7,315, by = 15)){SSB <- 92265.6} else #92265.6 
+              if(Nlengthbin %in% seq(7,315, by = 15)){SSB <- 92265.67 } else #92265.67 
                 if(Nlengthbin %in% seq(8,315, by = 15)){SSB <- 101915.23} else #101915.23 2025
                   if(Nlengthbin %in% seq(9,315, by = 15)){SSB <- 110281.24} else #110281.24 2045
                     if(Nlengthbin %in% seq(10,315, by = 15)){SSB <- 152473.71} else #152473.71 2037 
@@ -794,15 +794,13 @@ RDMoutputbind_edit <- select(bind_rows(RDMoutput_edit), state, tot_keep,  Season
 #saveRDS(RDMoutputbind_edit, "~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMoutputbind_315SSB.rds") #sequential length -> use this, later sims are just to compare between runs (not much difference between them)
 #saveRDS(RDMoutputbind_edit, "~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMoutputbind_315SSB2.rds") #sequential length 2
 #saveRDS(RDMoutputbind_edit, "~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMoutputbind_315SSB3.rds") #sequential length 3 
-#saveRDS(RDMoutputbind_edit, "~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMoutputbind_315SSB4.rds") #sequential length 4 
 
 ############################# FIT MODEL ########################################
 library(mgcv)
 library(gratia)
-RDMoutputbind_edit <- readRDS("~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMoutputbind_315SSB.rds") #use this, later sims are just to compare between runs (not much difference between them)
+#RDMoutputbind_edit <- readRDS("~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMoutputbind_315SSB.rds") #use this, later sims are just to compare between runs (not much difference between them)
 #RDMoutputbind_edit <- readRDS("~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMoutputbind_315SSB2.rds") 
 #RDMoutputbind_edit <- readRDS("~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMoutputbind_315SSB3.rds") 
-#RDMoutputbind_edit <- readRDS("~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMoutputbind_315SSB4.rds") 
 
 tot_keep <- RDMoutputbind_edit$tot_keep
 tot_rel <- RDMoutputbind_edit$tot_rel
@@ -813,7 +811,7 @@ MinLen <- RDMoutputbind_edit$MinLen
 SSB <- RDMoutputbind_edit$SSBcov
 
 inputdata <- data.frame(tot_keep, tot_rel,
-                        state, SeasonLen, Bag, MinLen, SSB) #remove tot_rel for RDMoutputbind_SSBscramble.rds
+                        state, SeasonLen, Bag, MinLen, SSB) 
 #View(inputdata)
 #hist(inputdata$tot_rel)
 
@@ -835,7 +833,7 @@ saveRDS(g1.1, "~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/gam_RDMla
 #g1.1 <- readRDS("~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/gam_RDMland_noSSB315.rds") #disordered length
             
 # ------------------------------- DISC GAM -------------------------------------------------#
-d1 <- gam(tot_rel ~ state + s(SSB, k = 3) + s(SeasonLen, k = 3) + #9,5,7 partial effect of smooths look strange with k any higher 
+d1 <- gam(tot_rel ~ state + s(SSB, k = 3) + s(SeasonLen, k = 3) + 
             s(Bag, k = 3) + s(MinLen, k = 3), data = inputdata, 
           family = Gamma(link = log), method = "REML") 
 summary(d1)
