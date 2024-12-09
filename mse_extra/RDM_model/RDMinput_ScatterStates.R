@@ -1,10 +1,12 @@
-
 library(dplyr)
 library(tidyr)
 library(data.table)
 library(mgcv)
+library(gratia)
 
-# Systematically pairs regs, adds SSB as covariate
+# trying another random sample to make sure a particular combination isn't what's been causing bizarre discards results
+# running discards gam with 4 different scramblings of regs has same issue
+# trying again where instead of having 9 identical datasets, one for each state, we instead scatter the states across the probable range of regulations more haphazardly -> somewhat improves seasonlen partial effect
 
 setwd("~/Desktop/FlounderMSE")
 
@@ -22,31 +24,53 @@ sample_seas <- c(60,
                  270, 
                  300)
 sample_bag <- c(4,5,6,7,8)
-sample_minlen <- c(14,15,16,17,18,19,20)
+sample_minlen <- c(14,14.5,15,15.5,16,16.5,17,17.5,18,18.5,19,19.5,20,20.5,21)
 state <- c("NC", "VA", "MA", "RI", "NY", "NJ", "CT", "DE", "MD")
 
 combinations_sample <- expand.grid(SeasonLen = unique(sample_seas), Bag = unique(sample_bag),
-                                   MinLen = unique(sample_minlen), State = unique(state))
+                                   MinLen = unique(sample_minlen))
 
-rbc4 <- combinations_sample
+
+states <- rep(state, each = 75)
+
+rbc4 <- combinations_sample 
+#View(rbc4)
+#random
+rbc4 <- rbc4[sample(nrow(rbc4)), ]
+row.names(rbc4) <- NULL  # reset row names
+#View(filltable)
+rbc4 <- rbc4 %>% mutate(State = states)
+
+#rbcNC <- rbc4 %>% mutate(State = "NC")
+#rbcNJ <- rbc4 %>% mutate(State = "NJ")
+#rbcNY <- rbc4 %>% mutate(State = "NY")
+#rbcMD <- rbc4 %>% mutate(State = "MD")
+#rbcMA <- rbc4 %>% mutate(State = "MA")
+#rbcRI <- rbc4 %>% mutate(State = "RI")
+#rbcVA <- rbc4 %>% mutate(State = "VA")
+#rbcDE <- rbc4 %>% mutate(State = "DE")
+#rbcCT <- rbc4 %>% mutate(State = "CT")
+
+#rbc4 <- rbind(rbcCT, rbcDE, rbcVA, rbcRI, rbcMA, rbcMD, rbcNY,
+#              rbcNJ, rbcNC)
 
 #for filling in RDM output table below 
 
 # sequential                      
-filltable <- dplyr::select(rbc4[1:315,], SeasonLen, Bag, MinLen) 
+filltable <- dplyr::select(rbc4[1:675,], SeasonLen, Bag, MinLen) 
 
 Alternative = "scen1"
 #extract regulations for each time step 
-if(Alternative == "scen1"){setwd("~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMinputAttempt1/sim_storelength")}
-if(Alternative == "scen1"){scendir = "~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMinputAttempt1/sim_storelength/"}
+if(Alternative == "scen1"){setwd("~/Desktop/FlounderMSE/RDMgam/storelengths/sim_storelength")}
+if(Alternative == "scen1"){scendir = "~/Desktop/FlounderMSE/RDMgam/storelengths/sim_storelength/"}
 
 # CONVERT STARTING REGULATIONS INTO RDM INPUT FORMAT    
-n = 315
+n = 75
 
 ## -----------------------------------------------------------------------------
 
 NJtableHCR <- rbc4 %>% filter(State == "NJ")
-
+#View(NYtableHCR)
 NJdatalist = list()
 NJdatalist = vector("list", length = n)
 
@@ -253,7 +277,6 @@ VAbig_data = do.call(rbind, VAdatalist)
 ## -----------------------------------------------------------------------------
 
 CTtableHCR <- rbc4 %>% filter(State == "CT")
-
 CTdatalist = list()
 CTdatalist = vector("list", length = n)
 
@@ -321,6 +344,7 @@ DEbig_data = do.call(rbind, DEdatalist)
 ## -----------------------------------------------------------------------------
 
 MAtableHCR <- rbc4 %>% filter(State == "MA")
+
 MAdatalist = list()
 MAdatalist = vector("list", length = n)
 
@@ -350,25 +374,25 @@ for (x in 1:length(MAtableHCR$State)){
   MAdatalist[[x]] <- MAinputmiddleman %>% mutate(Nsim = x)
 }
 MAbig_data = do.call(rbind, MAdatalist)
-#View(Big_Data)
+#View(MAbig_data)
 Big_Data <- rbind(CTbig_data, DEbig_data, MAbig_data, MDbig_data, NCbig_data, NJbig_data, NYbig_data, 
                   RIbig_data, VAbig_data)
 
 Big_Data <- Big_Data %>% arrange(Big_Data$Nsim)
 #View(Big_Data)
 
-n = 315 
+n = 75 
 
 bigdatalist = list()
 bigdatalist = vector("list", length = n)
-for (x in 1:315){
+for (x in 1:75){
   Big_Data2 <- Big_Data %>% 
     filter(Nsim == x )
   # Big_Data2$Nsim <- NULL
   bigdatalist[[x]] <- Big_Data2
 }  
 
-#View(bigdatalist[[315]])
+#View(bigdatalist[[75]])
 #View(directed_trips_table)
 
 #RDM FOR EACH SET OF REGULATIONS AND EACH LENGTH DISTRIBUTION 
@@ -409,12 +433,12 @@ conflicts_prefer(copula::`%in%`) #why do we need this all of a sudden?
 #iyr <- as.integer(args[1])
 #hcr_output <- args[2]
 
-n = 315
+n = 75
 
 RDMoutput_edit = list()
 RDMoutput_edit = vector("list", length = n)
 
-for (x in 1:315){
+for (x in 1:75){
   
   mgmt_scen <- 1
   directed_trips_table <- bigdatalist[[x]] %>% 
@@ -436,9 +460,7 @@ for (x in 1:315){
   #directed_trips_table <- readRDS("coastwide_regulations_scenario.rds")
   # Input the calibration output which contains the number of choice occasions needed to simulate
   #calibration_data = data.frame(readxl::read_excel("calibration_output_by_period.xlsx"))
-  
   calibration_data_table <- readRDS("calibration_output_by_period.rds")
-  
   #utility parameter draws
   #param_draws_all <- readRDS("param_draws_all.rds")
   source("gen_params.R")
@@ -482,36 +504,37 @@ for (x in 1:315){
   Nlen <- 42 
   Nlengthbin <- bigdatalist[[x]]$Nsim[1]
   om_length_cm <-  
-    if(Nlengthbin %in% seq(1,315, by = 15)){scan("~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMinputAttempt1/sim_storelength/om-length2020.dat",n=Nlen+1)} else #29781.11
-      if(Nlengthbin %in% seq(2,315, by = 15)){scan("~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMinputAttempt1/sim_storelength/om-length2021.dat",n=Nlen+1)} else #42332.81
-        if(Nlengthbin %in% seq(3,315, by = 15)){scan("~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMinputAttempt1/sim_storelength/om-length2022.dat",n=Nlen+1)} else #56688.65
-          if(Nlengthbin %in% seq(4,315, by = 15)){scan("~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMinputAttempt1/sim_storelength/om-length2039.dat",n=Nlen+1)} else #64506.83 
-            if(Nlengthbin %in% seq(5,315, by = 15)){scan("~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMinputAttempt1/sim_storelength/om-length2024.dat",n=Nlen+1)} else  #76233.42        
-              if(Nlengthbin %in% seq(6,315, by = 15)){scan("~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMinputAttempt1/sim_storelength/om-length2027.dat",n=Nlen+1)} else #86364.19
-                if(Nlengthbin %in% seq(7,315, by = 15)){scan("~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMinputAttempt1/sim_storelength/om-length2045.dat",n=Nlen+1)} else #92265.67 
-                  if(Nlengthbin %in% seq(8,315, by = 15)){scan("~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMinputAttempt1/sim_storelength_contrast/om-length2025.dat",n=Nlen+1)} else #101915.23 2025
-                    if(Nlengthbin %in% seq(9,315, by = 15)){scan("~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMinputAttempt1/sim_storelength_contrast/om-length2045.dat",n=Nlen+1)} else #110281.24 2045
-                      if(Nlengthbin %in% seq(10,315, by = 15)){scan("~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMinputAttempt1/sim_storelength_contrast/om-length2037.dat",n=Nlen+1)} else #152473.71 2037 
-                        if(Nlengthbin %in% seq(11,315, by = 15)){scan("~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMinputAttempt1/sim_storelength_contrast/om-length2032.dat",n=Nlen+1)} else #167042.76 2032
-                          if(Nlengthbin %in% seq(12,315, by = 15)){scan("~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMinputAttempt1/sim_storelength_contrast/om-length2026.dat",n=Nlen+1)} else #181257.26 2026  
-                            if(Nlengthbin %in% seq(13,315, by = 15)){scan("~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMinputAttempt1/sim_storelength_contrast/om-length2027.dat",n=Nlen+1)} else #210394.15 2027
-                              if(Nlengthbin %in% seq(14,315, by = 15)){scan("~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMinputAttempt1/sim_storelength_contrast/om-length2028.dat",n=Nlen+1)} else #225460.28 2028 
-                                if(Nlengthbin %in% seq(15,315, by = 15)){scan("~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMinputAttempt1/sim_storelength_contrast/om-length2034.dat",n=Nlen+1)} #254612.89 2034
-  SSB[x] <- if(Nlengthbin %in% seq(1,315, by = 15)){SSB <- 29781.11} else #29781.11
-    if(Nlengthbin %in% seq(2,315, by = 15)){SSB <- 42332.81} else #42332.81
-      if(Nlengthbin %in% seq(3,315, by = 15)){SSB <- 56688.65} else #56688.65
-        if(Nlengthbin %in% seq(4,315, by = 15)){SSB <- 64506.83} else #64506.83
-          if(Nlengthbin %in% seq(5,315, by = 15)){SSB <- 76233.42 } else  #76233.42        
-            if(Nlengthbin %in% seq(6,315, by = 15)){SSB <- 86364.19} else #86364.19
-              if(Nlengthbin %in% seq(7,315, by = 15)){SSB <- 92265.67 } else #92265.67 
-                if(Nlengthbin %in% seq(8,315, by = 15)){SSB <- 101915.23} else #101915.23 2025
-                  if(Nlengthbin %in% seq(9,315, by = 15)){SSB <- 110281.24} else #110281.24 2045
-                    if(Nlengthbin %in% seq(10,315, by = 15)){SSB <- 152473.71} else #152473.71 2037 
-                      if(Nlengthbin %in% seq(11,315, by = 15)){SSB <- 167042.76} else #167042.76 2032
-                        if(Nlengthbin %in% seq(12,315, by = 15)){SSB <- 181257.26} else #181257.26 2026  
-                          if(Nlengthbin %in% seq(13,315, by = 15)){SSB <- 210394.15} else #210394.15 2027
-                            if(Nlengthbin %in% seq(14,315, by = 15)){SSB <- 225460.28} else #225460.28 2028 
-                              if(Nlengthbin %in% seq(15,315, by = 15)){SSB <- 254612.89} #254612.89 2034
+    if(Nlengthbin %in% seq(1,75, by = 5)){scan("~/Desktop/FlounderMSE/RDMgam/storelengths/sim_storelength/om-length2020.dat",n=Nlen+1)} else #29781.11
+      if(Nlengthbin %in% seq(2,75, by = 5)){scan("~/Desktop/FlounderMSE/RDMgam/storelengths/sim_storelength/om-length2021.dat",n=Nlen+1)} else #42332.81
+        if(Nlengthbin %in% seq(3,75, by = 5)){scan("~/Desktop/FlounderMSE/RDMgam/storelengths/sim_storelength/om-length2022.dat",n=Nlen+1)} else #56688.65
+          if(Nlengthbin %in% seq(4,75, by = 5)){scan("~/Desktop/FlounderMSE/RDMgam/storelengths/sim_storelength/om-length2039.dat",n=Nlen+1)} else #64506.83 
+            if(Nlengthbin %in% seq(5,75, by = 5)){scan("~/Desktop/FlounderMSE/RDMgam/storelengths/sim_storelength/om-length2024.dat",n=Nlen+1)} else  #76233.42        
+              if(Nlengthbin %in% seq(6,75, by = 5)){scan("~/Desktop/FlounderMSE/RDMgam/storelengths/sim_storelength/om-length2027.dat",n=Nlen+1)} else #86364.19
+                if(Nlengthbin %in% seq(7,75, by = 5)){scan("~/Desktop/FlounderMSE/RDMgam/storelengths/sim_storelength/om-length2045.dat",n=Nlen+1)} else #92265.67 
+                  if(Nlengthbin %in% seq(8,75, by = 5)){scan("~/Desktop/FlounderMSE/RDMgam/storelengths/sim_storelength_contrast/om-length2025.dat",n=Nlen+1)} else #101915.23 2025
+                    if(Nlengthbin %in% seq(9,75, by = 5)){scan("~/Desktop/FlounderMSE/RDMgam/storelengths/sim_storelength_contrast/om-length2045.dat",n=Nlen+1)} else #110281.24 2045
+                      if(Nlengthbin %in% seq(10,75, by = 5)){scan("~/Desktop/FlounderMSE/RDMgam/storelengths/sim_storelength_contrast/om-length2037.dat",n=Nlen+1)} else #152473.71 2037 
+                        if(Nlengthbin %in% seq(11,75, by = 5)){scan("~/Desktop/FlounderMSE/RDMgam/storelengths/sim_storelength_contrast/om-length2032.dat",n=Nlen+1)} else #167042.76 2032
+                          if(Nlengthbin %in% seq(12,75, by = 5)){scan("~/Desktop/FlounderMSE/RDMgam/storelengths/sim_storelength_contrast/om-length2026.dat",n=Nlen+1)} else #181257.26 2026  
+                            if(Nlengthbin %in% seq(13,75, by = 5)){scan("~/Desktop/FlounderMSE/RDMgam/storelengths/sim_storelength_contrast/om-length2027.dat",n=Nlen+1)} else #210394.15 2027
+                              if(Nlengthbin %in% seq(14,75, by = 5)){scan("~/Desktop/FlounderMSE/RDMgam/storelengths/sim_storelength_contrast/om-length2028.dat",n=Nlen+1)} else #225460.28 2028 
+                                if(Nlengthbin %in% seq(15,75, by = 5)){scan("~/Desktop/FlounderMSE/RDMgam/storelengths/sim_storelength_contrast/om-length2034.dat",n=Nlen+1)} #254612.89 2034
+  SSB[x] <- if(Nlengthbin %in% seq(1,75, by = 5)){SSB <- 29781.11} else #29781.11
+    if(Nlengthbin %in% seq(2,75, by = 5)){SSB <- 42332.81} else #42332.81
+      if(Nlengthbin %in% seq(3,75, by = 5)){SSB <- 56688.65} else #56688.65
+        if(Nlengthbin %in% seq(4,75, by = 5)){SSB <- 64506.83} else #64506.83
+          if(Nlengthbin %in% seq(5,75, by = 5)){SSB <- 76233.42 } else  #76233.42        
+            if(Nlengthbin %in% seq(6,75, by = 5)){SSB <- 86364.19} else #86364.19
+              if(Nlengthbin %in% seq(7,75, by = 5)){SSB <- 92265.67 } else #92265.67 
+                if(Nlengthbin %in% seq(8,75, by = 5)){SSB <- 101915.23} else #101915.23 2025
+                  if(Nlengthbin %in% seq(9,75, by = 5)){SSB <- 110281.24} else #110281.24 2045
+                    if(Nlengthbin %in% seq(10,75, by = 5)){SSB <- 152473.71} else #152473.71 2037 
+                      if(Nlengthbin %in% seq(11,75, by = 5)){SSB <- 167042.76} else #167042.76 2032
+                        if(Nlengthbin %in% seq(12,75, by = 5)){SSB <- 181257.26} else #181257.26 2026  
+                          if(Nlengthbin %in% seq(13,75, by = 5)){SSB <- 210394.15} else #210394.15 2027
+                            if(Nlengthbin %in% seq(14,75, by = 5)){SSB <- 225460.28} else #225460.28 2028 
+                              if(Nlengthbin %in% seq(15,75, by = 5)){SSB <- 254612.89} #254612.89 2034
+  
   #cm2in <- read_csv("cm2in.csv", col_names = FALSE, show_col_types = FALSE)
   cm2in <- readRDS("cm2in.rds")
   lenbinuse <- as.integer(unlist(cm2in[,1]))
@@ -782,102 +805,41 @@ for (x in 1:315){
     group_by(state) %>% 
     summarize_if(is.numeric, .funs = sum,na.rm=TRUE) %>% 
     left_join(pred_len, by = c("state"))    
-  RDMoutput_edit[[x]] <- extra_output %>% mutate(Nsim = x, SeasonLen = filltable$SeasonLen[x], Bag = filltable$Bag[x],
-                                                 MinLen = filltable$MinLen[x], SSBcov = SSB[x])
+  RDMoutput_edit[[x]] <- extra_output %>% mutate(Nsim = x, 
+                                                 SeasonLen = ifelse(state == "CT", CTtableHCR$SeasonLen[x], 
+                                                                    ifelse(state == "DE", DEtableHCR$SeasonLen[x],
+                                                                           ifelse(state == "MA", MAtableHCR$SeasonLen[x],
+                                                                                  ifelse(state == "MD", MDtableHCR$SeasonLen[x],
+                                                                                         ifelse(state == "NC", NCtableHCR$SeasonLen[x],
+                                                                                         ifelse(state == "NY", NYtableHCR$SeasonLen[x],
+                                                                                                ifelse(state == "NJ", NJtableHCR$SeasonLen[x],
+                                                                                                       ifelse(state == "RI", RItableHCR$SeasonLen[x],
+                                                                                                              ifelse(state == "VA", VAtableHCR$SeasonLen[x], NA))))))))),
+                                                 Bag = ifelse(state == "CT", CTtableHCR$Bag[x], 
+                                                              ifelse(state == "DE", DEtableHCR$Bag[x],
+                                                                     ifelse(state == "MA", MAtableHCR$Bag[x],
+                                                                            ifelse(state == "MD", MDtableHCR$Bag[x],
+                                                                                   ifelse(state == "NC", NCtableHCR$Bag[x],
+                                                                                          ifelse(state == "NY", NYtableHCR$Bag[x],
+                                                                                                 ifelse(state == "NJ", NJtableHCR$Bag[x],
+                                                                                                        ifelse(state == "RI", RItableHCR$Bag[x],
+                                                                                                               ifelse(state == "VA", VAtableHCR$Bag[x], NA))))))))),
+                                                 MinLen = ifelse(state == "CT", CTtableHCR$MinLen[x], 
+                                             ifelse(state == "DE", DEtableHCR$MinLen[x],
+                                                    ifelse(state == "MA", MAtableHCR$MinLen[x],
+                                                           ifelse(state == "MD", MDtableHCR$MinLen[x],
+                                                                  ifelse(state == "NC", NCtableHCR$MinLen[x],
+                                                                         ifelse(state == "NY", NYtableHCR$MinLen[x],
+                                                                                ifelse(state == "NJ", NJtableHCR$MinLen[x],
+                                                                                       ifelse(state == "RI", RItableHCR$MinLen[x],
+                                                                                              ifelse(state == "VA", VAtableHCR$MinLen[x], NA))))))))),
+                                                 SSBcov = SSB[x])
   write.table(extra_output,file = "rec-catch.out", append = TRUE, row.names = FALSE, col.names = FALSE)
 }
 #View(RDMoutput_edit[[x]])
+
 #AGGREGATE OUTPUT 
+
 RDMoutputbind_edit <- select(bind_rows(RDMoutput_edit), state, tot_keep,  SeasonLen, Bag, MinLen, SSBcov, tot_rel)
-
 #View(RDMoutputbind_edit)
-#saveRDS(RDMoutputbind_edit, "~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMoutputbind_315SSB.rds") #sequential length -> use this, later sims are just to compare between runs (not much difference between them)
-#saveRDS(RDMoutputbind_edit, "~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMoutputbind_315SSB2.rds") #sequential length 2
-#saveRDS(RDMoutputbind_edit, "~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMoutputbind_315SSB3.rds") #sequential length 3 
-
-############################# FIT MODEL ########################################
-library(mgcv)
-library(gratia)
-#RDMoutputbind_edit <- readRDS("~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMoutputbind_315SSB.rds") #use this, later sims are just to compare between runs (not much difference between them)
-#RDMoutputbind_edit <- readRDS("~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMoutputbind_315SSB2.rds") 
-#RDMoutputbind_edit <- readRDS("~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMoutputbind_315SSB3.rds") 
-
-tot_keep <- RDMoutputbind_edit$tot_keep
-tot_rel <- RDMoutputbind_edit$tot_rel
-state <- RDMoutputbind_edit$state
-SeasonLen <- RDMoutputbind_edit$SeasonLen
-Bag <- RDMoutputbind_edit$Bag
-MinLen <- RDMoutputbind_edit$MinLen
-SSB <- RDMoutputbind_edit$SSBcov
-
-inputdata <- data.frame(tot_keep, tot_rel,
-                        state, SeasonLen, Bag, MinLen, SSB) 
-#View(inputdata)
-#hist(inputdata$tot_rel)
-
-# --------------------------------------- GAM -----------------------------------------------#
-g1 <- gam(tot_keep ~ state + s(SSB, k = 3) + s(SeasonLen, k = 3) + #9,5,7 partial effect of smooths look strange with k any higher 
-            s(Bag, k = 3) + s(MinLen, k = 3), data = inputdata, 
-          family = Gamma(link = log), method = "REML") 
-summary(g1)
-gam.check(g1)
-#saveRDS(g1, "~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/gam_RDMland315.rds") #disordered length
-#g1 <- readRDS("~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/gam_RDMland315.rds") #disordered length
-
-# ------------------------------- GAM without SSB to compare ------------------------------ #
-g1.1 <- gam(tot_keep ~ state + s(SeasonLen, k = 3) + #9,5,7
-              s(Bag, k = 3) + s(MinLen, k = 3), data = inputdata, 
-            family = Gamma(link = log), method = "REML") 
-saveRDS(g1.1, "~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/gam_RDMland_noSSB.rds") #disordered length
-#saveRDS(g1.1, "~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/gam_RDMland_noSSB315.rds") #disordered length
-#g1.1 <- readRDS("~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/gam_RDMland_noSSB315.rds") #disordered length
-            
-# ------------------------------- DISC GAM -------------------------------------------------#
-d1 <- gam(tot_rel ~ state + s(SSB, k = 3) + s(SeasonLen, k = 3) + 
-            s(Bag, k = 3) + s(MinLen, k = 3), data = inputdata, 
-          family = Gamma(link = log), method = "REML") 
-summary(d1)
-gam.check(d1)
-#saveRDS(d1, "~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/gam_RDM315_disc.rds") #disordered length
-#d1 <- readRDS("~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/gam_RDM315_disc.rds") #disordered length
-
-#g1 <- 
-
-preddata1 <- dplyr::select(inputdata, state, SeasonLen, Bag, MinLen, SSB)
-
-gamfit2 <- predict.gam(g1, newdata = preddata1, type = "link" , se.fit = TRUE)
-
-#compare sums
-#sum(RDMoutputbind_edit$tot_keep)
-#sum(exp(gamfit2$fit))
-
-kept <- exp(gamfit2$fit)
-seas <- inputdata$SeasonLen+10
-bag <- inputdata$Bag+0.5
-min <- inputdata$MinLen+0.5
-
-#seas
-plot(inputdata$tot_keep ~ inputdata$SeasonLen, xlim = c(55, 330))
-points(kept ~ seas, col = "green")
-
-#min
-plot(inputdata$tot_keep ~ inputdata$MinLen, xlim = c(13.5, 21))
-points(kept ~ min, col = "red")
-
-#bag
-plot(inputdata$tot_keep ~ inputdata$Bag, xlim = c(3, 9))
-points(kept ~ bag, col = "blue")
-
-#diagnostics
-appraise(g1)
-draw(g1)
-
-#disc
-appraise(d1)
-draw(d1)
-
-#compare to one without SSB
-appraise(g1.1)
-draw(g1.1)
-
-
+#saveRDS(RDMoutputbind_edit, "~/Desktop/FlounderMSE/RDMgam/RDMoutputbind_superscramble.rds") #trial 1 <- use this

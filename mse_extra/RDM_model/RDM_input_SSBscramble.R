@@ -2,6 +2,7 @@ library(dplyr)
 library(tidyr)
 library(data.table)
 library(mgcv)
+library(gratia)
 
 # Rearranges rows in regulations table so length distributions don't increase with regs, adds SSB as covariate
 
@@ -54,8 +55,8 @@ filltable <- dplyr::select(rbc4[1:315,], SeasonLen, Bag, MinLen)
 
 Alternative = "scen1"
 #extract regulations for each time step 
-if(Alternative == "scen1"){setwd("~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMinputAttempt1/sim_storelength")}
-if(Alternative == "scen1"){scendir = "~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMinputAttempt1/sim_storelength/"}
+if(Alternative == "scen1"){setwd("~/Desktop/FlounderMSE/RDMgam/storelengths/sim_storelength")}
+if(Alternative == "scen1"){scendir = "~/Desktop/FlounderMSE/RDMgam/storelengths/sim_storelength/"}
 
 # CONVERT STARTING REGULATIONS INTO RDM INPUT FORMAT    
 n = 315
@@ -368,7 +369,7 @@ for (x in 1:length(MAtableHCR$State)){
   MAdatalist[[x]] <- MAinputmiddleman %>% mutate(Nsim = x)
 }
 MAbig_data = do.call(rbind, MAdatalist)
-#View(Big_Data)
+#View(MAbig_data)
 Big_Data <- rbind(CTbig_data, DEbig_data, MAbig_data, MDbig_data, NCbig_data, NJbig_data, NYbig_data, 
                   RIbig_data, VAbig_data)
 
@@ -454,9 +455,7 @@ for (x in 1:315){
   #directed_trips_table <- readRDS("coastwide_regulations_scenario.rds")
   # Input the calibration output which contains the number of choice occasions needed to simulate
   #calibration_data = data.frame(readxl::read_excel("calibration_output_by_period.xlsx"))
-  
   calibration_data_table <- readRDS("calibration_output_by_period.rds")
-  
   #utility parameter draws
   #param_draws_all <- readRDS("param_draws_all.rds")
   source("gen_params.R")
@@ -469,7 +468,7 @@ for (x in 1:315){
   
   #selectivity (read in moved from the otehr file)
   selectivity <- readRDS("rec_selectivity_20210422.rds")
-  
+
   ## OM 2 ##
   # MRIP bias
   #calibration_data_table <- readRDS("calibration_output_by_period_lb.rds")
@@ -500,21 +499,21 @@ for (x in 1:315){
   Nlen <- 42 
   Nlengthbin <- bigdatalist[[x]]$Nsim[1]
   om_length_cm <-  
-    if(Nlengthbin %in% seq(1,315, by = 15)){scan("~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMinputAttempt1/sim_storelength/om-length2020.dat",n=Nlen+1)} else #29781.11
-      if(Nlengthbin %in% seq(2,315, by = 15)){scan("~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMinputAttempt1/sim_storelength/om-length2021.dat",n=Nlen+1)} else #42332.81
-        if(Nlengthbin %in% seq(3,315, by = 15)){scan("~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMinputAttempt1/sim_storelength/om-length2022.dat",n=Nlen+1)} else #56688.65
-          if(Nlengthbin %in% seq(4,315, by = 15)){scan("~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMinputAttempt1/sim_storelength/om-length2039.dat",n=Nlen+1)} else #64506.83 
-            if(Nlengthbin %in% seq(5,315, by = 15)){scan("~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMinputAttempt1/sim_storelength/om-length2024.dat",n=Nlen+1)} else  #76233.42        
-              if(Nlengthbin %in% seq(6,315, by = 15)){scan("~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMinputAttempt1/sim_storelength/om-length2027.dat",n=Nlen+1)} else #86364.19
-                if(Nlengthbin %in% seq(7,315, by = 15)){scan("~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMinputAttempt1/sim_storelength/om-length2045.dat",n=Nlen+1)} else #92265.67 
-                  if(Nlengthbin %in% seq(8,315, by = 15)){scan("~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMinputAttempt1/sim_storelength_contrast/om-length2025.dat",n=Nlen+1)} else #101915.23 2025
-                    if(Nlengthbin %in% seq(9,315, by = 15)){scan("~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMinputAttempt1/sim_storelength_contrast/om-length2045.dat",n=Nlen+1)} else #110281.24 2045
-                      if(Nlengthbin %in% seq(10,315, by = 15)){scan("~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMinputAttempt1/sim_storelength_contrast/om-length2037.dat",n=Nlen+1)} else #152473.71 2037 
-                        if(Nlengthbin %in% seq(11,315, by = 15)){scan("~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMinputAttempt1/sim_storelength_contrast/om-length2032.dat",n=Nlen+1)} else #167042.76 2032
-                          if(Nlengthbin %in% seq(12,315, by = 15)){scan("~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMinputAttempt1/sim_storelength_contrast/om-length2026.dat",n=Nlen+1)} else #181257.26 2026  
-                            if(Nlengthbin %in% seq(13,315, by = 15)){scan("~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMinputAttempt1/sim_storelength_contrast/om-length2027.dat",n=Nlen+1)} else #210394.15 2027
-                              if(Nlengthbin %in% seq(14,315, by = 15)){scan("~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMinputAttempt1/sim_storelength_contrast/om-length2028.dat",n=Nlen+1)} else #225460.28 2028 
-                                if(Nlengthbin %in% seq(15,315, by = 15)){scan("~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMinputAttempt1/sim_storelength_contrast/om-length2034.dat",n=Nlen+1)} #254612.89 2034
+    if(Nlengthbin %in% seq(1,315, by = 15)){scan("~/Desktop/FlounderMSE/RDMgam/storelengths/sim_storelength/om-length2020.dat",n=Nlen+1)} else #29781.11
+      if(Nlengthbin %in% seq(2,315, by = 15)){scan("~/Desktop/FlounderMSE/RDMgam/storelengths/sim_storelength/om-length2021.dat",n=Nlen+1)} else #42332.81
+        if(Nlengthbin %in% seq(3,315, by = 15)){scan("~/Desktop/FlounderMSE/RDMgam/storelengths/sim_storelength/om-length2022.dat",n=Nlen+1)} else #56688.65
+          if(Nlengthbin %in% seq(4,315, by = 15)){scan("~/Desktop/FlounderMSE/RDMgam/storelengths/sim_storelength/om-length2039.dat",n=Nlen+1)} else #64506.83 
+            if(Nlengthbin %in% seq(5,315, by = 15)){scan("~/Desktop/FlounderMSE/RDMgam/storelengths/sim_storelength/om-length2024.dat",n=Nlen+1)} else  #76233.42        
+              if(Nlengthbin %in% seq(6,315, by = 15)){scan("~/Desktop/FlounderMSE/RDMgam/storelengths/sim_storelength/om-length2027.dat",n=Nlen+1)} else #86364.19
+                if(Nlengthbin %in% seq(7,315, by = 15)){scan("~/Desktop/FlounderMSE/RDMgam/storelengths/sim_storelength/om-length2045.dat",n=Nlen+1)} else #92265.67 
+                  if(Nlengthbin %in% seq(8,315, by = 15)){scan("~/Desktop/FlounderMSE/RDMgam/storelengths/sim_storelength_contrast/om-length2025.dat",n=Nlen+1)} else #101915.23 2025
+                    if(Nlengthbin %in% seq(9,315, by = 15)){scan("~/Desktop/FlounderMSE/RDMgam/storelengths/sim_storelength_contrast/om-length2045.dat",n=Nlen+1)} else #110281.24 2045
+                      if(Nlengthbin %in% seq(10,315, by = 15)){scan("~/Desktop/FlounderMSE/RDMgam/storelengths/sim_storelength_contrast/om-length2037.dat",n=Nlen+1)} else #152473.71 2037 
+                        if(Nlengthbin %in% seq(11,315, by = 15)){scan("~/Desktop/FlounderMSE/RDMgam/storelengths/sim_storelength_contrast/om-length2032.dat",n=Nlen+1)} else #167042.76 2032
+                          if(Nlengthbin %in% seq(12,315, by = 15)){scan("~/Desktop/FlounderMSE/RDMgam/storelengths/sim_storelength_contrast/om-length2026.dat",n=Nlen+1)} else #181257.26 2026  
+                            if(Nlengthbin %in% seq(13,315, by = 15)){scan("~/Desktop/FlounderMSE/RDMgam/storelengths/sim_storelength_contrast/om-length2027.dat",n=Nlen+1)} else #210394.15 2027
+                              if(Nlengthbin %in% seq(14,315, by = 15)){scan("~/Desktop/FlounderMSE/RDMgam/storelengths/sim_storelength_contrast/om-length2028.dat",n=Nlen+1)} else #225460.28 2028 
+                                if(Nlengthbin %in% seq(15,315, by = 15)){scan("~/Desktop/FlounderMSE/RDMgam/storelengths/sim_storelength_contrast/om-length2034.dat",n=Nlen+1)} #254612.89 2034
   SSB[x] <- if(Nlengthbin %in% seq(1,315, by = 15)){SSB <- 29781.11} else #29781.11
     if(Nlengthbin %in% seq(2,315, by = 15)){SSB <- 42332.81} else #42332.81
       if(Nlengthbin %in% seq(3,315, by = 15)){SSB <- 56688.65} else #56688.65
@@ -809,18 +808,16 @@ for (x in 1:315){
 #AGGREGATE OUTPUT 
 
 RDMoutputbind_edit <- select(bind_rows(RDMoutput_edit), state, tot_keep,  SeasonLen, Bag, MinLen, SSBcov, tot_rel)
-
+sum(RDMoutputbind_edit$tot_rel)
 #View(RDMoutputbind_edit)
-#saveRDS(RDMoutputbind_edit, "~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMoutputbind_SSBscramble.rds") #trial 1 <- use this for now
-#saveRDS(RDMoutputbind_edit, "~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMoutputbind_SSBscramble2.rds") #trial 2
-#saveRDS(RDMoutputbind_edit, "~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMoutputbind_SSBscramble3.rds") #trial 3
+#saveRDS(RDMoutputbind_edit, "~/Desktop/FlounderMSE/RDMgam/RDMoutputbind_SSBscramble.rds") #trial 1 <- use this
 
 ############################# FIT MODEL ########################################
 library(mgcv)
 library(gratia)
-#RDMoutputbind_edit <- readRDS("~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMoutputbind_SSBscramble.rds") #trial 1 <- use this for now
-#RDMoutputbind_edit <- readRDS("~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMoutputbind_SSBscramble2.rds") #trial 2
-#RDMoutputbind_edit <- readRDS("~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/RDMoutputbind_SSBscramble3.rds") #trial 3
+#library(gamreg)
+#RDMoutputbind_edit <- readRDS("~/Desktop/FlounderMSE/RDMgam/RDMoutputbind_SSBscramble.rds") #trial 1 <- use this 
+#RDMoutputbind_edit <- readRDS("~/Desktop/FlounderMSE/RDMgam/RDMoutputbind_superscramble.rds")
 
 tot_keep <- RDMoutputbind_edit$tot_keep
 tot_rel <- RDMoutputbind_edit$tot_rel
@@ -832,7 +829,7 @@ SSB <- RDMoutputbind_edit$SSBcov
 
 inputdata <- data.frame(tot_keep, tot_rel,
                         state, SeasonLen, Bag, MinLen, SSB) 
-#View(inputdata)
+#View(RDMoutputbind_edit)
 #hist(inputdata$tot_rel)
 
 # --------------------------------------- GAM -----------------------------------------------#
@@ -841,70 +838,439 @@ g1 <- gam(tot_keep ~ state + s(SSB, k = 3) + s(SeasonLen, k = 3) + #9,5,7 partia
           family = Gamma(link = log), method = "REML") 
 summary(g1)
 gam.check(g1)
-#saveRDS(g1, "~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/gam_RDMland.rds") #disordered length
-#g1 <- readRDS("~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/gam_RDMland.rds") #disordered length
+#saveRDS(g1, "~/Desktop/FlounderMSE/RDMgam/gam_RDMland.rds") #disordered length
+#g1 <- readRDS("~/Desktop/FlounderMSE/RDMgam/gam_RDMland.rds") #disordered length
 
-# ------------------------------- GAM without SSB to compare ------------------------------ #
-g1.1 <- gam(tot_keep ~ state + s(SeasonLen, k = 3) + #9,5,7
-            s(Bag, k = 3) + s(MinLen, k = 3), data = inputdata, 
-          family = Gamma(link = log), method = "REML") 
-#saveRDS(g1.1, "~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/gam_RDMland_noSSB.rds") #disordered length
-#g1.1 <- readRDS("~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/gam_RDMland_noSSB.rds") #disordered length
+# --------------------------------------- GAM without SSB to compare ------------------------------ #
+#g1.1 <- gam(tot_keep ~ state + s(SeasonLen, k = 3) + #9,5,7
+#            s(Bag, k = 3) + s(MinLen, k = 3), data = inputdata, 
+#          family = Gamma(link = log), method = "REML") 
+#saveRDS(g1.1, "~/Desktop/FlounderMSE/RDMgam/gam_RDMland_noSSB.rds") #disordered length
+#g1.1 <- readRDS("~/Desktop/FlounderMSE/RDMgam/gam_RDMland_noSSB.rds") #disordered length
 
 # -------------------------------- Poisson w/ smooth ---------------------------------------#
-g4 <- gam(as.integer(tot_keep) ~ state + s(SSB, k = 3) + s(SeasonLen, k = 3) + #9,5,7
-            s(Bag, k = 3) + s(MinLen, k=3), data = inputdata, 
-          family = poisson(link = log), method = "REML")  
-summary(g4)
-gam.check(g4)
+#g4 <- gam(as.integer(tot_keep) ~ state + s(SSB, k = 3) + s(SeasonLen, k = 3) + #9,5,7
+#            s(Bag, k = 3) + s(MinLen, k=3), data = inputdata, 
+#          family = poisson(link = log), method = "REML")  
+#summary(g4)
+#gam.check(g4)
 
 # -------------------- gaussian log-transformed response w/ smooth -------------------------#
-g6 <- gam(log(tot_keep) ~ state + s(SSB, k = 3) + s(SeasonLen, k = 3) + #9,5,7
-            s(Bag, k = 3) + s(MinLen, k=3), data = inputdata, 
-          family = gaussian(), method = "REML") 
-summary(g6)
-gam.check(g6)
+#g6 <- gam(log(tot_keep) ~ state + s(SSB, k = 3) + s(SeasonLen, k = 3) + #9,5,7
+#            s(Bag, k = 3) + s(MinLen, k=3), data = inputdata, 
+#          family = gaussian(), method = "REML") 
+#summary(g6)
+#gam.check(g6)
 
-# ------------------------------- DISC GAM -------------------------------------------------#
-d1 <- gam(tot_rel ~ state + s(SSB, k = 3) + s(SeasonLen, k = 3) + 
+# ------------------------------- DISC GAM 1-------------------------------------------------#
+d1 <- gam(tot_rel ~  state + s(SSB, k = 3) + s(SeasonLen, k = 3) + 
             s(Bag, k = 3) + s(MinLen, k = 3), data = inputdata, 
           family = Gamma(link = log), method = "REML") 
 summary(d1)
 gam.check(d1)
-#saveRDS(d1, "~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/gam_RDM_disc.rds") #disordered length
-#d1 <- readRDS("~/Desktop/FlounderMSE/kw_sims_test/sinatra_split_saveOM/gam_RDM_disc.rds") #disordered length
+#saveRDS(d1, "~/Desktop/FlounderMSE/RDMgam/gam_RDM_disc.rds") #disordered length
+#d1 <- readRDS("~/Desktop/FlounderMSE/RDMgam/gam_RDM_disc.rds") #disordered length
 
-#for logged response
-#plot(inputdata$tot_keep ~ exp(gamfit2$fit))
+################### DISC GAM TROUBLESHOOTING ######################
 
-#g1 <- g4
+#extracting data for each state 
+inputdataVA <- inputdatadisc %>% filter(state == "VA")
+inputdataNC <- inputdatadisc %>% filter(state == "NC")
+inputdataMD <- inputdatadisc %>% filter(state == "MD")
+inputdataMA <- inputdatadisc %>% filter(state == "MA")
+inputdataCT <- inputdatadisc %>% filter(state == "CT")
+inputdataDE <- inputdatadisc %>% filter(state == "DE")
+inputdataRI <- inputdatadisc %>% filter(state == "RI")
+inputdataNY <- inputdatadisc %>% filter(state == "NY")
+inputdataNJ <- inputdatadisc %>% filter(state == "NJ")
+target <- c("NC", "CT", "DE", "RI", "NY", "NJ")
 
-preddata1 <- dplyr::select(inputdata, state, SeasonLen, Bag, MinLen, SSB)
+#looking at partial effects in residual distributions
 
-gamfit2 <- predict.gam(g1, newdata = preddata1, type = "link" , se.fit = TRUE)
+#discard predictions
+gamfit <- predict(d2)
+resid2 <- residuals(d2, type = c("deviance"))
 
-#compare sums
-#sum(RDMoutputbind_edit$tot_keep)
-#sum(exp(gamfit2$fit))
-
-kept <- exp(gamfit2$fit)
-seas <- inputdata$SeasonLen+10
-bag <- inputdata$Bag+0.5
-min <- inputdata$MinLen+0.5
-
-#seas
-plot(inputdata$tot_keep ~ inputdata$SeasonLen, xlim = c(55, 330))
-points(kept ~ seas, col = "green")
-
-#min
-plot(inputdata$tot_keep ~ inputdata$MinLen, xlim = c(13.5, 21))
-points(kept ~ min, col = "red")
+#visualize
+pred <- gamfit #change this depending on model 
+simdata <- data.frame(inputdata$Bag, pred, resid2) 
 
 #bag
-plot(inputdata$tot_keep ~ inputdata$Bag, xlim = c(3, 9))
-points(kept ~ bag, col = "blue")
+simdata4 <- simdata %>% filter(inputdata.Bag == 4)
+simdata5 <- simdata %>% filter(inputdata.Bag == 5)
+simdata6 <- simdata %>% filter(inputdata.Bag == 6)
+simdata7 <- simdata %>% filter(inputdata.Bag == 7)
+simdata8 <- simdata %>% filter(inputdata.Bag == 8)
 
-#diagnostics
+#length
+simdata4 <- simdata %>% filter(inputdata$MinLen == 14)
+simdata5 <- simdata %>% filter(inputdata$MinLen == 15)
+simdata6 <- simdata %>% filter(inputdata$MinLen == 16)
+simdata7 <- simdata %>% filter(inputdata$MinLen == 17)
+simdata8 <- simdata %>% filter(inputdata$MinLen == 18)
+simdata9 <- simdata %>% filter(inputdata$MinLen == 19)
+simdata10 <- simdata %>% filter(inputdata$MinLen == 20)
+
+#seasonlen
+simdata4 <- simdata %>% filter(inputdata$SeasonLen == 60)
+simdata5 <- simdata %>% filter(inputdata$SeasonLen == 90)
+simdata6 <- simdata %>% filter(inputdata$SeasonLen == 120)
+simdata7 <- simdata %>% filter(inputdata$SeasonLen == 150)
+simdata8 <- simdata %>% filter(inputdata$SeasonLen == 210)
+simdata9 <- simdata %>% filter(inputdata$SeasonLen == 240)
+simdata10 <- simdata %>% filter(inputdata$SeasonLen == 270)
+simdata11 <- simdata %>% filter(inputdata$SeasonLen == 300)
+
+#state
+simdataNC <- simdata %>% filter(inputdatadisc$state == "NC")
+simdataVA <- simdata %>% filter(inputdatadisc$state == "VA")
+simdataNJ <- simdata %>% filter(inputdatadisc$state == "NJ")
+simdataNY <- simdata %>% filter(inputdatadisc$state == "NY")
+simdataCT <- simdata %>% filter(inputdatadisc$state == "CT")
+simdataDE <- simdata %>% filter(inputdatadisc$state == "DE")
+simdataMA <- simdata %>% filter(inputdatadisc$state == "MA")
+simdataRI <- simdata %>% filter(inputdatadisc$state == "RI")
+simdataMD <- simdata %>% filter(inputdatadisc$state == "MD")
+
+#plot, just change data names or composition 
+plot(resid2~pred, data = simdataNC, xlim = c(10,21), ylim = c(-2,2), xlab = "Linear Predictor", ylab = "Deviance Residuals")
+points(resid2~pred, data = simdataVA, col= "blue")
+points(resid2~pred, data = simdataNJ, col= "red")
+points(resid2~pred, data = simdataNY, col= "yellow")
+points(resid2~pred, data = simdataCT, col= "green")
+points(resid2~pred, data = simdataDE, col= "orange")
+points(resid2~pred, data = simdataMA, col= "purple")
+points(resid2~pred, data = simdataRI, col= "pink")
+points(resid2~pred, data = simdataMD, col= "brown")
+legend(20, 1, legend=c("NC","VA", "NJ","NY","CT", "DE","MA", "RI", "MD"),  
+       fill = c("black","blue", "red", "yellow", "green", "orange", "purple",
+                "pink", "brown") )
+
+#incorporating size structure into discards GAM
+
+Nlen <- 42
+
+omlength2978111 <- {scan("~/Desktop/FlounderMSE/RDMgam/storelengths/sim_storelength/om-length2020.dat",n=Nlen+1)} #29781.11
+omlength2978111_nodate <- omlength2978111[2:43]
+omlength2978111_sum <- sum(omlength2978111[2:43])
+omlength2978111_nodatedata <- as.data.frame(as.list(omlength2978111_nodate))
+colnames(omlength2978111_nodatedata) <- paste0( seq(10, 92, by = 2))
+omlength2978111_nodatedata <- omlength2978111_nodatedata %>% mutate(SSBcov = 29781.11)
+
+omlength4233281 <- {scan("~/Desktop/FlounderMSE/RDMgam/storelengths/sim_storelength/om-length2021.dat",n=Nlen+1)}  #42332.81
+omlength4233281_nodate <- omlength4233281[2:43]
+omlength4233281_sum <- sum(omlength4233281[2:43])
+omlength4233281_nodatedata <- as.data.frame(as.list(omlength4233281_nodate))
+colnames(omlength4233281_nodatedata) <- paste0( seq(10, 92, by = 2))
+omlength4233281_nodatedata <- omlength4233281_nodatedata %>% mutate(SSBcov = 42332.81)
+
+omlength5668865 <- {scan("~/Desktop/FlounderMSE/RDMgam/storelengths/sim_storelength/om-length2022.dat",n=Nlen+1)}  #56688.65
+omlength5668865_nodate <- omlength5668865[2:43]
+omlength5668865_sum <- sum(omlength5668865[2:43])
+omlength5668865_nodatedata <- as.data.frame(as.list(omlength5668865_nodate))
+colnames(omlength5668865_nodatedata) <- paste0( seq(10, 92, by = 2))
+omlength5668865_nodatedata <- omlength5668865_nodatedata %>% mutate(SSBcov = 56688.65)
+
+omlength6450683 <- {scan("~/Desktop/FlounderMSE/RDMgam/storelengths/sim_storelength/om-length2039.dat",n=Nlen+1)}  #64506.83 
+omlength6450683_nodate <- omlength6450683[2:43]
+omlength6450683_sum <- sum(omlength6450683[2:43])
+omlength6450683_nodatedata <- as.data.frame(as.list(omlength6450683_nodate))
+colnames(omlength6450683_nodatedata) <- paste0( seq(10, 92, by = 2))
+omlength6450683_nodatedata <- omlength6450683_nodatedata %>% mutate(SSBcov = 64506.83)
+
+omlength7623342 <- {scan("~/Desktop/FlounderMSE/RDMgam/storelengths/sim_storelength/om-length2024.dat",n=Nlen+1)}   #76233.42        
+omlength7623342_nodate <- omlength7623342[2:43]
+omlength7623342_sum <- sum(omlength7623342[2:43])
+omlength7623342_nodatedata <- as.data.frame(as.list(omlength7623342_nodate))
+colnames(omlength7623342_nodatedata) <- paste0( seq(10, 92, by = 2))
+omlength7623342_nodatedata <- omlength7623342_nodatedata %>% mutate(SSBcov = 76233.42)
+
+omlength8636419 <- {scan("~/Desktop/FlounderMSE/RDMgam/storelengths/sim_storelength/om-length2027.dat",n=Nlen+1)}  #86364.19
+omlength8636419_nodate <- omlength8636419[2:43]
+omlength8636419_sum <- sum(omlength8636419[2:43])
+omlength8636419_nodatedata <- as.data.frame(as.list(omlength8636419_nodate))
+colnames(omlength8636419_nodatedata) <- paste0( seq(10, 92, by = 2))
+omlength8636419_nodatedata <- omlength8636419_nodatedata %>% mutate(SSBcov = 86364.19)
+
+omlength9226567 <- {scan("~/Desktop/FlounderMSE/RDMgam/storelengths/sim_storelength/om-length2045.dat",n=Nlen+1)}  #92265.67 
+omlength9226567_nodate <- omlength9226567[2:43]
+omlength9226567_sum <- sum(omlength9226567[2:43])
+omlength9226567_nodatedata <- as.data.frame(as.list(omlength9226567_nodate))
+colnames(omlength9226567_nodatedata) <- paste0( seq(10, 92, by = 2))
+omlength9226567_nodatedata <- omlength9226567_nodatedata %>% mutate(SSBcov = 92265.67)
+
+omlength10191523 <- {scan("~/Desktop/FlounderMSE/RDMgam/storelengths/sim_storelength_contrast/om-length2025.dat",n=Nlen+1)}  #101915.23 2025
+omlength10191523_nodate <- omlength10191523[2:43]
+omlength10191523_sum <- sum(omlength10191523[2:43])
+omlength10191523_nodatedata <- as.data.frame(as.list(omlength10191523_nodate))
+colnames(omlength10191523_nodatedata) <- paste0( seq(10, 92, by = 2))
+omlength10191523_nodatedata <- omlength10191523_nodatedata %>% mutate(SSBcov = 101915.23)
+
+omlength11028124 <- {scan("~/Desktop/FlounderMSE/RDMgam/storelengths/sim_storelength_contrast/om-length2045.dat",n=Nlen+1)}  #110281.24 2045
+omlength11028124_nodate <- omlength11028124[2:43]
+omlength11028124_sum <- sum(omlength11028124[2:43])
+omlength11028124_nodatedata <- as.data.frame(as.list(omlength11028124_nodate))
+colnames(omlength11028124_nodatedata) <- paste0( seq(10, 92, by = 2))
+omlength11028124_nodatedata <- omlength11028124_nodatedata %>% mutate(SSBcov = 110281.24)
+
+omlength15247371 <- {scan("~/Desktop/FlounderMSE/RDMgam/storelengths/sim_storelength_contrast/om-length2037.dat",n=Nlen+1)}  #152473.71 2037 
+omlength15247371_nodate <- omlength15247371[2:43]
+omlength15247371_sum <- sum(omlength15247371[2:43])
+omlength15247371_nodatedata <- as.data.frame(as.list(omlength15247371_nodate))
+colnames(omlength15247371_nodatedata) <- paste0( seq(10, 92, by = 2))
+omlength15247371_nodatedata <- omlength15247371_nodatedata %>% mutate(SSBcov = 152473.71)
+
+omlength16704276 <- {scan("~/Desktop/FlounderMSE/RDMgam/storelengths/sim_storelength_contrast/om-length2032.dat",n=Nlen+1)}  #167042.76 2032
+omlength16704276_nodate <- omlength16704276[2:43]
+omlength16704276_sum <- sum(omlength16704276[2:43])
+omlength16704276_nodatedata <- as.data.frame(as.list(omlength16704276_nodate))
+colnames(omlength16704276_nodatedata) <- paste0( seq(10, 92, by = 2))
+omlength16704276_nodatedata <- omlength16704276_nodatedata %>% mutate(SSBcov = 167042.76)
+
+omlength18125726 <- {scan("~/Desktop/FlounderMSE/RDMgam/storelengths/sim_storelength_contrast/om-length2026.dat",n=Nlen+1)}  #181257.26 2026  
+omlength18125726_nodate <- omlength18125726[2:43]
+omlength18125726_sum <- sum(omlength18125726[2:43])
+omlength18125726_nodatedata <- as.data.frame(as.list(omlength18125726_nodate))
+colnames(omlength18125726_nodatedata) <- paste0( seq(10, 92, by = 2))
+omlength18125726_nodatedata <- omlength18125726_nodatedata %>% mutate(SSBcov = 181257.26)
+
+omlength21039415 <- {scan("~/Desktop/FlounderMSE/RDMgam/storelengths/sim_storelength_contrast/om-length2027.dat",n=Nlen+1)}  #210394.15 2027
+omlength21039415_nodate <- omlength21039415[2:43]
+omlength21039415_sum <- sum(omlength21039415[2:43])
+omlength21039415_nodatedata <- as.data.frame(as.list(omlength21039415_nodate))
+colnames(omlength21039415_nodatedata) <- paste0( seq(10, 92, by = 2))
+omlength21039415_nodatedata <- omlength21039415_nodatedata %>% mutate(SSBcov = 210394.15)
+
+omlength22546028 <- {scan("~/Desktop/FlounderMSE/RDMgam/storelengths/sim_storelength_contrast/om-length2028.dat",n=Nlen+1)}  #225460.28 2028 
+omlength22546028_nodate <- omlength22546028[2:43]
+omlength22546028_sum <- sum(omlength22546028[2:43])
+omlength22546028_nodatedata <- as.data.frame(as.list(omlength22546028_nodate))
+colnames(omlength22546028_nodatedata) <- paste0( seq(10, 92, by = 2))
+omlength22546028_nodatedata <- omlength22546028_nodatedata %>% mutate(SSBcov = 225460.28)
+
+omlength25461289 <- {scan("~/Desktop/FlounderMSE/RDMgam/storelengths/sim_storelength_contrast/om-length2034.dat",n=Nlen+1)} #254612.89 2034
+omlength25461289_nodate <- omlength25461289[2:43]
+omlength25461289_sum <- sum(omlength25461289[2:43])
+omlength25461289_nodatedata <- as.data.frame(as.list(omlength25461289_nodate))
+colnames(omlength25461289_nodatedata) <- paste0( seq(10, 92, by = 2))
+omlength25461289_nodatedata <- omlength25461289_nodatedata %>% mutate(SSBcov = 254612.89)
+
+#FOR NUMBER OF FISH, PROPORTIONS OF FISH LOWER THAN MIN SIZE
+omlengthdata <- rbind(omlength2978111_nodatedata, omlength4233281_nodatedata,
+                      omlength5668865_nodatedata, omlength6450683_nodatedata,
+                      omlength7623342_nodatedata, omlength8636419_nodatedata,
+                      omlength9226567_nodatedata, omlength10191523_nodatedata,
+                      omlength11028124_nodatedata, omlength15247371_nodatedata,
+                      omlength16704276_nodatedata, omlength18125726_nodatedata,
+                      omlength21039415_nodatedata, omlength22546028_nodatedata,
+                      omlength25461289_nodatedata)
+
+RDMoutputbind_disc1 <- left_join(RDMoutputbind_edit, omlengthdata, by = c("SSBcov"))
+
+RDMoutputbind_disc2 <- RDMoutputbind_disc1 %>% mutate(LengthSize = ifelse(
+  SSBcov == 29781.11, omlength2978111_sum, ifelse(
+    SSBcov == 42332.81, omlength4233281_sum, ifelse(
+      SSBcov == 56688.65, omlength5668865_sum, ifelse(
+        SSBcov == 64506.83, omlength6450683_sum, ifelse(
+          SSBcov == 76233.42, omlength7623342_sum, ifelse(
+            SSBcov == 86364.19, omlength8636419_sum, ifelse(
+              SSBcov == 92265.67, omlength9226567_sum, ifelse(
+                SSBcov == 101915.23, omlength10191523_sum, ifelse(
+                  SSBcov == 110281.24, omlength11028124_sum, ifelse(
+                    SSBcov == 152473.71, omlength15247371_sum, ifelse(
+                      SSBcov == 167042.76, omlength16704276_sum, ifelse(
+                        SSBcov == 181257.26, omlength18125726_sum, ifelse(
+                          SSBcov == 210394.15, omlength21039415_sum, ifelse(
+                            SSBcov == 225460.28, omlength22546028_sum, ifelse(
+                              SSBcov == 254612.89, omlength25461289_sum, 0))))))))))))))))
+#View(RDMoutputbind_disc4)
+
+#NUMBER UNDER MINSIZE
+RDMoutputbind_disc3 <- RDMoutputbind_disc2 %>% mutate(SumRel = ifelse(
+  MinLen == 14, rowSums(RDMoutputbind_disc2[, 8:21], na.rm = TRUE), ifelse(
+    MinLen == 15, rowSums(RDMoutputbind_disc2[, 8:22], na.rm = TRUE), ifelse(
+      MinLen == 16, rowSums(RDMoutputbind_disc2[, 8:23], na.rm = TRUE), ifelse(
+        MinLen == 17, rowSums(RDMoutputbind_disc2[, 8:25], na.rm = TRUE), ifelse(
+          MinLen == 18, rowSums(RDMoutputbind_disc2[, 8:26], na.rm = TRUE), ifelse(
+            MinLen == 19, rowSums(RDMoutputbind_disc2[, 8:27], na.rm = TRUE), ifelse(
+              MinLen == 20, rowSums(RDMoutputbind_disc2[, 8:28], na.rm = TRUE), NA
+              ))))))))
+
+#MED LENGTH AT MATURITY FROM 2013 BENCHMARK STOCK ASSESSMENT - 26.8cm, 10.5 inches
+RDMoutputbind_disc4 <- RDMoutputbind_disc3 %>% mutate(PropRel = SumRel/LengthSize,
+                                                      LenMat = rowSums(RDMoutputbind_disc3[,8:16], na.rm = TRUE),
+                                                      PropLenMat = LenMat/LengthSize)
+
+#SUMMED SIZE STRUCTURE ONLY 
+RDMoutputbind_disc <- RDMoutputbind_edit %>% mutate(LengthSize = ifelse(
+  SSBcov == 29781.11, omlength2978111_sum, ifelse(
+    SSBcov == 42332.81, omlength4233281_sum, ifelse(
+      SSBcov == 56688.65, omlength5668865_sum, ifelse(
+        SSBcov == 64506.83, omlength6450683_sum, ifelse(
+          SSBcov == 76233.42, omlength7623342_sum, ifelse(
+            SSBcov == 86364.19, omlength8636419_sum, ifelse(
+              SSBcov == 92265.67, omlength9226567_sum, ifelse(
+                SSBcov == 101915.23, omlength10191523_sum, ifelse(
+                  SSBcov == 110281.24, omlength11028124_sum, ifelse(
+                    SSBcov == 152473.71, omlength15247371_sum, ifelse(
+                      SSBcov == 167042.76, omlength16704276_sum, ifelse(
+                        SSBcov == 181257.26, omlength18125726_sum, ifelse(
+                          SSBcov == 210394.15, omlength21039415_sum, ifelse(
+                            SSBcov == 225460.28, omlength22546028_sum, ifelse(
+                              SSBcov == 254612.89, omlength25461289_sum, 0))))))))))))))))
+
+#for summed size structure only 
+tot_rel <- RDMoutputbind_disc$tot_rel
+state <- RDMoutputbind_disc$state
+SeasonLen <- RDMoutputbind_disc$SeasonLen
+Bag <- RDMoutputbind_disc$Bag
+MinLen <- RDMoutputbind_disc$MinLen
+SSB <- RDMoutputbind_disc$SSBcov
+LengthSize <- RDMoutputbind_disc$LengthSize
+
+#for sum or proportion below min size, size at maturity  
+tot_rel <- RDMoutputbind_disc4$tot_rel
+state <- RDMoutputbind_disc4$state
+SeasonLen <- RDMoutputbind_disc4$SeasonLen
+Bag <- RDMoutputbind_disc4$Bag
+MinLen <- RDMoutputbind_disc4$MinLen
+SSB <- RDMoutputbind_disc4$SSBcov
+LengthSize <- RDMoutputbind_disc4$LengthSize
+SumRel <- RDMoutputbind_disc4$SumRel
+PropRel <- RDMoutputbind_disc4$PropRel
+LenMat <- RDMoutputbind_disc4$LenMat
+PropLenMat <- RDMoutputbind_disc4$PropLenMat
+
+#make data frame 
+inputdatadisc <- data.frame(tot_rel,
+                        state, SeasonLen, Bag, MinLen, SSB, LengthSize, SumRel, PropRel, LenMat, PropLenMat) 
+
+
+# ------------------------------- DISC GAM 2 SUMMED LENGTHS -------------------------------------------------#
+d2 <- gam(tot_rel ~  state + s(SSB, k = 3) + s(SeasonLen, k = 3) + 
+            s(Bag, k = 3) + s(MinLen, k = 3) + s(LengthSize, k = 3), data = inputdatadisc, 
+          family = Gamma(link = log), method = "REML") 
+summary(d2) #summed length bins
+#gam.check(d2)
+appraise(d2)
+draw(d2)
+
+# ------------------------------- DISC GAM 3 SUMMED LENGTHS <MIN SIZE-------------------------------------------------#
+d3 <- gam(tot_rel ~  state + s(SSB, k = 3) + s(SeasonLen, k = 3) + 
+            s(Bag, k = 3) + s(MinLen, k = 3) + s(SumRel, k = 3), data = inputdatadisc, 
+          family = Gamma(link = log), method = "REML") 
+summary(d3) #summed length bins ~ =< a given minimum size 
+#gam.check(d3)
+appraise(d3)
+draw(d3)
+#saveRDS(d3, "~/Desktop/FlounderMSE/RDMgam/gam_RDM_disc_superscramble12424.rds") #disordered length
+#d3 <- readRDS("~/Desktop/FlounderMSE/RDMgam/gam_RDM_disc_superscramble12424.rds") #disordered length
+
+# ------------------------------- DISC GAM 4 PROPORTION <MIN SIZE-------------------------------------------------#
+d4 <- gam(tot_rel ~  state + s(SSB, k = 3) + s(SeasonLen, k = 3) + 
+           s(Bag, k = 3) + s(MinLen, PropRel), data = inputdatadisc, #interaction seems to reduce confounding between two variables
+          family = Gamma(link = log), method = "REML") 
+summary(d4) #proportion of length bins ~ =< a given minimum size 
+#gam.check(d4)
+appraise(d4)
+library(ggplot2)
+smooth_plot <- draw(d4) +
+  scale_x_continuous(trans = "log") 
+#interaction between minlen and proprel makes sense, but doesn't fix seasonlen issue
+
+# ------------------------------- DISC GAM 5 SUM <SIZE AT MATURITY -------------------------------------------------#
+d5 <- gam(tot_rel ~  state + s(SSB, k = 3) + s(SeasonLen, k = 3) + 
+            s(Bag, k = 3) + s(MinLen, k = 3) + s(LenMat, k = 3), data = inputdatadisc, 
+          family = Gamma(link = log), method = "REML") 
+summary(d5) #proportion of length bins ~ =< size at maturity  
+#gam.check(d5)
+appraise(d5)
+draw(d5)
+#this doesn't improve anything -> in fact makes fit worse
+
+# ------------------------------- DISC GAM 6 SUM <SIZE AT MATURITY -------------------------------------------------#
+d6 <- gam(tot_rel ~  state + s(SSB, k = 3) + s(SeasonLen, k = 3) + 
+            s(Bag, k = 3) + s(MinLen, PropLenMat), data = inputdatadisc, 
+          family = Gamma(link = log), method = "REML") 
+summary(d6) #proportion of length bins ~ =< size at maturity  
+#gam.check(d6)
+appraise(d6) #a little better than d5 with and without interaction
+draw(d6) +
+  scale_x_continuous(trans = "log") 
+
+################### --------------- PREDICTIONS ---------------- #####################
+
+#WITHIN SAMPLE 
+
+#land 
+preddata1 <- dplyr::select(inputdata, state, SeasonLen, Bag, MinLen, SSB)
+gamfit2 <- predict.gam(g1, newdata = preddata1, type = "link" , se.fit = TRUE)
+
+#disc
+preddata2 <- dplyr::select(inputdatadisc, state, SeasonLen, Bag, MinLen, SSB, SumRel)
+gamfit3 <- predict.gam(d3, newdata = preddata2, type = "link" , se.fit = TRUE)
+
+#OUT OF SAMPLE
+
+#LOOCV
+n <- length(inputdata$Bag)
+loo_predictions <- numeric(n)
+
+data <- inputdata
+
+# Perform LOOCV LAND
+for (i in 1:n) {
+  train_data <- data[-i, ]
+  test_data <- data[i, , drop = FALSE]
+  gam_model <- gam(tot_keep ~ state + s(SSB, k = 3) + s(SeasonLen, k = 3) + #9,5,7 partial effect of smooths look strange with k any higher 
+                     s(Bag, k = 3) + s(MinLen, k = 3), data = train_data, 
+                   family = Gamma(link = log), method = "REML")
+  loo_predictions[i] <- predict(gam_model, newdata = test_data)
+}
+#saveRDS(loo_predictions, "~/Desktop/FlounderMSE/LOOCV_g1.rds")
+loo_predictions <- readRDS("~/Desktop/FlounderMSE/LOOCV_g1.rds") #very similar but not exactly the same as in-sample
+
+# performance metrics 
+mse <- mean((loo_predictions - log(data$tot_keep))^2) #keep in logspace since model was fit in logspace
+rmse <- sqrt(mse)
+mae <- mean(abs(loo_predictions - log(data$tot_keep)))
+
+#residuals and predictions
+residuals <- data$tot_keep - exp(loo_predictions)
+plot(residuals ~data$tot_keep)
+
+plot(data$tot_keep~exp(gamfit2$fit))
+plot(data$tot_keep~exp(loo_predictions))
+
+data <- inputdatadisc
+
+# Perform LOOCV DISC
+for (i in 1:n) {
+  train_data <- data[-i, ]
+  test_data <- data[i, , drop = FALSE]
+  gam_model <- gam(tot_rel ~  state + s(SSB, k = 3) + s(SeasonLen, k = 3) + 
+                     s(Bag, k = 3) + s(MinLen, k = 3) + s(SumRel, k = 3), data = train_data, 
+                   family = Gamma(link = log), method = "REML")
+  loo_predictions[i] <- predict(gam_model, newdata = test_data[2:9])
+}
+#saveRDS(loo_predictions, "~/Desktop/FlounderMSE/LOOCV_d3.rds")
+loo_predictions_disc <- readRDS("~/Desktop/FlounderMSE/LOOCV_d3.rds")
+
+# performance metrics 
+mse <- mean((loo_predictions_disc - log(data$tot_rel))^2) #keep in logspace since model was fit in logspace
+rmse <- sqrt(mse)
+mae <- mean(abs(loo_predictions_disc - log(data$tot_rel)))
+
+#residuals and predictions
+residuals <- data$tot_rel - exp(loo_predictions_disc)
+plot(residuals ~data$tot_rel)
+
+plot(data$tot_rel~exp(gamfit3$fit))
+plot(data$tot_rel~exp(loo_predictions_disc))
+
+#DIAGNOSTICS AND PARTIAL EFFECTS 
+
+#land
 appraise(g1)
 draw(g1)
 
@@ -912,11 +1278,38 @@ draw(g1)
 appraise(d1)
 draw(d1)
 
-#compare to one without SSB
-appraise(g1.1)
-draw(g1.1)
+#for logged response
+#plot(inputdata$tot_keep ~ exp(gamfit2$fit))
 
-#original gam
+############# FOR DETERMINING SCALARS FOR do_recmeasures_hcr.R ##########################################
+
+scalarinput <- dplyr::select(inputdata[100:108,], state, SeasonLen, Bag, MinLen, SSB) # pick number where "CT" is first state in list 
+scalaroutput = list()
+scalaroutput = vector("list", length = nrow(scalarinput))
+
+for(x in 1:length(scalarinput$SeasonLen)){
+scalarinput2 <- scalarinput[x,]
+gamfit_scalar <- predict.gam(g1, newdata = scalarinput2, type = "response" , se.fit = TRUE)
+scalaroutput[[x]] <- scalarinput[x,] %>% mutate(land = gamfit_scalar$fit)
+}
+scalaroutput2 <- bind_rows(scalaroutput)
+  
+CTscalar <- scalaroutput2$land[1]/sum(scalaroutput2$land) #scalarinput states should start with "CT"
+DEscalar <- scalaroutput2$land[2]/sum(scalaroutput2$land)
+MAscalar <- scalaroutput2$land[3]/sum(scalaroutput2$land)
+MDscalar <- scalaroutput2$land[4]/sum(scalaroutput2$land)
+NCscalar <- scalaroutput2$land[5]/sum(scalaroutput2$land)
+NJscalar <- scalaroutput2$land[6]/sum(scalaroutput2$land)
+NYscalar <- scalaroutput2$land[7]/sum(scalaroutput2$land)
+RIscalar <- scalaroutput2$land[8]/sum(scalaroutput2$land)
+VAscalar <- scalaroutput2$land[9]/sum(scalaroutput2$land)
+
+GAMscalar <- data.frame(CTscalar, DEscalar, MAscalar, MDscalar, NCscalar, NJscalar, NYscalar, RIscalar, VAscalar)
+#so far these values have been the same no matter which SSB or regulation scenario we start on 
+#saveRDS(GAMscalar, "~/Desktop/FlounderMSE/GAMscalar.rds")
+#readRDS("~/Desktop/FlounderMSE/GAMscalar.rds")
+
+#ORIGINAL GAMS FOR COMPARISON
 
 #land
 #gamland <- readRDS("~/Desktop/FlounderMSE/gam_land.rds")
@@ -927,5 +1320,3 @@ draw(g1.1)
 #gamdisc <- readRDS("~/Desktop/FlounderMSE/gam_disc.rds")
 #appraise(gamdisc)
 #draw(gamdisc)
-
-
