@@ -1,0 +1,2983 @@
+ Stepping into ReadIn
+ HERE!
+ ReadIN finished
+ Starting Historical Projection
+ Stepping into Set-Up
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ Finished with Set-Up
+ Initializing
+ check Init.junk
+  0.50000000000000000     
+ Finished with Initialization
+ Doing historical projection
+ ...check histproj.junk
+   29044.423581188476        32625.519556548476        32625.519556548476     
+ Finished historical projection
+ Historical Projection finished
+ ISEEDX      -84397
+ ISEEDZ           1
+ finding historical data
+ reading data specs: check histdata.junk
+ finished reading data specs
+ finished generating historical data
+ finished writing assessment files
+ Stepping into Set-Up
+        2020
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   29044.423581188476        44057.276700197013        44057.276700197013     
+   29044.423581188476        56399.321269674532        56399.321269674532     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2020 to2021
+ finished writing assessment files
+ Stepping into Set-Up
+        2022
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   29044.423581188476        68919.900100835133        68919.900100835133     
+   29044.423581188476        79022.773147163374        79022.773147163374     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2022 to2023
+ finished writing assessment files
+ Stepping into Set-Up
+        2024
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   29044.423581188476        81395.770306609251        81395.770306609251     
+   29044.423581188476        89312.511316789329        89312.511316789329     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2024 to2025
+ finished writing assessment files
+ Stepping into Set-Up
+        2026
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   29044.423581188476        81672.712198202556        81672.712198202556     
+   29044.423581188476        89862.045875926109        89862.045875926109     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2026 to2027
+ finished writing assessment files
+ Stepping into Set-Up
+        2028
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   29044.423581188476        87154.881946094363        87154.881946094363     
+   29044.423581188476        83706.626647042212        83706.626647042212     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2028 to2029
+ finished writing assessment files
+ Stepping into Set-Up
+        2030
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   29044.423581188476        78099.489354745543        78099.489354745543     
+   29044.423581188476        71340.301815145052        71340.301815145052     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2030 to2031
+ finished writing assessment files
+ Stepping into Set-Up
+        2032
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   29044.423581188476        54751.098320392783        54751.098320392783     
+   29044.423581188476        40739.016204224361        40739.016204224361     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2032 to2033
+ finished writing assessment files
+ Stepping into Set-Up
+        2034
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   29044.423581188476        25590.950238434918        25590.950238434918     
+   29044.423581188476        13190.561746398131        13190.561746398131     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2034 to2035
+ finished writing assessment files
+ Stepping into Set-Up
+        2036
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   29044.423581188476        24907.568911771628        24907.568911771628     
+   29044.423581188476        40989.131914013255        40989.131914013255     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2036 to2037
+ finished writing assessment files
+ Stepping into Set-Up
+        2038
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   29044.423581188476        65953.893256031384        65953.893256031384     
+   29044.423581188476        93313.240485184026        93313.240485184026     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2038 to2039
+ finished writing assessment files
+ Stepping into Set-Up
+        2040
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   29044.423581188476        96919.705745291416        96919.705745291416     
+   29044.423581188476        98335.829381379575        98335.829381379575     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2040 to2041
+ finished writing assessment files
+ Stepping into Set-Up
+        2042
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   29044.423581188476        71368.237570249272        71368.237570249272     
+   29044.423581188476        66515.476282929201        66515.476282929201     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2042 to2043
+ finished writing assessment files
+ Stepping into Set-Up
+        2044
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   29044.423581188476        72906.744733495245        72906.744733495245     
+   29044.423581188476        73297.956475092695        73297.956475092695     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2044 to2045
+ finished writing assessment files
+ Starting Historical Projection
+ Stepping into Set-Up
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ Finished with Set-Up
+ Initializing
+ check Init.junk
+  0.50000000000000000     
+ Finished with Initialization
+ Doing historical projection
+ ...check histproj.junk
+   27952.231766006520        32448.481728335631        32448.481728335631     
+ Finished historical projection
+ Historical Projection finished
+ ISEEDX       -5928
+ ISEEDZ           1
+ finding historical data
+ reading data specs: check histdata.junk
+ finished reading data specs
+ finished generating historical data
+ finished writing assessment files
+ Stepping into Set-Up
+        2020
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   27952.231766006520        45503.207665001966        45503.207665001966     
+   27952.231766006520        60091.478275146153        60091.478275146153     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2020 to2021
+ finished writing assessment files
+ Stepping into Set-Up
+        2022
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   27952.231766006520        74514.895427351483        74514.895427351483     
+   27952.231766006520        90876.673486187952        90876.673486187952     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2022 to2023
+ finished writing assessment files
+ Stepping into Set-Up
+        2024
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   27952.231766006520        80978.558387716490        80978.558387716490     
+   27952.231766006520        65845.903402662138        65845.903402662138     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2024 to2025
+ finished writing assessment files
+ Stepping into Set-Up
+        2026
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   27952.231766006520        49109.247354863677        49109.247354863677     
+   27952.231766006520        41315.454243185188        41315.454243185188     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2026 to2027
+ finished writing assessment files
+ Stepping into Set-Up
+        2028
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   27952.231766006520        53103.232245715160        53103.232245715160     
+   27952.231766006520        69351.971750787881        69351.971750787881     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2028 to2029
+ finished writing assessment files
+ Stepping into Set-Up
+        2030
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   27952.231766006520        93073.242150186241        93073.242150186241     
+   27952.231766006520        109912.70294975647        109912.70294975647     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2030 to2031
+ finished writing assessment files
+ Stepping into Set-Up
+        2032
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   27952.231766006520        109263.41691849015        109263.41691849015     
+   27952.231766006520        103589.84184102717        103589.84184102717     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2032 to2033
+ finished writing assessment files
+ Stepping into Set-Up
+        2034
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   27952.231766006520        78039.371684048616        78039.371684048616     
+   27952.231766006520        58665.879537706824        58665.879537706824     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2034 to2035
+ finished writing assessment files
+ Stepping into Set-Up
+        2036
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   27952.231766006520        53525.866828451995        53525.866828451995     
+   27952.231766006520        49033.861675517794        49033.861675517794     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2036 to2037
+ finished writing assessment files
+ Stepping into Set-Up
+        2038
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   27952.231766006520        56511.255011145251        56511.255011145251     
+   27952.231766006520        72301.185358937902        72301.185358937902     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2038 to2039
+ finished writing assessment files
+ Stepping into Set-Up
+        2040
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   27952.231766006520        69432.474616216641        69432.474616216641     
+   27952.231766006520        57052.671181771875        57052.671181771875     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2040 to2041
+ finished writing assessment files
+ Stepping into Set-Up
+        2042
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   27952.231766006520        38555.379974513467        38555.379974513467     
+   27952.231766006520        26023.110792175412        26023.110792175412     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2042 to2043
+ finished writing assessment files
+ Stepping into Set-Up
+        2044
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   27952.231766006520        29160.679229991259        29160.679229991259     
+   27952.231766006520        40120.084406646914        40120.084406646914     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2044 to2045
+ finished writing assessment files
+ Starting Historical Projection
+ Stepping into Set-Up
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ Finished with Set-Up
+ Initializing
+ check Init.junk
+  0.50000000000000000     
+ Finished with Initialization
+ Doing historical projection
+ ...check histproj.junk
+   25266.523809953047        28635.193313765063        28635.193313765063     
+ Finished historical projection
+ Historical Projection finished
+ ISEEDX      -35841
+ ISEEDZ           1
+ finding historical data
+ reading data specs: check histdata.junk
+ finished reading data specs
+ finished generating historical data
+ finished writing assessment files
+ Stepping into Set-Up
+        2020
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   25266.523809953047        40601.602724345306        40601.602724345306     
+   25266.523809953047        64144.453807056860        64144.453807056860     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2020 to2021
+ finished writing assessment files
+ Stepping into Set-Up
+        2022
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   25266.523809953047        86822.472607070580        86822.472607070580     
+   25266.523809953047        98272.674152986379        98272.674152986379     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2022 to2023
+ finished writing assessment files
+ Stepping into Set-Up
+        2024
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   25266.523809953047        79186.563161031023        79186.563161031023     
+   25266.523809953047        73007.935145339114        73007.935145339114     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2024 to2025
+ finished writing assessment files
+ Stepping into Set-Up
+        2026
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   25266.523809953047        63014.010613812818        63014.010613812818     
+   25266.523809953047        51098.819197211800        51098.819197211800     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2026 to2027
+ finished writing assessment files
+ Stepping into Set-Up
+        2028
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   25266.523809953047        55766.905779980421        55766.905779980421     
+   25266.523809953047        60629.433007500375        60629.433007500375     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2028 to2029
+ finished writing assessment files
+ Stepping into Set-Up
+        2030
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   25266.523809953047        76679.487200892137        76679.487200892137     
+   25266.523809953047        93169.359954821310        93169.359954821310     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2030 to2031
+ finished writing assessment files
+ Stepping into Set-Up
+        2032
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   25266.523809953047        132060.45955622019        132060.45955622019     
+   25266.523809953047        176100.55838179679        176100.55838179679     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2032 to2033
+ finished writing assessment files
+ Stepping into Set-Up
+        2034
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   25266.523809953047        165969.72459123185        165969.72459123185     
+   25266.523809953047        142743.08397535875        142743.08397535875     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2034 to2035
+ finished writing assessment files
+ Stepping into Set-Up
+        2036
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   25266.523809953047        93076.279827349194        93076.279827349194     
+   25266.523809953047        52700.482008068473        52700.482008068473     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2036 to2037
+ finished writing assessment files
+ Stepping into Set-Up
+        2038
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   25266.523809953047        40100.058997755099        40100.058997755099     
+   25266.523809953047        31844.202879831842        31844.202879831842     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2038 to2039
+ finished writing assessment files
+ Stepping into Set-Up
+        2040
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   25266.523809953047        46148.123575642909        46148.123575642909     
+   25266.523809953047        61894.855401732195        61894.855401732195     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2040 to2041
+ finished writing assessment files
+ Stepping into Set-Up
+        2042
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   25266.523809953047        68077.751259105557        68077.751259105557     
+   25266.523809953047        67690.844542476494        67690.844542476494     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2042 to2043
+ finished writing assessment files
+ Stepping into Set-Up
+        2044
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   25266.523809953047        53531.677224166131        53531.677224166131     
+   25266.523809953047        46653.658796830474        46653.658796830474     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2044 to2045
+ finished writing assessment files
+ Starting Historical Projection
+ Stepping into Set-Up
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ Finished with Set-Up
+ Initializing
+ check Init.junk
+  0.50000000000000000     
+ Finished with Initialization
+ Doing historical projection
+ ...check histproj.junk
+   26685.803068740344        30843.375227265875        30843.375227265875     
+ Finished historical projection
+ Historical Projection finished
+ ISEEDX      -97388
+ ISEEDZ           1
+ finding historical data
+ reading data specs: check histdata.junk
+ finished reading data specs
+ finished generating historical data
+ finished writing assessment files
+ Stepping into Set-Up
+        2020
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   26685.803068740344        44499.760793350717        44499.760793350717     
+   26685.803068740344        57947.458272249947        57947.458272249947     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2020 to2021
+ finished writing assessment files
+ Stepping into Set-Up
+        2022
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   26685.803068740344        56850.418471067635        56850.418471067635     
+   26685.803068740344        59212.947047027410        59212.947047027410     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2022 to2023
+ finished writing assessment files
+ Stepping into Set-Up
+        2024
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   26685.803068740344        55740.510916393119        55740.510916393119     
+   26685.803068740344        50713.202411040278        50713.202411040278     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2024 to2025
+ finished writing assessment files
+ Stepping into Set-Up
+        2026
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   26685.803068740344        49982.288111033922        49982.288111033922     
+   26685.803068740344        48621.131956505196        48621.131956505196     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2026 to2027
+ finished writing assessment files
+ Stepping into Set-Up
+        2028
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   26685.803068740344        57182.136344574792        57182.136344574792     
+   26685.803068740344        61226.541068278479        61226.541068278479     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2028 to2029
+ finished writing assessment files
+ Stepping into Set-Up
+        2030
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   26685.803068740344        71574.382863761755        71574.382863761755     
+   26685.803068740344        81825.690616182197        81825.690616182197     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2030 to2031
+ finished writing assessment files
+ Stepping into Set-Up
+        2032
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   26685.803068740344        104925.09442434710        104925.09442434710     
+   26685.803068740344        139499.49144404777        139499.49144404777     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2032 to2033
+ finished writing assessment files
+ Stepping into Set-Up
+        2034
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   26685.803068740344        172116.98843578997        172116.98843578997     
+   26685.803068740344        270005.09551215469        270005.09551215469     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2034 to2035
+ finished writing assessment files
+ Stepping into Set-Up
+        2036
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   26685.803068740344        359254.21179494634        359254.21179494634     
+   26685.803068740344        401849.10928650649        401849.10928650649     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2036 to2037
+ finished writing assessment files
+ Stepping into Set-Up
+        2038
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   26685.803068740344        362583.75398478308        362583.75398478308     
+   26685.803068740344        280665.62269105634        280665.62269105634     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2038 to2039
+ finished writing assessment files
+ Stepping into Set-Up
+        2040
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   26685.803068740344        160451.39865145192        160451.39865145192     
+   26685.803068740344        57252.881879270892        57252.881879270892     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2040 to2041
+ finished writing assessment files
+ Stepping into Set-Up
+        2042
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   26685.803068740344        34032.746509362398        34032.746509362398     
+   26685.803068740344        35078.844488935370        35078.844488935370     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2042 to2043
+ finished writing assessment files
+ Stepping into Set-Up
+        2044
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   26685.803068740344        62434.908362483635        62434.908362483635     
+   26685.803068740344        87745.021214100954        87745.021214100954     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2044 to2045
+ finished writing assessment files
+ Starting Historical Projection
+ Stepping into Set-Up
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ Finished with Set-Up
+ Initializing
+ check Init.junk
+  0.50000000000000000     
+ Finished with Initialization
+ Doing historical projection
+ ...check histproj.junk
+   29213.683831851649        33616.878098785135        33616.878098785135     
+ Finished historical projection
+ Historical Projection finished
+ ISEEDX      -63993
+ ISEEDZ           1
+ finding historical data
+ reading data specs: check histdata.junk
+ finished reading data specs
+ finished generating historical data
+ finished writing assessment files
+ Stepping into Set-Up
+        2020
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   29213.683831851649        46702.743950906486        46702.743950906486     
+   29213.683831851649        67065.397753432364        67065.397753432364     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2020 to2021
+ finished writing assessment files
+ Stepping into Set-Up
+        2022
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   29213.683831851649        85653.205018068315        85653.205018068315     
+   29213.683831851649        101225.54593439921        101225.54593439921     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2022 to2023
+ finished writing assessment files
+ Stepping into Set-Up
+        2024
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   29213.683831851649        82592.216012851117        82592.216012851117     
+   29213.683831851649        61360.586747439986        61360.586747439986     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2024 to2025
+ finished writing assessment files
+ Stepping into Set-Up
+        2026
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   29213.683831851649        25843.886448736492        25843.886448736492     
+   29213.683831851649        12572.411290178756        12572.411290178756     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2026 to2027
+ finished writing assessment files
+ Stepping into Set-Up
+        2028
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   29213.683831851649        22831.028713793236        22831.028713793236     
+   29213.683831851649        39769.751385878284        39769.751385878284     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2028 to2029
+ finished writing assessment files
+ Stepping into Set-Up
+        2030
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   29213.683831851649        68077.487255414570        68077.487255414570     
+   29213.683831851649        91238.068276130842        91238.068276130842     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2030 to2031
+ finished writing assessment files
+ Stepping into Set-Up
+        2032
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   29213.683831851649        88882.399231263393        88882.399231263393     
+   29213.683831851649        92401.791511596588        92401.791511596588     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2032 to2033
+ finished writing assessment files
+ Stepping into Set-Up
+        2034
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   29213.683831851649        81965.323770049581        81965.323770049581     
+   29213.683831851649        68869.251019590782        68869.251019590782     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2034 to2035
+ finished writing assessment files
+ Stepping into Set-Up
+        2036
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   29213.683831851649        52065.630786902540        52065.630786902540     
+   29213.683831851649        40429.258198459320        40429.258198459320     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2036 to2037
+ finished writing assessment files
+ Stepping into Set-Up
+        2038
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   29213.683831851649        40120.562144702802        40120.562144702802     
+   29213.683831851649        73394.381505136727        73394.381505136727     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2038 to2039
+ finished writing assessment files
+ Stepping into Set-Up
+        2040
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   29213.683831851649        132307.62308434362        132307.62308434362     
+   29213.683831851649        154309.95558699098        154309.95558699098     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2040 to2041
+ finished writing assessment files
+ Stepping into Set-Up
+        2042
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   29213.683831851649        99312.577279382211        99312.577279382211     
+   29213.683831851649        50376.539192086471        50376.539192086471     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2042 to2043
+ finished writing assessment files
+ Stepping into Set-Up
+        2044
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   29213.683831851649        33277.437753005615        33277.437753005615     
+   29213.683831851649        21018.061687557241        21018.061687557241     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2044 to2045
+ finished writing assessment files
+ Starting Historical Projection
+ Stepping into Set-Up
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ Finished with Set-Up
+ Initializing
+ check Init.junk
+  0.50000000000000000     
+ Finished with Initialization
+ Doing historical projection
+ ...check histproj.junk
+   28456.261473732815        32150.947446014859        32150.947446014859     
+ Finished historical projection
+ Historical Projection finished
+ ISEEDX      -41232
+ ISEEDZ           1
+ finding historical data
+ reading data specs: check histdata.junk
+ finished reading data specs
+ finished generating historical data
+ finished writing assessment files
+ Stepping into Set-Up
+        2020
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   28456.261473732815        43308.304442991677        43308.304442991677     
+   28456.261473732815        57126.945769857601        57126.945769857601     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2020 to2021
+ finished writing assessment files
+ Stepping into Set-Up
+        2022
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   28456.261473732815        61839.713087524455        61839.713087524455     
+   28456.261473732815        60019.503425106966        60019.503425106966     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2022 to2023
+ finished writing assessment files
+ Stepping into Set-Up
+        2024
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   28456.261473732815        41527.737019851767        41527.737019851767     
+   28456.261473732815        35110.645361611845        35110.645361611845     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2024 to2025
+ finished writing assessment files
+ Stepping into Set-Up
+        2026
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   28456.261473732815        38407.792088741873        38407.792088741873     
+   28456.261473732815        42507.619645481878        42507.619645481878     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2026 to2027
+ finished writing assessment files
+ Stepping into Set-Up
+        2028
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   28456.261473732815        52521.612509332968        52521.612509332968     
+   28456.261473732815        71215.004346662972        71215.004346662972     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2028 to2029
+ finished writing assessment files
+ Stepping into Set-Up
+        2030
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   28456.261473732815        114629.16580314106        114629.16580314106     
+   28456.261473732815        147191.70913639275        147191.70913639275     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2030 to2031
+ finished writing assessment files
+ Stepping into Set-Up
+        2032
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   28456.261473732815        140028.67065273551        140028.67065273551     
+   28456.261473732815        127502.87471780513        127502.87471780513     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2032 to2033
+ finished writing assessment files
+ Stepping into Set-Up
+        2034
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   28456.261473732815        84869.834164994551        84869.834164994551     
+   28456.261473732815        51398.809101121369        51398.809101121369     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2034 to2035
+ finished writing assessment files
+ Stepping into Set-Up
+        2036
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   28456.261473732815        44203.574135541341        44203.574135541341     
+   28456.261473732815        37958.242915507799        37958.242915507799     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2036 to2037
+ finished writing assessment files
+ Stepping into Set-Up
+        2038
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   28456.261473732815        49534.720717569020        49534.720717569020     
+   28456.261473732815        65504.983384513042        65504.983384513042     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2038 to2039
+ finished writing assessment files
+ Stepping into Set-Up
+        2040
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   28456.261473732815        72608.310954750792        72608.310954750792     
+   28456.261473732815        70072.690410437775        70072.690410437775     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2040 to2041
+ finished writing assessment files
+ Stepping into Set-Up
+        2042
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   28456.261473732815        49328.883155869509        49328.883155869509     
+   28456.261473732815        36875.951898620850        36875.951898620850     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2042 to2043
+ finished writing assessment files
+ Stepping into Set-Up
+        2044
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   28456.261473732815        37767.615697989786        37767.615697989786     
+   28456.261473732815        38233.607454495381        38233.607454495381     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2044 to2045
+ finished writing assessment files
+ Starting Historical Projection
+ Stepping into Set-Up
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ Finished with Set-Up
+ Initializing
+ check Init.junk
+  0.50000000000000000     
+ Finished with Initialization
+ Doing historical projection
+ ...check histproj.junk
+   27992.401799905150        31377.669338290074        31377.669338290074     
+ Finished historical projection
+ Historical Projection finished
+ ISEEDX      -99101
+ ISEEDZ           1
+ finding historical data
+ reading data specs: check histdata.junk
+ finished reading data specs
+ finished generating historical data
+ finished writing assessment files
+ Stepping into Set-Up
+        2020
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   27992.401799905150        42221.890625293541        42221.890625293541     
+   27992.401799905150        55931.798298449416        55931.798298449416     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2020 to2021
+ finished writing assessment files
+ Stepping into Set-Up
+        2022
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   27992.401799905150        72540.349557309601        72540.349557309601     
+   27992.401799905150        88472.308108435827        88472.308108435827     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2022 to2023
+ finished writing assessment files
+ Stepping into Set-Up
+        2024
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   27992.401799905150        93776.969847258326        93776.969847258326     
+   27992.401799905150        94900.172713439446        94900.172713439446     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2024 to2025
+ finished writing assessment files
+ Stepping into Set-Up
+        2026
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   27992.401799905150        72960.214588768606        72960.214588768606     
+   27992.401799905150        53518.891142233231        53518.891142233231     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2026 to2027
+ finished writing assessment files
+ Stepping into Set-Up
+        2028
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   27992.401799905150        53074.062622993981        53074.062622993981     
+   27992.401799905150        66495.191294798919        66495.191294798919     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2028 to2029
+ finished writing assessment files
+ Stepping into Set-Up
+        2030
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   27992.401799905150        69759.575529962225        69759.575529962225     
+   27992.401799905150        59125.643597696231        59125.643597696231     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2030 to2031
+ finished writing assessment files
+ Stepping into Set-Up
+        2032
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   27992.401799905150        42752.520246521271        42752.520246521271     
+   27992.401799905150        35413.405624980485        35413.405624980485     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2032 to2033
+ finished writing assessment files
+ Stepping into Set-Up
+        2034
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   27992.401799905150        35116.546849036029        35116.546849036029     
+   27992.401799905150        30767.209011266648        30767.209011266648     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2034 to2035
+ finished writing assessment files
+ Stepping into Set-Up
+        2036
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   27992.401799905150        32975.803220525137        32975.803220525137     
+   27992.401799905150        37723.573429273602        37723.573429273602     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2036 to2037
+ finished writing assessment files
+ Stepping into Set-Up
+        2038
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   27992.401799905150        52889.295024645544        52889.295024645544     
+   27992.401799905150        68432.958141126335        68432.958141126335     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2038 to2039
+ finished writing assessment files
+ Stepping into Set-Up
+        2040
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   27992.401799905150        80008.322459396790        80008.322459396790     
+   27992.401799905150        89882.724497299612        89882.724497299612     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2040 to2041
+ finished writing assessment files
+ Stepping into Set-Up
+        2042
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   27992.401799905150        96088.839092484573        96088.839092484573     
+   27992.401799905150        109939.60524319665        109939.60524319665     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2042 to2043
+ finished writing assessment files
+ Stepping into Set-Up
+        2044
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   27992.401799905150        101003.98095230242        101003.98095230242     
+   27992.401799905150        83043.598715134242        83043.598715134242     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2044 to2045
+ finished writing assessment files
+ Starting Historical Projection
+ Stepping into Set-Up
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ Finished with Set-Up
+ Initializing
+ check Init.junk
+  0.50000000000000000     
+ Finished with Initialization
+ Doing historical projection
+ ...check histproj.junk
+   25257.696715242244        28924.428940265141        28924.428940265141     
+ Finished historical projection
+ Historical Projection finished
+ ISEEDX      -81449
+ ISEEDZ           1
+ finding historical data
+ reading data specs: check histdata.junk
+ finished reading data specs
+ finished generating historical data
+ finished writing assessment files
+ Stepping into Set-Up
+        2020
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   25257.696715242244        42615.336528058011        42615.336528058011     
+   25257.696715242244        65174.892200879971        65174.892200879971     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2020 to2021
+ finished writing assessment files
+ Stepping into Set-Up
+        2022
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   25257.696715242244        99462.359516168450        99462.359516168450     
+   25257.696715242244        144546.71117160952        144546.71117160952     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2022 to2023
+ finished writing assessment files
+ Stepping into Set-Up
+        2024
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   25257.696715242244        163834.73087486534        163834.73087486534     
+   25257.696715242244        161574.45848924687        161574.45848924687     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2024 to2025
+ finished writing assessment files
+ Stepping into Set-Up
+        2026
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   25257.696715242244        88553.620049462406        88553.620049462406     
+   25257.696715242244        33673.489246539197        33673.489246539197     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2026 to2027
+ finished writing assessment files
+ Stepping into Set-Up
+        2028
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   25257.696715242244        32882.838679954293        32882.838679954293     
+   25257.696715242244        29311.969807444450        29311.969807444450     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2028 to2029
+ finished writing assessment files
+ Stepping into Set-Up
+        2030
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   25257.696715242244        45013.399536757868        45013.399536757868     
+   25257.696715242244        60545.969303935010        60545.969303935010     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2030 to2031
+ finished writing assessment files
+ Stepping into Set-Up
+        2032
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   25257.696715242244        71384.471211140102        71384.471211140102     
+   25257.696715242244        76006.560263834283        76006.560263834283     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2032 to2033
+ finished writing assessment files
+ Stepping into Set-Up
+        2034
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   25257.696715242244        75075.133558085567        75075.133558085567     
+   25257.696715242244        79086.729068836794        79086.729068836794     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2034 to2035
+ finished writing assessment files
+ Stepping into Set-Up
+        2036
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   25257.696715242244        79968.580691606039        79968.580691606039     
+   25257.696715242244        99937.743435705474        99937.743435705474     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2036 to2037
+ finished writing assessment files
+ Stepping into Set-Up
+        2038
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   25257.696715242244        98338.175643690745        98338.175643690745     
+   25257.696715242244        86895.453528623097        86895.453528623097     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2038 to2039
+ finished writing assessment files
+ Stepping into Set-Up
+        2040
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   25257.696715242244        76627.143132490135        76627.143132490135     
+   25257.696715242244        67794.019277228072        67794.019277228072     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2040 to2041
+ finished writing assessment files
+ Stepping into Set-Up
+        2042
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   25257.696715242244        66761.577421157184        66761.577421157184     
+   25257.696715242244        59793.468166915736        59793.468166915736     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2042 to2043
+ finished writing assessment files
+ Stepping into Set-Up
+        2044
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   25257.696715242244        60049.510001555704        60049.510001555704     
+   25257.696715242244        59234.373050162176        59234.373050162176     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2044 to2045
+ finished writing assessment files
+ Starting Historical Projection
+ Stepping into Set-Up
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ Finished with Set-Up
+ Initializing
+ check Init.junk
+  0.50000000000000000     
+ Finished with Initialization
+ Doing historical projection
+ ...check histproj.junk
+   27373.456003339434        31486.285720278000        31486.285720278000     
+ Finished historical projection
+ Historical Projection finished
+ ISEEDX      -22612
+ ISEEDZ           1
+ finding historical data
+ reading data specs: check histdata.junk
+ finished reading data specs
+ finished generating historical data
+ finished writing assessment files
+ Stepping into Set-Up
+        2020
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   27373.456003339434        43042.452776099846        43042.452776099846     
+   27373.456003339434        54747.545730357655        54747.545730357655     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2020 to2021
+ finished writing assessment files
+ Stepping into Set-Up
+        2022
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   27373.456003339434        58422.748324418790        58422.748324418790     
+   27373.456003339434        61512.231931610579        61512.231931610579     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2022 to2023
+ finished writing assessment files
+ Stepping into Set-Up
+        2024
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   27373.456003339434        45206.414226697423        45206.414226697423     
+   27373.456003339434        40156.896244215728        40156.896244215728     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2024 to2025
+ finished writing assessment files
+ Stepping into Set-Up
+        2026
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   27373.456003339434        65572.363009249239        65572.363009249239     
+   27373.456003339434        90992.400809119092        90992.400809119092     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2026 to2027
+ finished writing assessment files
+ Stepping into Set-Up
+        2028
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   27373.456003339434        106880.28930335230        106880.28930335230     
+   27373.456003339434        112421.57428425539        112421.57428425539     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2028 to2029
+ finished writing assessment files
+ Stepping into Set-Up
+        2030
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   27373.456003339434        79569.465355869470        79569.465355869470     
+   27373.456003339434        52287.920987509046        52287.920987509046     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2030 to2031
+ finished writing assessment files
+ Stepping into Set-Up
+        2032
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   27373.456003339434        51873.963355876789        51873.963355876789     
+   27373.456003339434        53346.491084061163        53346.491084061163     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2032 to2033
+ finished writing assessment files
+ Stepping into Set-Up
+        2034
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   27373.456003339434        68166.125900821353        68166.125900821353     
+   27373.456003339434        87989.787710423203        87989.787710423203     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2034 to2035
+ finished writing assessment files
+ Stepping into Set-Up
+        2036
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   27373.456003339434        117517.60970328569        117517.60970328569     
+   27373.456003339434        149921.13038601523        149921.13038601523     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2036 to2037
+ finished writing assessment files
+ Stepping into Set-Up
+        2038
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   27373.456003339434        152268.30604245909        152268.30604245909     
+   27373.456003339434        152308.28573623215        152308.28573623215     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2038 to2039
+ finished writing assessment files
+ Stepping into Set-Up
+        2040
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   27373.456003339434        130513.21352171824        130513.21352171824     
+   27373.456003339434        101108.12300288564        101108.12300288564     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2040 to2041
+ finished writing assessment files
+ Stepping into Set-Up
+        2042
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   27373.456003339434        77966.914450148732        77966.914450148732     
+   27373.456003339434        73785.063444728934        73785.063444728934     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2042 to2043
+ finished writing assessment files
+ Stepping into Set-Up
+        2044
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   27373.456003339434        85841.487467143335        85841.487467143335     
+   27373.456003339434        89481.947968344626        89481.947968344626     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2044 to2045
+ finished writing assessment files
+ Starting Historical Projection
+ Stepping into Set-Up
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ Finished with Set-Up
+ Initializing
+ check Init.junk
+  0.50000000000000000     
+ Finished with Initialization
+ Doing historical projection
+ ...check histproj.junk
+   30096.555248229186        34903.690774326729        34903.690774326729     
+ Finished historical projection
+ Historical Projection finished
+ ISEEDX      -62207
+ ISEEDZ           1
+ finding historical data
+ reading data specs: check histdata.junk
+ finished reading data specs
+ finished generating historical data
+ finished writing assessment files
+ Stepping into Set-Up
+        2020
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   30096.555248229186        46570.833447477926        46570.833447477926     
+   30096.555248229186        57034.416210750154        57034.416210750154     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2020 to2021
+ finished writing assessment files
+ Stepping into Set-Up
+        2022
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   30096.555248229186        63408.373160898409        63408.373160898409     
+   30096.555248229186        66846.647988648125        66846.647988648125     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2022 to2023
+ finished writing assessment files
+ Stepping into Set-Up
+        2024
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   30096.555248229186        67246.366916896863        67246.366916896863     
+   30096.555248229186        70467.684744600701        70467.684744600701     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2024 to2025
+ finished writing assessment files
+ Stepping into Set-Up
+        2026
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   30096.555248229186        72682.490658391500        72682.490658391500     
+   30096.555248229186        88008.412012118002        88008.412012118002     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2026 to2027
+ finished writing assessment files
+ Stepping into Set-Up
+        2028
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   30096.555248229186        87797.273788246355        87797.273788246355     
+   30096.555248229186        75203.200919780458        75203.200919780458     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2028 to2029
+ finished writing assessment files
+ Stepping into Set-Up
+        2030
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   30096.555248229186        55624.050523472441        55624.050523472441     
+   30096.555248229186        40224.090849718217        40224.090849718217     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2030 to2031
+ finished writing assessment files
+ Stepping into Set-Up
+        2032
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   30096.555248229186        33243.511586902619        33243.511586902619     
+   30096.555248229186        30190.662159655210        30190.662159655210     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2032 to2033
+ finished writing assessment files
+ Stepping into Set-Up
+        2034
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   30096.555248229186        48646.448625050311        48646.448625050311     
+   30096.555248229186        73929.831489692471        73929.831489692471     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2034 to2035
+ finished writing assessment files
+ Stepping into Set-Up
+        2036
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   30096.555248229186        90374.511302038416        90374.511302038416     
+   30096.555248229186        97503.419604750161        97503.419604750161     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2036 to2037
+ finished writing assessment files
+ Stepping into Set-Up
+        2038
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   30096.555248229186        72948.020258549630        72948.020258549630     
+   30096.555248229186        56657.973541535008        56657.973541535008     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2038 to2039
+ finished writing assessment files
+ Stepping into Set-Up
+        2040
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   30096.555248229186        38730.379471040847        38730.379471040847     
+   30096.555248229186        28518.317844407684        28518.317844407684     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2040 to2041
+ finished writing assessment files
+ Stepping into Set-Up
+        2042
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   30096.555248229186        56511.722898785309        56511.722898785309     
+   30096.555248229186        104877.21601804168        104877.21601804168     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2042 to2043
+ finished writing assessment files
+ Stepping into Set-Up
+        2044
+ Setting up Biology - check biology.junk
+ Finished setting up Biology
+ Setting up Selectivity - check Selex.junk
+ Finished setting up Selectivity
+ Setting up Recruitment devs - check RecDevs.junk
+ Finished setting up Recruitment Devs
+ loading RBC
+ check catches.junk
+ Finished with Set-Up
+ Doing future projection
+ ...check histproj.junk
+   30096.555248229186        148505.16369048736        148505.16369048736     
+   30096.555248229186        175326.11872883423        175326.11872883423     
+ Finished future projection
+ getting projection data
+ reading data specs: check histdata.junk
+ finished reading data specs
+finished generating data from 2044 to2045
+ finished writing assessment files

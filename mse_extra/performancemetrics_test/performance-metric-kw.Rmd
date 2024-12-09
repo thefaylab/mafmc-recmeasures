@@ -1,0 +1,1590 @@
+---
+title: "performance-metric-kw"
+author: "Kamran Walsh"
+date: "2024-08-06"
+output: html_document
+---
+
+Functions:
+```{r}
+#projection plot
+projection.plot <- function(project.results) {
+  project.results <- project.results %>% 
+    #filter(type %in% c("biomass","catch")) %>%
+    I()
+  project.results %>% 
+    #group_by(scenario, type, year) %>% 
+    #median_qi(value, .width = c(.5, .8, .95)) %>%
+    ggplot() +  
+    stat_lineribbon(aes(x = year, y = value, fill = scenario),
+                    #show.legend = FALSE,
+                    alpha = 0.35) +
+    # geom_lineribbon(aes(x = year, y = value, ymin = .lower, ymax = .upper, fill = scenario),
+    #                 show.legend = FALSE) +
+    scale_fill_brewer(type = "qual", palette = 2) +
+    facet_wrap(~type, scale = "free") + 
+    geom_line(aes(y=value,x=year,group=scenario),data = subset(project.results, type != "index" & isim==1), lty=1,lwd=0.5,col=gray(0.7),alpha=0.5) +
+    geom_line(aes(y=value,x=year,group=scenario),data = subset(project.results, type != "index" & isim==2), lty=1,lwd=0.5,col=gray(0.7),alpha=0.5) +
+    geom_line(aes(y=value,x=year,group=scenario),data = subset(project.results, type != "index" & isim==3), lty=1,lwd=0.5,col=gray(0.7),alpha=0.5) +
+    geom_line(aes(y=value,x=year,group=scenario),data = subset(project.results, type != "index" & isim==4), lty=1,lwd=0.5,col=gray(0.7),alpha=0.5) +
+    ylim(0,NA) + 
+    ylab("") + 
+    theme_bw() +
+    theme(legend.position="bottom") + #,
+          #axis.text.y = element_blank()) +
+    labs(fill = "")
+}
+
+library(tidyverse)
+library(ggdist)
+library(scales)
+library(fmsb)
+read_results <- function(scendir =  "~/Desktop/FlounderMSE/kw_sims_test/TestingSims/testsims_old/SplittingSimsTest/"
+                         ,scen.name="compare",
+                         om.name = 1,
+                         fsim = 1) {
+  
+ # scendir <- "~/Dropbox/fluke-mse/sims/2022-07-25/01-01/"
+  #scendir = "~/research/mafmc-recmeasures/sims/001/"
+  #scen.name="MP 1"
+  #om.name = 1
+  #fsim = 1
+  print(scendir)
+
+spawbio <- read.table(paste0(scendir,"spawbio.out"), header = TRUE)
+totcatch <- read.table(paste0(scendir, "totcatch.out"), header = TRUE)
+if(om.name!=1) sexcatch <- read.table(paste0(scendir, "sexcatch.out"), header = TRUE)
+recoutput <- read.table(paste0(scendir, "recoutput.out"), header = FALSE, skip = 1) #TRUE)
+recoutput2 <- read.table(paste0(scendir, "recoutput2.out"), header = FALSE, skip = 1) #TRUE)
+rbctrack <- read.table(paste0(scendir, "rbctrack.out"), header = FALSE, skip = 1)
+fout <- read.table(paste0(scendir,"frate.out"), header = TRUE)
+names(spawbio) <- str_sub(names(spawbio), start=2)
+names(totcatch) <- str_sub(names(totcatch), start=2)
+if(om.name!=1) names(sexcatch) <- str_sub(names(sexcatch), start=2)
+names(fout) <- str_sub(names(fout), start=2)
+nsim = length(unique(rbctrack[,1]))
+results <- spawbio %>% 
+  as_tibble() %>% 
+  rowid_to_column(var = "isim") %>% 
+  pivot_longer(cols= 2:ncol(.), names_to = "year", values_to = "biomass") %>% 
+  mutate(year = as.integer(year)) %>% 
+  I()
+res2 <- totcatch %>% 
+  tibble() %>% 
+  #rowid_to_column(var = "isim") %>% 
+  mutate(isim = rep(1:(nrow(.)/4),each=4)) %>% 
+  rename(fleet = L) %>%
+  select(isim,everything()) %>% 
+  pivot_longer(cols= 3:ncol(.), names_to = "year", values_to = "catch") %>% 
+  mutate(year = as.integer(year)) %>% 
+  group_by(isim, year) %>% 
+  summarize(totcat_wt = sum(catch),
+             keep_wt = sum(catch*(fleet==3)),
+             release_wt = sum(catch*(fleet==4))) %>% 
+  #pivot_wider(names_from = fleet, names_glue = "fleet_{fleet}", values_from = catch) %>% 
+  I()
+#res2
+results <- results %>% 
+  left_join(res2)
+
+#recoutput - getting rid of extra outpt from iscen=1 & unfinished simulations
+nyrs <- length(unique(recoutput[,2]))
+# dummy <- recoutput %>% 
+#   tibble() %>% 
+#   slice(1:nyrs)
+# dummy2 <- recoutput %>% 
+#   tibble() %>% 
+#   slice(((nyrs+1):nrow(.))) %>% 
+#   filter(V1 != 1)
+# temp <- bind_rows(dummy,dummy2)
+# nsim <- floor(nrow(temp)/nyrs)
+# recoutput <-  temp %>% 
+#   slice((1:(nsim*nyrs)))
+
+recoutput[,1] <- rep(1:nsim, each = 2*nyrs)
+res3 <- recoutput[,1:4] %>% as_tibble()
+names(res3) <- c("isim", "year", "type", "number") #,"trips")
+res3 <- res3 %>% 
+  mutate(#year = 2019 + year,
+    type = ifelse(type==1, "keep_num", "release_num")) %>% 
+  pivot_wider(names_from = "type", values_from = "number") %>% 
+  I()
+
+
+#recoutput2 - getting rid of extra outpt from iscen=1 & unfinished simulations
+nyrs <- length(unique(recoutput2[,2]))
+# dummy <- recoutput2 %>% 
+#   tibble() %>% 
+#   slice(1:(10*nyrs))
+# dummy2 <- recoutput2 %>% 
+#   tibble() %>% 
+#   slice(((10*nyrs+1):nrow(.))) %>% 
+#   filter(V1 != 1)
+# temp <- bind_rows(dummy,dummy2)
+# nsim <- floor(nrow(temp)/nyrs)
+# recoutput2 <-  temp %>% 
+#   slice((1:(nsim*nyrs*10)))
+recoutput2[,1] <- rep(1:nsim, each = 10*nyrs)
+names(recoutput2) <- c("isim","year","state","n_keep","n_release","ntrips","nchoice","change_cs","cost",
+                        "keep_one", "mulen_keep","mulen_release","trophy")
+#names(recoutput2) <- c("isim","year","state","ntrips","nchoice","change_cs","cost",
+#                       "keep_one", "mulen_keep","mulen_release","trophy")
+coast_recoutput <- recoutput2 %>% 
+  filter(state == 1)
+
+res3 <- recoutput[,1:4] %>% as_tibble()
+names(res3) <- c("isim", "year", "type", "number") #,"trips")
+res3 <- res3 %>% 
+  mutate(#year = 2019 + year,
+    type = ifelse(type==1, "keep_num", "release_num")) %>% 
+  pivot_wider(names_from = "type", values_from = "number") %>% 
+  left_join(coast_recoutput) %>% 
+  I()
+
+results <- results %>% 
+  left_join(res3)
+
+rbc2 <- rbctrack %>% 
+  tibble() %>% 
+  select(1,2,4,15,9,10,11,12,18,22) %>% 
+  I()
+rbc2 <- rbctrack %>% 
+  tibble() %>% 
+  select(1,2,4,8,9,11,12,18,15:17) %>% 
+  I()
+#names(rbc2) <- c("isim","year","abc","fmsy","est_ofl","true_ofl","rhl","bmsy","msy","fem_ssb")
+names(rbc2) <- c("isim","year","abc","fmsy","est_ofl","rhl","bmsy","exp_keep","seaslen","bag","minlen") #,"msy")
+rbc2 <- rbc2 %>% 
+  mutate(exp_keep = as.numeric(ifelse(exp_keep == "******************",NA,exp_keep))) %>% 
+  mutate(year = 2019 + 2*year - 1) %>% 
+  I()
+results <- results %>% 
+  left_join(rbc2)
+  #mutate(scenario = rep("coastwide 14",nrow(.)))
+
+# temp <- results %>% 
+#   filter(year!=2019) %>% 
+#   fill("abc","fmsy","est_ofl","true_ofl","rhl","bmsy","msy","fem_ssb")
+
+temp <- results %>% 
+  filter(year!=2019) %>% 
+  fill("abc","fmsy","est_ofl",,"rhl","bmsy","exp_keep","seaslen","bag","minlen")
+
+results <- results %>% 
+  filter(year==2019) %>% 
+  bind_rows(temp) %>% 
+  arrange(isim,year)
+
+
+# refpts <- read.table("mse/coast14/refpts.out", header = FALSE, skip = 1)
+# names(refpts) <- c("isim", "fref", "bref", "cref")
+# coast_results <- coast_results %>% 
+#   left_join(refpts)
+
+# 2024-06-14 GF commenting out because F is coming from rbctrack.out file (currently estF)
+res4 <- fout %>%
+  as_tibble() %>%
+  rowid_to_column(var = "isim") %>%
+  pivot_longer(cols= 2:ncol(.), names_to = "year", values_to = "frate") %>%
+  mutate(year = as.integer(year)) %>%
+  I()
+results <- results %>%
+  left_join(res4)
+
+if(om.name!=1)  {
+res5 <- sexcatch %>%
+  tibble() %>%
+  #rowid_to_column(var = "isim") %>%
+  mutate(isim = rep(1:(nrow(.)/4),each=4)) %>%
+  rename(fleet = L) %>%
+  select(isim,everything()) %>%
+  pivot_longer(cols= 3:ncol(.), names_to = "year", values_to = "prop_female") %>%
+  mutate(year = as.integer(year)) %>%
+  filter(fleet == 3) %>%
+  select(-fleet) %>%
+  # group_by(isim, year) %>%
+  # summarize(totcat_wt = sum(catch),
+  #           prop_fem = sum(catch*(fleet==3)),
+  #           release_wt = sum(catch*(fleet==4))) %>%
+  #pivot_wider(names_from = fleet, names_glue = "fleet_{fleet}", values_from = catch) %>%
+  I()
+#res5
+results <- results %>%
+  left_join(res5)
+}
+
+results <- results %>% 
+  mutate(scenario = rep(scen.name,nrow(.)),
+         om = rep(om.name, nrow(.)),
+         isim = isim + fsim -1)
+
+return(results)
+}
+
+get_diag_ts <- function(results) {
+  
+diag_ts <- results %>% 
+  mutate(keep_to_rel = keep_num/release_num,
+         change_cs = change_cs*-1,
+         "kept per trip" = 1000*keep_num/ntrips,
+         "rel per trip" = 1000*release_num/ntrips,
+         "F/Fref" = frate/fmsy,
+         "B/Bref" = biomass/bmsy,
+         "expense" = cost,
+         cs_per_trip = change_cs/ntrips,
+         rec_removals = keep_wt + release_wt,
+         keep_one = keep_one/ntrips,
+         keep_to_exp = 1000*keep_num / (0.39*exp_keep))  %>% 
+  select(om, scenario, isim, year, biomass, totcat_wt, rec_removals, keep_to_rel, "kept per trip", "rel per trip",
+         "F/Fref", "B/Bref",
+         mulen_keep,
+         mulen_release,
+         trophy,
+         expense,
+         change_cs,
+         ntrips,
+         keep_one,
+         cs_per_trip,
+         prop_female,
+         keep_to_exp,
+         bag,
+         minlen,
+         seaslen,
+         exp_keep
+         ) %>% 
+  rename("spawning biomass" = biomass,
+         "total catch" = totcat_wt,
+         "kept:released" = keep_to_rel) %>% 
+  pivot_longer(cols=c("spawning biomass","total catch","kept:released", "kept per trip", 
+                      "rel per trip",
+                      "F/Fref", "B/Bref",
+                      rec_removals,
+                      mulen_keep,
+                      mulen_release,
+                      trophy,
+                      expense,
+                      change_cs,
+                      ntrips,
+                      keep_one,
+                      cs_per_trip,
+                      prop_female,
+                      keep_to_exp,
+                      bag,
+                      minlen,
+                      seaslen,
+                      exp_keep
+                      ),names_to = "type", values_to = "value") %>% 
+  I()
+ return(diag_ts)
+}
+
+
+get_om1_sexcatch <- function(scendir, scen.name) {
+fsim=1
+sexcatch <- read.table(paste0(scendir, "sexcatch.out"), header = TRUE)
+names(sexcatch) <- str_sub(names(sexcatch), start=2)
+
+  res5 <- sexcatch %>%
+    tibble() %>%
+    #rowid_to_column(var = "isim") %>%
+    mutate(isim = rep(1:(nrow(.)/4),each=4)) %>%
+    rename(fleet = L) %>%
+    select(isim,everything()) %>%
+    pivot_longer(cols= 3:ncol(.), names_to = "year", values_to = "prop_female") %>%
+    mutate(year = as.integer(year)) %>%
+    filter(fleet == 3) %>%
+    select(-fleet) %>%
+    # group_by(isim, year) %>%
+    # summarize(totcat_wt = sum(catch),
+    #           prop_fem = sum(catch*(fleet==3)),
+    #           release_wt = sum(catch*(fleet==4))) %>%
+    #pivot_wider(names_from = fleet, names_glue = "fleet_{fleet}", values_from = catch) %>%
+    I()
+  #res5
+  
+  results <- res5 %>% 
+    mutate(scenario = rep(scen.name,nrow(.)),
+           om = rep(1, nrow(.)),
+           isim = isim + fsim -1)
+  return(results)
+}
+
+#add small radar plot
+do_small_radar_plot <- function(metrics) {
+  # metrics is a dataframe of metrics, expecting columns
+  # metrics <- tibble(metric = rep(letters[1:5],each=3),
+  #                   value = runif(15),
+  #                   mp = as.character(rep(1:3,5)))
+  # # metric 
+  # # value
+  # # mp (management procedure)
+  summaries <- metrics %>% 
+    group_by(metric) %>% 
+    summarize(min = min(value, na.rm = TRUE),
+              max = max(value, na.rm = TRUE)) %>% 
+    #pivot_longer(cols = c(2:3),names_to = "mp",
+    #             values_to = "value") %>% 
+    #pivot_wider(names_from = metric, values_from = value) %>% 
+    #arrange(desc(mp)) %>% 
+    I()
+  #summaries  
+  nmetrics <- length(unique(metrics$metric))
+  nmp <- length(unique(metrics$mp))
+  
+  d <- metrics %>% 
+    group_by(mp) %>% 
+    left_join(summaries) %>% 
+    mutate(value = value/(max + 1e-08)) %>% 
+    select(mp, metric, value) %>% 
+    pivot_wider(names_from = metric, values_from = value) %>% 
+    ungroup()
+  
+  bounds <- tibble(mp = c("max","min"),
+                   #"spawning biomass" = c(1,0),
+                   #"total catch" = c(1,0),
+                   "kept:released" = c(1,0),
+                   "kept per trip" = c(1,0),
+                   "not overfishing" = c(1,0),
+                   "not overfished" = c(1,0),
+                   "change_cs" = c(1,0),
+                   #"mulen_keep" = c(1,0),
+                   #"mulen_release" = c(1,0),
+                   #"trophy" = c(1,0),
+                   #"rec_removals" = c(1,0),
+                   "keep_one" = c(1,0)) #,
+                   #"prop_female" = c(1,0),
+                   #"ntrips" = c(1,0)) #,
+  #filter(metric %in% c("change_cs", "kept per trip", "kept:released", "not overfished", "not overfishing")) %>% 
+  #d = c(1,0),
+  #e = c(1,0))
+  
+  dd <- bounds %>% 
+    bind_rows(d)
+  
+  #NEW PLOT
+  #colorblind colors
+  colors_fill2<-c(alpha("#000000",0.1),
+                  alpha("#E69F00",0.1),
+                  alpha("#56B4E9",0.1),
+                  alpha("#009E73",0.1),
+                  alpha("#F0E442",0.1),
+                  alpha("#E69F00",0.1),
+                  alpha("#56B4E9",0.1),
+                  alpha("#009E73",0.1))
+  colors_line2<-c(alpha("#000000",0.9),
+                  alpha("#E69F00",0.9),
+                  alpha("#56B4E9",0.9),
+                  alpha("#009E73",0.9),
+                  alpha("#F0E442",0.9),
+                  alpha("#E69F00",0.9),
+                  alpha("#56B4E9",0.9),
+                  alpha("#009E73",0.9))
+  colors_line2<-c(alpha("#1b9e77",0.9),
+                  alpha("#d95f02",0.9),
+                  alpha("#56B4E9",0.9),
+                  alpha("#dc14cf",0.9),
+                  #alpha("#009E73",0.9),
+                  alpha("#F0E442",0.9),
+                  alpha("#E69F00",0.9),
+                  alpha("#56B4E9",0.9),
+                  alpha("#009E73",0.9))
+  
+  colors_fill2<-c(alpha("#1b9e77",0.1),
+                  alpha("#d95f02",0.1),
+                  alpha("#7570b3",0.1),
+                  alpha("#e7298a",0.1),
+                  alpha("#66a61e",0.1),
+                  alpha("#e6ab02",0.1),
+                  alpha("#a6761d",0.1),
+                  alpha("#d95f02",0.1))
+  
+  colors_line2<-c(alpha("#1b9e77",0.9),
+                  alpha("#d95f02",0.9),
+                  alpha("#7570b3",0.9),
+                  alpha("#e7298a",0.9),
+                  alpha("#66a61e",0.9),
+                  alpha("#e6ab02",0.9),
+                  alpha("#a6761d",0.9),
+                  alpha("#d95f02",0.9))
+  
+  #colorblind
+  radarchart(dd[,-1],seg=5,pcol=colors_line2,
+             pfcol=colors_fill2,plwd=2,
+             vlabels=names(dd)[-1], vlcex=0.8,
+             plty=c(rep(1,7),rep(2,7)),
+             pdensity=0)
+  rows<<-rownames(dd[-c(1,2),])
+  colors_line<<-colors_line2
+  legend("bottomright",inset=0,title ="",title.adj = 0.2,
+         legend=unique(d$mp),
+         pch=16,
+         col=colors_line2[1:nmp],
+         lty=1, cex=0.8, bty= 'n', y.intersp=1)
+  
+}
+```
+
+Switch 
+```{r}
+
+HCRtoplot <- "SPLIT"
+#change the folder names for the scenarios you want to summarize results for and give them a unique name
+```
+
+Read in Data:
+- use numbers if merging to spreadsheet, character names (e.g. "BTable3.1") if using code in here
+
+BASE2 sinatra_split "BASE2split" 4 reg types parallel
+```{r}
+params <- if(HCRtoplot == "BASE2split"){list(
+  scendir = c( #BBM
+    "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102624/50BBM2/sim1_bag/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102624/50BBM2/sim2_length/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102624/50BBM2/sim3_season/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102624/50BBM2/sim4_all/",
+       
+            #BRP
+            "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102624/50BRP/sim1_bag/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102624/50BRP/sim2_length/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102624/50BRP/sim3_season/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102624/50BRP/sim4_all/",
+  
+             #PCA 
+         "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102624/50PCA/sim1_bag/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102624/50PCA/sim2_length/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102624/50PCA/sim3_season/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102624/50PCA/sim4_all/",
+  
+               #NCA
+          "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102624/50NCA/sim1_bag/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102624/50NCA/sim2_length/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102624/50NCA/sim3_season/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102624/50NCA/sim4_all/"
+        ),
+  scen.name = c(
+1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16
+  ),
+  fsim = rep(1,16))
+}
+```
+
+"BTable3", 
+"LTable3",  
+"STable3", 
+"ATable3",  
+
+"BTable3.1",
+"LTable3.1", 
+"STable3.1", 
+"ATable3.1", 
+
+"BTable3.2",
+"LTable3.2", 
+"STable3.2",
+"ATable3.2",
+
+"BTable3.3",
+"LTable3.3", 
+"STable3.3", 
+"ATable3.3"
+
+BASE2 sinatra original "BASE2"
+```{r}
+params <- if(HCRtoplot == "BASE2"){list( #was 102024 before 11/22/24
+  scendir = c( #BBM
+    "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102024/50BBM2/sim1_bag/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102024/50BBM2/sim2_length/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102024/50BBM2/sim3_season/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102024/50BBM2/sim4_all/",
+       
+            #BRP
+            "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102024/50BRP/sim1_bag/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102024/50BRP/sim2_length/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102024/50BRP/sim3_season/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102024/50BRP/sim4_all/",
+  
+             #PCA 
+         "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102024/50PCA/sim1_bag/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102024/50PCA/sim2_length/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102024/50PCA/sim3_season/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102024/50PCA/sim4_all/",
+  
+               #NCA
+          "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102624/50NCA/sim1_bag/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102624/50NCA/sim2_length/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102624/50NCA/sim3_season/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102624/50NCA/sim4_all/"
+        ),
+  scen.name = c(
+"BTable3",
+"LTable3",  
+"STable3", 
+"ATable3",  
+
+"BTable3.1",
+"LTable3.1", 
+"STable3.1", 
+"ATable3.1", 
+
+"BTable3.2",
+"LTable3.2", 
+"STable3.2",
+"ATable3.2",
+
+"BTable3.3",
+"LTable3.3", 
+"STable3.3", 
+"ATable3.3"
+  ),
+  fsim = rep(1,16))
+}
+```
+
+BASE3 <- parallel sims sinatra_split "BASE3"  
+```{r}
+params <- if(HCRtoplot == "BASE3"){list( #check splits 1-80 vs 1,1,1,1,1,2,2,2,2,2, etc. with code 
+  scendir = c( #BBM
+    "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/BBM/1_bag/sim1_10/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/BBM/1_bag/sim11_20/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/BBM/1_bag/sim21_30/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/BBM/1_bag/sim31_40/",
+               "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/BBM/1_bag/sim41_50/",
+    
+    "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/BBM/2_length/sim1_10/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/BBM/2_length/sim11_20/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/BBM/2_length/sim21_30/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/BBM/2_length/sim31_40/",
+               "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/BBM/2_length/sim41_50/",
+       
+    "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/BBM/3_season/sim1_10/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/BBM/3_season/sim11_20/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/BBM/3_season/sim21_30/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/BBM/3_season/sim31_40/",
+               "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/BBM/3_season/sim41_50/",
+       
+    "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/BBM/4_all/sim1_10/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/BBM/4_all/sim11_20/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/BBM/4_all/sim21_30/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/BBM/4_all/sim31_40/",
+               "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/BBM/4_all/sim41_50/",
+       
+            #BRP
+     "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/BRP/1_bag/sim1_10/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/BRP/1_bag/sim11_20/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/BRP/1_bag/sim21_30/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/BRP/1_bag/sim31_40/",
+               "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/BRP/1_bag/sim41_50/",
+    
+    "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/BRP/2_length/sim1_10/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/BRP/2_length/sim11_20/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/BRP/2_length/sim21_30/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/BRP/2_length/sim31_40/",
+               "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/BRP/2_length/sim41_50/",
+       
+    "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/BRP/3_season/sim1_10/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/BRP/3_season/sim11_20/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/BRP/3_season/sim21_30/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/BRP/3_season/sim31_40/",
+               "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/BRP/3_season/sim41_50/",
+       
+    "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/BRP/4_all/sim1_10/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/BRP/4_all/sim11_20/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/BRP/4_all/sim21_30/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/BRP/4_all/sim31_40/",
+               "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/BRP/4_all/sim41_50/" ,
+ 
+          
+             #PCA 
+   "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/PCA/1_bag/sim1_10/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/PCA/1_bag/sim11_20/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/PCA/1_bag/sim21_30/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/PCA/1_bag/sim31_40/",
+               "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/PCA/1_bag/sim41_50/",
+    
+    "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/PCA/2_length/sim1_10/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/PCA/2_length/sim11_20/",
+               "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/PCA/2_length/sim21_30/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/PCA/2_length/sim31_40/",
+               "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/PCA/2_length/sim41_50/",
+       
+    "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/PCA/3_season/sim1_10/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/PCA/3_season/sim11_20/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/PCA/3_season/sim21_30/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/PCA/3_season/sim31_40/",
+               "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/PCA/3_season/sim41_50/",
+       
+    "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/PCA/4_all/sim1_10/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/PCA/4_all/sim11_20/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/PCA/4_all/sim21_30/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/PCA/4_all/sim31_40/",
+               "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/PCA/4_all/sim41_50/",
+ 
+        
+               #NCA
+      "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/NCA/1_bag/sim1_10/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/NCA/1_bag/sim11_20/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/NCA/1_bag/sim21_30/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/NCA/1_bag/sim31_40/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/NCA/1_bag/sim41_50/",
+    
+    "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/NCA/2_length/sim1_10/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/NCA/2_length/sim11_20/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/NCA/2_length/sim21_30/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/NCA/2_length/sim31_40/",
+               "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/NCA/2_length/sim41_50/",
+
+    "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/NCA/3_season/sim1_10/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/NCA/3_season/sim11_20/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/NCA/3_season/sim21_30/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/NCA/3_season/sim31_40/",
+               "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/NCA/3_season/sim41_50/",
+       
+    "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/NCA/4_all/sim1_10/",
+               "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/NCA/4_all/sim11_20/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/NCA/4_all/sim21_30/",
+             "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/NCA/4_all/sim31_40/",
+               "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/102124/NCA/4_all/sim41_50/"
+            ),
+  scen.name = c(
+    "BTable3_1",
+"BTable3_2", 
+"BTable3_3", 
+"BTable3_4", 
+"BTable3_5",  
+"LTable3_1",  
+"LTable3_2", 
+"LTable3_3", 
+"LTable3_4", 
+"LTable3_5",
+"STable3_1", 
+"STable3_2", 
+"STable3_3", 
+"STable3_4",  
+"STable3_5",  
+"ATable3_1",  
+"ATable3_2", 
+"ATable3_3", 
+"ATable3_4", 
+"ATable3_5",
+
+"BTable3.1_1",
+"BTable3.1_2",
+"BTable3.1_3", 
+"BTable3.1_4",
+"BTable3.1_5", 
+"LTable3.1_1", 
+"LTable3.1_2",
+"LTable3.1_3", 
+"LTable3.1_4",
+"LTable3.1_5",
+"STable3.1_1", 
+"STable3.1_2", 
+"STable3.1_3", 
+"STable3.1_4", 
+"STable3.1_5", 
+"ATable3.1_1", 
+"ATable3.1_2",
+"ATable3.1_3", 
+"ATable3.1_4",
+"ATable3.1_5",
+
+"BTable3.2_1",
+"BTable3.2_2",
+"BTable3.2_3",
+"BTable3.2_4",
+"BTable3.2_5",
+"LTable3.2_1", 
+"LTable3.2_2", 
+"LTable3.2_3", 
+"LTable3.2_4",
+"LTable3.2_5",
+"STable3.2_1",
+"STable3.2_2", 
+"STable3.2_3", 
+"STable3.2_4", 
+"STable3.2_5", 
+"ATable3.2_1",
+"ATable3.2_2",
+"ATable3.2_3", 
+"ATable3.2_4", 
+"ATable3.2_5",
+
+"BTable3.3_1",
+"BTable3.3_2",
+"BTable3.3_3",
+"BTable3.3_4",
+"BTable3.3_5", 
+"LTable3.3_1", 
+"LTable3.3_2",
+"LTable3.3_3", 
+"LTable3.3_4", 
+"LTable3.3_5",
+"STable3.3_1", 
+"STable3.3_2", 
+"STable3.3_3", 
+"STable3.3_4", 
+"STable3.3_5", 
+"ATable3.3_1", 
+"ATable3.3_2", 
+"ATable3.3_3", 
+"ATable3.3_4", 
+"ATable3.3_5"
+  ),
+  fsim = rep(1,80))
+}
+```
+
+"BTable3_1",
+"BTable3_2", 
+"BTable3_3", 
+"BTable3_4", 
+"BTable3_5",  
+"LTable3_1",  
+"LTable3_2", 
+"LTable3_3", 
+"LTable3_4", 
+"LTable3_5",
+"STable3_1", 
+"STable3_2", 
+"STable3_3", 
+"STable3_4",  
+"STable3_5",  
+"ATable3_1",  
+"ATable3_2", 
+"ATable3_3", 
+"ATable3_4", 
+"ATable3_5",
+
+"BTable3.1_1",
+"BTable3.1_2",
+"BTable3.1_3", 
+"BTable3.1_4",
+"BTable3.1_5", 
+"LTable3.1_1", 
+"LTable3.1_2",
+"LTable3.1_3", 
+"LTable3.1_4",
+"LTable3.1_5",
+"STable3.1_1", 
+"STable3.1_2", 
+"STable3.1_3", 
+"STable3.1_4", 
+"STable3.1_5", 
+"ATable3.1_1", 
+"ATable3.1_2",
+"ATable3.1_3", 
+"ATable3.1_4",
+"ATable3.1_5",
+
+"BTable3.2_1",
+"BTable3.2_2",
+"BTable3.2_3",
+"BTable3.2_4",
+"BTable3.2_5",
+"LTable3.2_1", 
+"LTable3.2_2", 
+"LTable3.2_3", 
+"LTable3.2_4",
+"LTable3.2_5",
+"STable3.2_1",
+"STable3.2_2", 
+"STable3.2_3", 
+"STable3.2_4", 
+"STable3.2_5", 
+"ATable3.2_1",
+"ATable3.2_2",
+"ATable3.2_3", 
+"ATable3.2_4", 
+"ATable3.2_5",
+
+"BTable3.3_1",
+"BTable3.3_2",
+"BTable3.3_3",
+"BTable3.3_4",
+"BTable3.3_5", 
+"LTable3.3_1", 
+"LTable3.3_2",
+"LTable3.3_3", 
+"LTable3.3_4", 
+"LTable3.3_5",
+"STable3.3_1", 
+"STable3.3_2", 
+"STable3.3_3", 
+"STable3.3_4", 
+"STable3.3_5", 
+"ATable3.3_1", 
+"ATable3.3_2", 
+"ATable3.3_3", 
+"ATable3.3_4", 
+"ATable3.3_5"
+
+Splitnonsplit test "SPLIT" sinatra sequential vs. parallel testing
+```{r}
+params <- if(HCRtoplot == "SPLIT"){list(
+  scendir = c( #nonsplit
+    "~/Desktop/FlounderMSE/kw_sims_test/TestingSims/testsims_old/SplittingSimsTest/runnewest50sims26years/spawbiotest_oldersinatra2bag/",
+    "~/Desktop/FlounderMSE/kw_sims_test/TestingSims/testsims_old/SplittingSimsTest/runnewest50sims26years/spawbiotest_oldersinatra2all/",
+  
+    #split               
+"~/Desktop/FlounderMSE/kw_sims_test/TestingSims/testsims_old/SplittingSimsTest/runnewest50sims26years/split_oldersinatra2bag/sim1_10/",
+"~/Desktop/FlounderMSE/kw_sims_test/TestingSims/testsims_old/SplittingSimsTest/runnewest50sims26years/split_oldersinatra2bag/sim11_20/",
+"~/Desktop/FlounderMSE/kw_sims_test/TestingSims/testsims_old/SplittingSimsTest/runnewest50sims26years/split_oldersinatra2bag/sim21_30/",
+"~/Desktop/FlounderMSE/kw_sims_test/TestingSims/testsims_old/SplittingSimsTest/runnewest50sims26years/split_oldersinatra2bag/sim31_40/",
+"~/Desktop/FlounderMSE/kw_sims_test/TestingSims/testsims_old/SplittingSimsTest/runnewest50sims26years/split_oldersinatra2bag/sim41_50/",
+"~/Desktop/FlounderMSE/kw_sims_test/TestingSims/testsims_old/SplittingSimsTest/runnewest50sims26years/split_oldersinatra2all/sim1_10/",
+"~/Desktop/FlounderMSE/kw_sims_test/TestingSims/testsims_old/SplittingSimsTest/runnewest50sims26years/split_oldersinatra2all/sim11_20/",
+"~/Desktop/FlounderMSE/kw_sims_test/TestingSims/testsims_old/SplittingSimsTest/runnewest50sims26years/split_oldersinatra2all/sim21_30/",
+"~/Desktop/FlounderMSE/kw_sims_test/TestingSims/testsims_old/SplittingSimsTest/runnewest50sims26years/split_oldersinatra2all/sim31_40/",
+"~/Desktop/FlounderMSE/kw_sims_test/TestingSims/testsims_old/SplittingSimsTest/runnewest50sims26years/split_oldersinatra2all/sim41_50/"
+),
+  scen.name = c(#1,2,3,4,5,6,7,8
+"BNonsplit_bag",
+"ANonsplit_all",
+"BSplit_bag",
+"BSplit_bag",
+"BSplit_bag",
+"BSplit_bag",
+"BSplit_bag",
+"ASplit_all",
+"ASplit_all",
+"ASplit_all",
+"ASplit_all",
+"ASplit_all"
+  ),
+  fsim = rep(1,12))
+}
+```
+
+BBM "BBM"
+```{r}
+#BBM V2
+params <- if(HCRtoplot == "BBMv2"){list(
+  scendir = c("~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3/1_bag/sim1_10/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3/1_bag/sim11_20/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3/1_bag/sim21_30/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3/1_bag/sim31_40/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3/1_bag/sim41_50/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3/2_length/sim1_10/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3/2_length/sim11_20/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3/2_length/sim21_30/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3/2_length/sim31_40/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3/2_length/sim41_50/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3/3_season/sim1_10/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3/3_season/sim11_20/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3/3_season/sim21_30/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3/3_season/sim31_40/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3/3_season/sim41_50/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3/4_all/sim1_10/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3/4_all/sim11_20/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3/4_all/sim21_30/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3/4_all/sim31_40/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3/4_all/sim41_50/",
+              
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.1/1_bag/sim1_10/",
+             "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.1/1_bag/sim11_20/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.1/1_bag/sim21_30/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.1/1_bag/sim31_40/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.1/1_bag/sim41_50/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.1/2_length/sim1_10/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.1/2_length/sim11_20/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.1/2_length/sim21_30/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.1/2_length/sim31_40/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.1/2_length/sim41_50/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.1/3_season/sim1_10/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.1/3_season/sim11_20/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.1/3_season/sim21_30/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.1/3_season/sim31_40/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.1/3_season/sim41_50/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.1/4_all/sim1_10/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.1/4_all/sim11_20/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.1/4_all/sim21_30/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.1/4_all/sim31_40/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.1/4_all/sim41_50/",
+              
+             "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.2/1_bag/sim1_10/",
+             "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.2/1_bag/sim11_20/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.2/1_bag/sim21_30/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.2/1_bag/sim31_40/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.2/1_bag/sim41_50/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.2/2_length/sim1_10/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.2/2_length/sim11_20/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.2/2_length/sim21_30/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.2/2_length/sim31_40/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.2/2_length/sim41_50/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.2/3_season/sim1_10/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.2/3_season/sim11_20/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.2/3_season/sim21_30/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.2/3_season/sim31_40/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.2/3_season/sim41_50/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.2/4_all/sim1_10/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.2/4_all/sim11_20/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.2/4_all/sim21_30/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.2/4_all/sim31_40/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.2/4_all/sim41_50/",
+              
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.3/1_bag/sim1_10/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.3/1_bag/sim11_20/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.3/1_bag/sim21_30/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.3/1_bag/sim31_40/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.3/1_bag/sim41_50/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.3/2_length/sim1_10/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.3/2_length/sim11_20/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.3/2_length/sim21_30/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.3/2_length/sim31_40/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.3/2_length/sim41_50/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.3/3_season/sim1_10/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.3/3_season/sim11_20/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.3/3_season/sim21_30/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.3/3_season/sim31_40/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.3/3_season/sim41_50/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.3/4_all/sim1_10/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.3/4_all/sim11_20/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.3/4_all/sim21_30/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.3/4_all/sim31_40/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.3/4_all/sim41_50/",
+              
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.4/1_bag/sim1_10/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.4/1_bag/sim11_20/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.4/1_bag/sim21_30/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.4/1_bag/sim31_40/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.4/1_bag/sim41_50/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.4/2_length/sim1_10/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.4/2_length/sim11_20/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.4/2_length/sim21_30/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.4/2_length/sim31_40/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.4/2_length/sim41_50/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.4/3_season/sim1_10/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.4/3_season/sim11_20/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.4/3_season/sim21_30/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.4/3_season/sim31_40/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.4/3_season/sim41_50/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.4/4_all/sim1_10/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.4/4_all/sim11_20/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.4/4_all/sim21_30/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.4/4_all/sim31_40/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.4/4_all/sim41_50/",
+              
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.5/1_bag/sim1_10/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.5/1_bag/sim11_20/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.5/1_bag/sim21_30/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.5/1_bag/sim31_40/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.5/1_bag/sim41_50/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.5/2_length/sim1_10/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.5/2_length/sim11_20/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.5/2_length/sim21_30/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.5/2_length/sim31_40/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.5/2_length/sim41_50/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.5/3_season/sim1_10/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.5/3_season/sim11_20/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.5/3_season/sim21_30/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.5/3_season/sim31_40/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.5/3_season/sim41_50/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.5/4_all/sim1_10/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.5/4_all/sim11_20/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.5/4_all/sim21_30/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.5/4_all/sim31_40/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.5/4_all/sim41_50/",
+              
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.6/1_bag/sim1_10/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.6/1_bag/sim11_20/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.6/1_bag/sim21_30/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.6/1_bag/sim31_40/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.6/1_bag/sim41_50/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.6/2_length/sim1_10/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.6/2_length/sim11_20/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.6/2_length/sim21_30/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.6/2_length/sim31_40/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.6/2_length/sim41_50/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.6/3_season/sim1_10/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.6/3_season/sim11_20/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.6/3_season/sim21_30/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.6/3_season/sim31_40/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.6/3_season/sim41_50/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.6/4_all/sim1_10/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.6/4_all/sim11_20/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.6/4_all/sim21_30/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.6/4_all/sim31_40/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.6/4_all/sim41_50/",
+              
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.7/1_bag/sim1_10/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.7/1_bag/sim11_20/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.7/1_bag/sim21_30/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.7/1_bag/sim31_40/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.7/1_bag/sim41_50/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.7/2_length/sim1_10/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.7/2_length/sim11_20/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.7/2_length/sim21_30/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.7/2_length/sim31_40/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.7/2_length/sim41_50/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.7/3_season/sim1_10/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.7/3_season/sim11_20/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.7/3_season/sim21_30/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.7/3_season/sim31_40/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.7/3_season/sim41_50/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.7/4_all/sim1_10/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.7/4_all/sim11_20/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.7/4_all/sim21_30/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.7/4_all/sim31_40/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/Table3.7/4_all/sim41_50/"
+              ),
+  scen.name = c(
+"BTable3_1", "BTable3_2", "BTable3_3", "BTable3_4", "BTable3_5",  "LTable3_1",  "LTable3_2", "LTable3_3", "LTable3_4", "LTable3_5",
+"STable3_1", "STable3_2", "STable3_3",  "STable3_4",  "STable3_5",  "ATable3_1",  "ATable3_2", "ATable3_3", "ATable3_4", "ATable3_5",
+"BTable3.1_1", "BTable3.1_2", "BTable3.1_3", "BTable3.1_4", "BTable3.1_5", "LTable3.1_1", "LTable3.1_2","LTable3.1_3", "LTable3.1_4","LTable3.1_5",
+"STable3.1_1", "STable3.1_2", "STable3.1_3", "STable3.1_4", "STable3.1_5", "ATable3.1_1", "ATable3.1_2","ATable3.1_3", "ATable3.1_4","ATable3.1_5",
+"BTable3.2_1","BTable3.2_2", "BTable3.2_3", "BTable3.2_4", "BTable3.2_5", "LTable3.2_1", "LTable3.2_2", "LTable3.2_3", "LTable3.2_4", "LTable3.2_5",
+"STable3.2_1", "STable3.2_2", "STable3.2_3", "STable3.2_4", "STable3.2_5", "ATable3.2_1", "ATable3.2_2", "ATable3.2_3", "ATable3.2_4", "ATable3.2_5",
+"BTable3.3_1","BTable3.3_2", "BTable3.3_3", "BTable3.3_4", "BTable3.3_5", "LTable3.3_1", "LTable3.3_2", "LTable3.3_3", "LTable3.3_4", "LTable3.3_5",
+"STable3.3_1", "STable3.3_2", "STable3.3_3", "STable3.3_4", "STable3.3_5", "ATable3.3_1", "ATable3.3_2", "ATable3.3_3", "ATable3.3_4", "ATable3.3_5",
+"BTable3.4_1","BTable3.4_2", "BTable3.4_3", "BTable3.4_4", "BTable3.4_5", "LTable3.4_1", "LTable3.4_2", "LTable3.4_3", "LTable3.4_4", "LTable3.4_5",
+"STable3.4_1", "STable3.4_2", "STable3.4_3", "STable3.4_4", "STable3.4_5", "ATable3.4_1", "ATable3.4_2", "ATable3.4_3", "ATable3.4_4", "ATable3.4_5",
+"BTable3.5_1","BTable3.5_2", "BTable3.5_3", "BTable3.5_4", "BTable3.5_5", "LTable3.5_1", "LTable3.5_2", "LTable3.5_3", "LTable3.5_4", "LTable3.5_5",
+"STable3.5_1", "STable3.5_2", "STable3.5_3", "STable3.5_4", "STable3.5_5", "ATable3.5_1", "ATable3.5_2", "ATable3.5_3", "ATable3.5_4", "ATable3.5_5",
+"BTable3.6_1", "BTable3.6_2", "BTable3.6_3", "BTable3.6_4", "BTable3.6_5", "LTable3.6_1", "LTable3.6_2", "LTable3.6_3", "LTable3.6_4", "LTable3.6_5",
+"STable3.6_1", "STable3.6_2", "STable3.6_3", "STable3.6_4", "STable3.6_5", "ATable3.6_1", "ATable3.6_2", "ATable3.6_3", "ATable3.6_4", "ATable3.6_5",
+"BTable3.7_1", "BTable3.7_2", "BTable3.7_3", "BTable3.7_4", "BTable3.7_5", "LTable3.7_1", "LTable3.7_2", "LTable3.7_3", "LTable3.7_4", "LTable3.7_5",
+"STable3.7_1", "STable3.7_2", "STable3.7_3", "STable3.7_4", "STable3.7_5", "ATable3.7_1", "ATable3.7_2", "ATable3.7_3", "ATable3.7_4", "ATable3.7_5"
+  ),
+  fsim = rep(1,160))
+}
+```
+
+BRP "BRP"
+```{r}
+params <- if(HCRtoplot == "BRP"){list(
+  scendir = c("~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2/1_bag/sim1_10/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2/1_bag/sim11_20/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2/1_bag/sim21_30/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2/1_bag/sim31_40/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2/1_bag/sim41_50/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2/2_length/sim1_10/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2/2_length/sim11_20/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2/2_length/sim21_30/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2/2_length/sim31_40/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2/2_length/sim41_50/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2/3_season/sim1_10/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2/3_season/sim11_20/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2/3_season/sim21_30/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2/3_season/sim31_40/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2/3_season/sim41_50/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2/4_all/sim1_10/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2/4_all/sim11_20/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2/4_all/sim21_30/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2/4_all/sim31_40/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2/4_all/sim41_50/",
+              
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.1/1_bag/sim1_10/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.1/1_bag/sim11_20/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.1/1_bag/sim21_30/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.1/1_bag/sim31_40/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.1/1_bag/sim41_50/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.1/2_length/sim1_10/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.1/2_length/sim11_20/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.1/2_length/sim21_30/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.1/2_length/sim31_40/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.1/2_length/sim41_50/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.1/3_season/sim1_10/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.1/3_season/sim11_20/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.1/3_season/sim21_30/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.1/3_season/sim31_40/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.1/3_season/sim41_50/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.1/4_all/sim1_10/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.1/4_all/sim11_20/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.1/4_all/sim21_30/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.1/4_all/sim31_40/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.1/4_all/sim41_50/",
+              
+             "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.2/1_bag/sim1_10/",
+             "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.2/1_bag/sim11_20/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.2/1_bag/sim21_30/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.2/1_bag/sim31_40/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.2/1_bag/sim41_50/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.2/2_length/sim1_10/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.2/2_length/sim11_20/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.2/2_length/sim21_30/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.2/2_length/sim31_40/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.2/2_length/sim41_50/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.2/3_season/sim1_10/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.2/3_season/sim11_20/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.2/3_season/sim21_30/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.2/3_season/sim31_40/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.2/3_season/sim41_50/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.2/4_all/sim1_10/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.2/4_all/sim11_20/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.2/4_all/sim21_30/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.2/4_all/sim31_40/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.2/4_all/sim41_50/",
+              
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.3/1_bag/sim1_10/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.3/1_bag/sim11_20/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.3/1_bag/sim21_30/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.3/1_bag/sim31_40/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.3/1_bag/sim41_50/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.3/2_length/sim1_10/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.3/2_length/sim11_20/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.3/2_length/sim21_30/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.3/2_length/sim31_40/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.3/2_length/sim41_50/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.3/3_season/sim1_10/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.3/3_season/sim11_20/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.3/3_season/sim21_30/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.3/3_season/sim31_40/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.3/3_season/sim41_50/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.3/4_all/sim1_10/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.3/4_all/sim11_20/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.3/4_all/sim21_30/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.3/4_all/sim31_40/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.3/4_all/sim41_50/",
+              
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.4/1_bag/sim1_10/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.4/1_bag/sim11_20/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.4/1_bag/sim21_30/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.4/1_bag/sim31_40/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.4/1_bag/sim41_50/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.4/2_length/sim1_10/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.4/2_length/sim11_20/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.4/2_length/sim21_30/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.4/2_length/sim31_40/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.4/2_length/sim41_50/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.4/3_season/sim1_10/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.4/3_season/sim11_20/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.4/3_season/sim21_30/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.4/3_season/sim31_40/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.4/3_season/sim41_50/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.4/4_all/sim1_10/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.4/4_all/sim11_20/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.4/4_all/sim21_30/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.4/4_all/sim31_40/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.4/4_all/sim41_50/",
+              
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.5/1_bag/sim1_10/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.5/1_bag/sim11_20/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.5/1_bag/sim21_30/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.5/1_bag/sim31_40/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.5/1_bag/sim41_50/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.5/2_length/sim1_10/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.5/2_length/sim11_20/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.5/2_length/sim21_30/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.5/2_length/sim31_40/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.5/2_length/sim41_50/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.5/3_season/sim1_10/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.5/3_season/sim11_20/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.5/3_season/sim21_30/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.5/3_season/sim31_40/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.5/3_season/sim41_50/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.5/4_all/sim1_10/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.5/4_all/sim11_20/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.5/4_all/sim21_30/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.5/4_all/sim31_40/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.5/4_all/sim41_50/",
+              
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.6/1_bag/sim1_10/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.6/1_bag/sim11_20/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.6/1_bag/sim21_30/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.6/1_bag/sim31_40/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.6/1_bag/sim41_50/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.6/2_length/sim1_10/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.6/2_length/sim11_20/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.6/2_length/sim21_30/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.6/2_length/sim31_40/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.6/2_length/sim41_50/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.6/3_season/sim1_10/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.6/3_season/sim11_20/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.6/3_season/sim21_30/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.6/3_season/sim31_40/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.6/3_season/sim41_50/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.6/4_all/sim1_10/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.6/4_all/sim11_20/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.6/4_all/sim21_30/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.6/4_all/sim31_40/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.6/4_all/sim41_50/",
+              
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.7/1_bag/sim1_10/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.7/1_bag/sim11_20/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.7/1_bag/sim21_30/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.7/1_bag/sim31_40/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.7/1_bag/sim41_50/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.7/2_length/sim1_10/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.7/2_length/sim11_20/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.7/2_length/sim21_30/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.7/2_length/sim31_40/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.7/2_length/sim41_50/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.7/3_season/sim1_10/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.7/3_season/sim11_20/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.7/3_season/sim21_30/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.7/3_season/sim31_40/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.7/3_season/sim41_50/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.7/4_all/sim1_10/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.7/4_all/sim11_20/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.7/4_all/sim21_30/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.7/4_all/sim31_40/",
+              "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2.7/4_all/sim41_50/"
+              ),
+  scen.name = c(
+"BTable3_1", "BTable3_2", "BTable3_3", "BTable3_4", "BTable3_5",  "LTable3_1",  "LTable3_2", "LTable3_3", "LTable3_4", "LTable3_5",
+"STable3_1", "STable3_2", "STable3_3",  "STable3_4",  "STable3_5",  "ATable3_1",  "ATable3_2", "ATable3_3", "ATable3_4", "ATable3_5",
+"BTable3.1_1", "BTable3.1_2", "BTable3.1_3", "BTable3.1_4", "BTable3.1_5", "LTable3.1_1", "LTable3.1_2","LTable3.1_3", "LTable3.1_4","LTable3.1_5",
+"STable3.1_1", "STable3.1_2", "STable3.1_3", "STable3.1_4", "STable3.1_5", "ATable3.1_1", "ATable3.1_2","ATable3.1_3", "ATable3.1_4","ATable3.1_5",
+"BTable3.2_1","BTable3.2_2", "BTable3.2_3", "BTable3.2_4", "BTable3.2_5", "LTable3.2_1", "LTable3.2_2", "LTable3.2_3", "LTable3.2_4", "LTable3.2_5",
+"STable3.2_1", "STable3.2_2", "STable3.2_3", "STable3.2_4", "STable3.2_5", "ATable3.2_1", "ATable3.2_2", "ATable3.2_3", "ATable3.2_4", "ATable3.2_5",
+"BTable3.3_1","BTable3.3_2", "BTable3.3_3", "BTable3.3_4", "BTable3.3_5", "LTable3.3_1", "LTable3.3_2", "LTable3.3_3", "LTable3.3_4", "LTable3.3_5",
+"STable3.3_1", "STable3.3_2", "STable3.3_3", "STable3.3_4", "STable3.3_5", "ATable3.3_1", "ATable3.3_2", "ATable3.3_3", "ATable3.3_4", "ATable3.3_5",
+"BTable3.4_1","BTable3.4_2", "BTable3.4_3", "BTable3.4_4", "BTable3.4_5", "LTable3.4_1", "LTable3.4_2", "LTable3.4_3", "LTable3.4_4", "LTable3.4_5",
+"STable3.4_1", "STable3.4_2", "STable3.4_3", "STable3.4_4", "STable3.4_5", "ATable3.4_1", "ATable3.4_2", "ATable3.4_3", "ATable3.4_4", "ATable3.4_5",
+"BTable3.5_1","BTable3.5_2", "BTable3.5_3", "BTable3.5_4", "BTable3.5_5", "LTable3.5_1", "LTable3.5_2", "LTable3.5_3", "LTable3.5_4", "LTable3.5_5",
+"STable3.5_1", "STable3.5_2", "STable3.5_3", "STable3.5_4", "STable3.5_5", "ATable3.5_1", "ATable3.5_2", "ATable3.5_3", "ATable3.5_4", "ATable3.5_5",
+"BTable3.6_1", "BTable3.6_2", "BTable3.6_3", "BTable3.6_4", "BTable3.6_5", "LTable3.6_1", "LTable3.6_2", "LTable3.6_3", "LTable3.6_4", "LTable3.6_5",
+"STable3.6_1", "STable3.6_2", "STable3.6_3", "STable3.6_4", "STable3.6_5", "ATable3.6_1", "ATable3.6_2", "ATable3.6_3", "ATable3.6_4", "ATable3.6_5",
+"BTable3.7_1", "BTable3.7_2", "BTable3.7_3", "BTable3.7_4", "BTable3.7_5", "LTable3.7_1", "LTable3.7_2", "LTable3.7_3", "LTable3.7_4", "LTable3.7_5",
+"STable3.7_1", "STable3.7_2", "STable3.7_3", "STable3.7_4", "STable3.7_5", "ATable3.7_1", "ATable3.7_2", "ATable3.7_3", "ATable3.7_4", "ATable3.7_5"
+  ),
+  fsim = rep(1,160))
+}
+```
+
+Organize Output
+```{r}
+#summarize the output files DONT RERUN THIS UNLESS NEEDED
+all_results <- purrr::pmap_dfr(params,read_results, om.name=5)
+```
+
+```{r}
+#View(all_results)
+#generate time series of metrics
+diag_ts <- get_diag_ts(all_results) %>% 
+  mutate(nurow = ifelse(type == "spawning biomass" & value == 0,0,1),
+         nurow = ifelse(type == "B/Bref" & value == 0,0,nurow)) %>% 
+  filter(nurow==1) %>% 
+  select(-nurow)
+```
+
+```{r}
+#if you don't want to merge with external spreadsheet, and have selected the character name option, run this:
+
+diag_ts <- diag_ts %>%
+  mutate(RegType = ifelse( #edits start here
+    substr(diag_ts$scenario, 1,1) == "B", "Bag",
+    ifelse(
+    substr(diag_ts$scenario, 1,1) == "L", "Length",
+    ifelse(
+    substr(diag_ts$scenario, 1,1) == "S", "Season",
+    ifelse(
+    substr(diag_ts$scenario, 1,1) == "A", "All", NA  
+    )))))
+
+#stack them if split into 5x10 -> this honestly might be redundant; results don't change 
+diag_ts$isim <- ifelse(stringr::str_sub(diag_ts$scenario,-1) == "2",
+                                             diag_ts$isim + 10, 
+                       ifelse(stringr::str_sub(diag_ts$scenario,-1) == "3",
+                                             diag_ts$isim + 20,
+                              ifelse(stringr::str_sub(diag_ts$scenario,-1) == "4",
+                                             diag_ts$isim + 30,
+                                     ifelse(stringr::str_sub(diag_ts$scenario,-1) == "5",
+                                             diag_ts$isim + 40, diag_ts$isim))))
+
+#change these criteria as needed depending on scenario 
+diag_ts$scenario <- ifelse(substr(diag_ts$scenario, 2,8) != "Table3.", "BBM",
+                                   ifelse(substr(diag_ts$scenario, 2,9) == "Table3.1", "BRP",
+                                   ifelse(substr(diag_ts$scenario, 2,9) == "Table3.2", "PCA",
+                                   ifelse(substr(diag_ts$scenario, 2,9) == "Table3.3", "NCA",
+                                  ifelse(substr(diag_ts$scenario, 2,9) == "Table3.4", "Table3.4",
+                                    ifelse(substr(diag_ts$scenario, 2,9) == "Table3.5", "Table3.5",
+                                    ifelse(substr(diag_ts$scenario, 2,9) == "Table3.6", "Table3.6",
+                                   ifelse(substr(diag_ts$scenario, 2,9) == "Table3.7", "Table3.7", NA))))))))
+
+ # View(diag_ts)
+```
+
+```{r}
+# # time series plots
+ p1 <- diag_ts %>% 
+   filter(year != 2019) %>% 
+   mutate(type = fct_relevel(type,c("spawning biomass", "total catch"))) %>% 
+   filter(type %in% c("B/Bref","F/Fref"),
+          scenario %in% c("MP 1","MP 2")) %>% 
+   projection.plot()
+```
+
+```{r}
+ ###### summarizing metrics
+
+metrics <- diag_ts %>% 
+  filter(year >= 2036) %>%   #2036 in original to get end of time series
+  group_by(om, scenario, isim, 
+         RegType, #for if using code, remove this if merging from spreadsheet 
+           type) %>% 
+  summarize(value = case_when(
+    type == "F/Fref" ~ mean(value<1, na.rm=TRUE),
+    type == "B/Bref" ~ mean(value>0.5, na.rm=TRUE),
+    TRUE ~ mean(value, na.rm=TRUE)), .groups = "drop") %>% 
+  distinct() %>%  #unsure what is happening, but this helps.
+  rename(metric = type,
+         mp = scenario) %>% 
+  mutate(metric = case_when(
+    metric == "F/Fref" ~ "not overfishing",
+    metric == "B/Bref" ~ "not overfished",
+    TRUE ~ metric))
+#View(metrics)
+median_metrics <- metrics %>% 
+  group_by(om, mp, metric) %>% 
+  summarize(value = median(value, na.rm=TRUE))
+#################################################
+
+#OR use this to read in a spreadsheet of scenario names and specs
+scen_lookup <- read.csv("~/Downloads/scentable2next.csv") %>%
+  janitor::clean_names() %>% rename(mp = run_number)
+```
+
+State Information
+```{r}
+### state information ###
+
+read_state_results <- function(scendir = "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/",scen.name="compare",
+                               om.name = 1,
+                         fsim = 1) {
+
+recoutput2 <- read.table(paste0(scendir, "recoutput2.out"), header = FALSE, skip = 1) #TRUE)
+nyrs <- length(unique(recoutput2[,2]))
+nsim <- length(unique(recoutput2[,1]))
+recoutput2[,1] <- rep(1:nsim, each = 10*nyrs)
+names(recoutput2) <- c("isim","year","state","keep_num","rel_num","ntrips","nchoice","change_cs","cost",
+                       "keep_one", "mulen_keep","mulen_release","trophy")
+state_recoutput <- recoutput2 %>% 
+  mutate(scenario = rep(scen.name,nrow(.)),
+         isim = isim + fsim -1,
+         om = rep(om.name,nrow(.)))
+
+return(state_recoutput)
+}
+
+
+get_state_ts <- function(results) {
+  
+  diag_ts <- results %>% 
+    mutate(#keep_to_rel = keep_num/release_num,
+           change_cs = change_cs*-1,
+           "kept per trip" = 1000*keep_num/ntrips,
+           "rel per trip" = 1000*rel_num/ntrips,
+           #"F/Fref" = frate/fmsy,
+           #"B/Bref" = biomass/bmsy,
+           "expense" = cost,
+           cs_per_trip = change_cs/ntrips,
+           #rec_removals = keep_wt + release_wt,
+           keep_one = keep_one/ntrips)  %>% 
+    select(scenario, isim, state, year, 
+           #biomass, 
+           #totcat_wt, 
+           #rec_removals, 
+           #keep_to_rel, 
+           "kept per trip", #"F/Fref", "B/Bref",
+           "rel per trip", 
+           mulen_keep,
+           mulen_release,
+           trophy,
+           expense,
+           change_cs,
+           ntrips,
+           keep_one,
+           cs_per_trip,
+           #"kept:released"
+           #prop_female
+    ) %>% 
+    # rename("spawning biomass" = biomass,
+    #        "total catch" = totcat_wt,
+    #        "kept:released" = keep_to_rel) %>% 
+    pivot_longer(cols=c(#"spawning biomass","total catch","kept:released", 
+                        "kept per trip", 
+                        "rel per trip",
+                        #"F/Fref", "B/Bref",
+                        #rec_removals,
+                        mulen_keep,
+                        mulen_release,
+                        trophy,
+                        expense,
+                        change_cs,
+                        ntrips,
+                        keep_one,
+                        cs_per_trip,
+                        #"kept:released"
+                        #prop_female
+    ),names_to = "type", values_to = "value") %>% 
+    I()
+  return(diag_ts)
+}
+
+#generate time series of state metrics
+state_results <- purrr::pmap_dfr(params,read_state_results)
+
+state_metrics <- get_state_ts(state_results) %>% 
+  filter(state!=1) %>% 
+  # mutate(nurow = ifelse(type == "spawning biomass" & value == 0,0,1),
+  #        nurow = ifelse(type == "B/Bref" & value == 0,0,nurow)) %>% 
+  # filter(nurow==1) %>% 
+  # select(-nurow)
+  filter(year >= 2036) %>%   #2036 in original
+  group_by(scenario, type, isim, state) %>% 
+  summarize(#value = case_when(
+    # type == "F/Fref" ~ mean(value<1, na.rm=TRUE),
+    # type == "B/Bref" ~ mean(value>0.5, na.rm=TRUE),
+    #TRUE 
+    value = mean(value, na.rm=TRUE), .groups = "drop") %>% 
+  distinct() %>%  #unsure what is happening, but this helps.
+  rename(metric = type,
+         mp = scenario) #%>% 
+  # mutate(metric = case_when(
+  #   metric == "F/Fref" ~ "not overfishing",
+  #   metric == "B/Bref" ~ "not overfished",
+  #   TRUE ~ metric))
+
+ state_metrics <- state_metrics %>% mutate(RegType = ifelse( #edits start here
+    substr(state_metrics$mp, 1,1) == "B", "Bag",
+    ifelse(
+    substr(state_metrics$mp, 1,1) == "L", "Length",
+    ifelse(
+    substr(state_metrics$mp, 1,1) == "S", "Season",
+    ifelse(
+    substr(state_metrics$mp, 1,1) == "A", "All", NA  
+    ))))) 
+ 
+state_metrics$isim <- ifelse(stringr::str_sub(state_metrics$mp,-1) == "2",
+                                             state_metrics$isim + 10, 
+                       ifelse(stringr::str_sub(state_metrics$mp,-1) == "3",
+                                             state_metrics$isim + 20,
+                              ifelse(stringr::str_sub(state_metrics$mp,-1) == "4",
+                                             state_metrics$isim + 30,
+                                     ifelse(stringr::str_sub(state_metrics$mp,-1) == "5",
+                                             state_metrics$isim + 40, state_metrics$isim))))
+
+
+state_metrics$om <- 5.  #dummy value for 2024 rec measures modeling
+
+```
+
+Save Files
+```{r}
+saveRDS(metrics,"~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/101624/baseregsposter.rds")
+saveRDS(median_metrics,"~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/101624/median_baseregsposter.rds")
+#saveRDS(state_metrics,"~/Desktop/FlounderMSE/kw_sims_test/MSE_boxplots/82824/full_state_metricsBBMv2_#regchanged.rds") 
+```
+
+Make Plots
+```{r}
+# #metrics <- readRDS("all_results_distrib.rds")
+# #median_metrics <- readRDS("all_results_medians.rds")
+metrics <- readRDS("~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/101624/baseregsposter.rds")
+median_metrics <- readRDS("~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/101624/median_baseregsposter.rds")
+state_metrics <- readRDS("~/Desktop/FlounderMSE/kw_sims_test/MSE_boxplots/82824/full_state_metricsBBMv2_regchanged.rds") %>%
+  mutate(state = fct_relevel(state,
+                             c("MA","RI","CT","NY","NJ","DE","MD","VA","NC")))
+
+state_medians <- state_metrics %>% 
+  group_by(om, mp, state, metric) %>% 
+  summarize(value = median(value, na.rm=TRUE)) %>% 
+  I()
+
+#metrics3 <- rbind(metrics, metrics1)
+#View(metrics3)
+
+#prepare table for plotting 
+metrics2 <- metrics %>% 
+ # left_join(scen_lookup) %>% #include this if using sheet
+  mutate(om = factor(om),
+      #   om = fct_recode(om, "Base" = "1","MRIP Bias" = "2","Shift" = "3"),
+         mp2 = fct_recode(factor(mp), #put hcr if using sheet, mp if using code in here
+                          "BNonsplit_bag" = "BNonsplit_bag",
+                          "BSplit_bag" = "BSplit_bag",
+                           "ANonsplit_all" = "ANonsplit_all",
+                          "ASplit_all" = "ASplit_all",
+                       #   "PCA" = "PCA",
+                       #   "BRP" = "BRP",
+                       #   "BBM" = "BBM",
+                       #   "NCA" = "NCA",
+                          #   "Table3" = "Table3",
+                       #  "Table3.1" = "Table3.1",
+                       #  "Table3.2" = "Table3.2",
+                       #  "Table3.3" = "Table3.3",
+                      #   "Table3.4" = "Table3.4",
+                      #  "Table3.5" = "Table3.5",
+                     #    "Table3.6" = "Table3.6",
+                     #    "Table3.7" = "Table3.7"
+                        ),
+       #  mp3 = fct_collapse(factor(RegType), #reg_to_change if sheet, RegType if not
+       #              "Bag" = "Bag",
+         #             "Length" = "Length",
+            #             "Season" = "Season",
+             #         "All" = "All"
+             #        ),
+   #     mp3 = fct_relevel(mp3, "bag", "season"),
+         #value = ifelse(metric == "exp_keep", 0.39*value, value),
+         metric = factor(metric, levels = c("keep_one",
+                                            "kept per trip", #_mp1",
+                                            "cs_per_trip",
+                                            "trophy",
+                                            #"keep_one_mp1",
+                                            "keep_one_range", #_mp1",
+                                            "kept:released", #_mp1",
+                                            #"kept:rel_range", #_mp1",
+                                            "not overfished",
+                                            "not overfishing",
+                                            "spawning biomass", #_mp1",
+                                            "rel per trip", #_mp1",
+                                            "rec_removals", #_mp1",
+                                            "prop_female",
+                                            "ntrips", #_mp1",
+                                            "change_cs"#,
+                                            #"exp_keep"
+                                            #"gdp_mp1"
+                                            ))) 
+
+#View(metrics2)
+```
+
+
+```{r}
+# add boxplots
+p2 <- metrics2 %>% 
+  drop_na() %>% 
+  filter(!(metric %in% c("change_cs","keep_one_range"))) %>% 
+  droplevels() %>% 
+  #filter(om == "Base") %>% 
+  ggplot() +
+ # aes(x = mp3, y = value, fill = mp2) +
+  aes(x = mp2, y = value, fill = mp2) +
+  geom_boxplot(outlier.shape=NA) +
+  scale_fill_brewer(type = "qual", palette = 2) +
+  facet_wrap(~metric, scale = "free_y", drop = F) +
+  ylab("performance metric value") +
+  xlab("regulation to change") +
+  theme_bw() +
+  theme(legend.position = "bottom") + #,
+        #axis.text.x = element_blank()) +
+  labs(fill = "HCR") + #,
+       #subtitle = "Base scenario") +
+  guides(fill = guide_legend(nrow = 1))
+# add table summaries
+#ggsave("boxplot-metrics.png",p2,width=8,height=8)
+#ggsave("boxplot-metrics-om2.png",p2,width=8,height=8)
+#ggsave("boxplot-metrics-om3.png",p2,width=8,height=8)
+#ggsave("boxplot-metrics.png",p2,width=9,height=6)
+#ggsave("boxplot-metrics_estF.png",p2,width=9,height=6)
+p2
+```
+
+(State-by-state stuff yet to be done for 2024 -> add in below at some point)
+
+Put in organization for splitsims
+
+```{r}
+p3 <- median_metrics %>%  
+   mutate(om = factor(om), 
+          om = fct_recode(om, "Base" = "1","MRIP Bias" = "2","Shift" = "3")) %>%  
+   mutate(mp = fct_recode(mp, 
+                   "rhl" = "NCA",
+                          "perc_change" = "PCA", 
+                          "refpt" = "BRP",
+                          "bmatrix" = "BBM")) %>%  
+   #filter(!metric %in% c("change_cs", "cs_per_trip")) %>%  -->
+   #filter(!metric %in% c("expense","cs_per_trip","total catch")) %>%  -->
+   filter(metric %in% c("change_cs", "kept per trip", "kept:released", "not overfished", "not overfishing", "keep_one")) %>%  
+   do_small_radar_plot()
+```
