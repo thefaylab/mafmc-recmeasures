@@ -1,0 +1,26 @@
+ Stepping into ReadIn
+ HERE!
+ ReadIN finished
+ Starting Historical Projection
+ Stepping into Set-Up
+ Finished with Set-Up
+ Initializing
+  0.50000000000000000     
+ Finished with Initialization
+ Doing historical projection
+ ...check histproj.junk
+   25959.532090684195        29781.105924535605        29781.105924535605     
+ Finished historical projection
+ Historical Projection finished
+ ISEEDX      -34020
+ ISEEDZ           1
+ Stepping into Set-Up
+        2020
+ loading RBC
+ Finished with Set-Up
+ Doing future projection
+   25959.532090684195        39411.290074672652        39411.290074672652     
+   25959.532090684195        48293.060440726978        48293.060440726978     
+ Finished future projection
+ Stepping into Set-Up
+        2022
