@@ -3,6 +3,7 @@ library(tidyr)
 library(data.table)
 library(mgcv)
 library(gratia)
+library(ggplot2)
 
 # Rearranges rows in regulations table so length distributions don't increase with regs, adds SSB as covariate
 
@@ -301,7 +302,6 @@ for (x in 1:length(CTtableHCR$State)){
 }
 CTbig_data = do.call(rbind, CTdatalist)
 
-
 ## -----------------------------------------------------------------------------
 
 DEtableHCR <- rbc4 %>% filter(State == "DE")
@@ -495,7 +495,7 @@ for (x in 1:315){
   #comment out below if OM 3
   prop_rel <- c(1,1,1)
   
-  # READ IN LENGTH DISTRIBUTION FOR EACH SET OF REGULATIONS 
+  # READ IN LENGTH DISTRIBUTION FOR EACH SET OF REGULATIONS x<-15
   Nlen <- 42 
   Nlengthbin <- bigdatalist[[x]]$Nsim[1]
   om_length_cm <-  
@@ -808,7 +808,7 @@ for (x in 1:315){
 #AGGREGATE OUTPUT 
 
 RDMoutputbind_edit <- select(bind_rows(RDMoutput_edit), state, tot_keep,  SeasonLen, Bag, MinLen, SSBcov, tot_rel)
-sum(RDMoutputbind_edit$tot_rel)
+#sum(RDMoutputbind_edit$tot_rel)
 #View(RDMoutputbind_edit)
 #saveRDS(RDMoutputbind_edit, "~/Desktop/FlounderMSE/RDMgam/RDMoutputbind_SSBscramble.rds") #trial 1 <- use this
 
@@ -817,7 +817,6 @@ library(mgcv)
 library(gratia)
 #library(gamreg)
 #RDMoutputbind_edit <- readRDS("~/Desktop/FlounderMSE/RDMgam/RDMoutputbind_SSBscramble.rds") #trial 1 <- use this 
-#RDMoutputbind_edit <- readRDS("~/Desktop/FlounderMSE/RDMgam/RDMoutputbind_superscramble.rds")
 
 tot_keep <- RDMoutputbind_edit$tot_keep
 tot_rel <- RDMoutputbind_edit$tot_rel
@@ -830,37 +829,1786 @@ SSB <- RDMoutputbind_edit$SSBcov
 inputdata <- data.frame(tot_keep, tot_rel,
                         state, SeasonLen, Bag, MinLen, SSB) 
 #View(RDMoutputbind_edit)
-#hist(inputdata$tot_rel)
+
+reg_option <- readRDS("~/Desktop/FlounderMSE/mafmc-recmeasures/mse/regulations_option1.rds")
 
 # --------------------------------------- GAM -----------------------------------------------#
 g1 <- gam(tot_keep ~ state + s(SSB, k = 3) + s(SeasonLen, k = 3) + #9,5,7 partial effect of smooths look strange with k any higher 
             s(Bag, k = 3) + s(MinLen, k = 3), data = inputdata, 
-          family = Gamma(link = log), method = "REML") 
+          family = Gamma(link = log), method = "REML") #random effect on spline for minlen that introduces  a sort of random effect by state 
 summary(g1)
 gam.check(g1)
 #saveRDS(g1, "~/Desktop/FlounderMSE/RDMgam/gam_RDMland.rds") #disordered length
 #g1 <- readRDS("~/Desktop/FlounderMSE/RDMgam/gam_RDMland.rds") #disordered length
+#draw(g1)
 
-# --------------------------------------- GAM without SSB to compare ------------------------------ #
-#g1.1 <- gam(tot_keep ~ state + s(SeasonLen, k = 3) + #9,5,7
-#            s(Bag, k = 3) + s(MinLen, k = 3), data = inputdata, 
-#          family = Gamma(link = log), method = "REML") 
-#saveRDS(g1.1, "~/Desktop/FlounderMSE/RDMgam/gam_RDMland_noSSB.rds") #disordered length
-#g1.1 <- readRDS("~/Desktop/FlounderMSE/RDMgam/gam_RDMland_noSSB.rds") #disordered length
+g1pred <- predict(g1, type = "response") #if not 
+plot(inputdata$tot_keep ~ g1pred)
+plot(inputdata$tot_keep ~ g1pred, xlim = c(0,1e7), ylim = c(0,1e7)) + abline(b = 1, a = 0, col = "red")
 
-# -------------------------------- Poisson w/ smooth ---------------------------------------#
-#g4 <- gam(as.integer(tot_keep) ~ state + s(SSB, k = 3) + s(SeasonLen, k = 3) + #9,5,7
-#            s(Bag, k = 3) + s(MinLen, k=3), data = inputdata, 
-#          family = poisson(link = log), method = "REML")  
-#summary(g4)
-#gam.check(g4)
+########## FACET RDM GAM 1 BY STATE AND REGULATIONS ################
 
-# -------------------- gaussian log-transformed response w/ smooth -------------------------#
-#g6 <- gam(log(tot_keep) ~ state + s(SSB, k = 3) + s(SeasonLen, k = 3) + #9,5,7
-#            s(Bag, k = 3) + s(MinLen, k=3), data = inputdata, 
-#          family = gaussian(), method = "REML") 
-#summary(g6)
-#gam.check(g6)
+#for substituting with hierarchical GAM
+#inputdata <- inputdata_sampled
+#g1pred <- g1.3pred
+
+RDMoutputscramble_facet <- inputdata %>% mutate(Pred = g1.1pred)
+
+#state
+ggplot(RDMoutputscramble_facet, mapping=aes(x=Pred, y = tot_keep, col = state)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  xlim(0,2e7) +
+  ylim(0,2e7) + 
+  xlab("Predicted Harvest") + 
+  ylab("Observed Harvest") + 
+  ggtitle("Mapping Harvest Estimates to Recreational Regulations") +
+  facet_wrap(~state, scales = "free_y")
+
+#Bag
+ggplot(RDMoutputscramble_facet, mapping=aes(x=Pred, y = tot_keep, col = Bag)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  xlim(0,5e6) +
+  ylim(0,5e6) +
+  facet_wrap(~Bag, scales = "free_y")
+
+#MinLen
+ggplot(RDMoutputscramble_facet, mapping=aes(x=Pred, y = tot_keep, col = MinLen)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  xlim(0,5e6) +
+  ylim(0,5e6) +
+  facet_wrap(~MinLen, scales = "free_y")
+
+#SeasonLen
+ggplot(RDMoutputscramble_facet, mapping=aes(x=Pred, y = tot_keep, col = SeasonLen)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  xlim(0,5e6) +
+  ylim(0,5e6) +
+  facet_wrap(~SeasonLen, scales = "free_y")
+
+#SSB
+ggplot(RDMoutputscramble_facet, mapping=aes(x=Pred, y = tot_keep, col = SSB)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  xlim(0,5e6) +
+  ylim(0,5e6) +
+  facet_wrap(~SSB, scales = "free_y")
+
+
+############ LOOK AT RI and CT RDM GAM 1 FIT ONLY ################## 
+
+#RI only 
+
+RDMoutputscramble_facetRI <- inputdata %>% mutate(Pred = g1.1pred) %>% filter(state == "RI") 
+
+#Bag
+ggplot(RDMoutputscramble_facetRI, mapping=aes(x=Pred, y = tot_keep, col = Bag)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  xlim(0,5e6) +
+  ylim(0,5e6) +
+  facet_wrap(~Bag, scales = "free_y")
+
+#MinLen
+ggplot(RDMoutputscramble_facetRI, mapping=aes(x=Pred, y = tot_keep, col = MinLen)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  xlim(0,5e6) +
+  ylim(0,5e6) +
+  facet_wrap(~MinLen, scales = "free_y")
+
+#SeasonLen
+ggplot(RDMoutputscramble_facetRI, mapping=aes(x=Pred, y = tot_keep, col = SeasonLen)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  xlim(0,1e7) +
+  ylim(0,1e7) +
+  facet_wrap(~SeasonLen, scales = "free_y")
+
+#SSB
+ggplot(RDMoutputscramble_facetRI, mapping=aes(x=Pred, y = tot_keep, col = SSB)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  xlim(0,1e7) +
+  ylim(0,1e7) +
+  facet_wrap(~SSB, scales = "free_y")
+
+#CT only 
+
+RDMoutputscramble_facetCT <- inputdata %>% mutate(Pred = g1.3pred) %>% filter(state == "CT") 
+
+#Bag
+ggplot(RDMoutputscramble_facetCT, mapping=aes(x=Pred, y = tot_keep, col = Bag)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  xlim(0,1e7) +
+  ylim(0,1e7) +
+  facet_wrap(~Bag, scales = "free_y")
+
+#MinLen
+ggplot(RDMoutputscramble_facetCT, mapping=aes(x=Pred, y = tot_keep, col = MinLen)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  xlim(0,1e7) +
+  ylim(0,1e7) +
+  facet_wrap(~MinLen, scales = "free_y")
+
+#SeasonLen
+ggplot(RDMoutputscramble_facetCT, mapping=aes(x=Pred, y = tot_keep, col = SeasonLen)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  xlim(0,1e7) +
+  ylim(0,1e7) +
+  facet_wrap(~SeasonLen, scales = "free_y")
+
+#SSB
+ggplot(RDMoutputscramble_facetCT, mapping=aes(x=Pred, y = tot_keep, col = SSB)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  xlim(0,1e7) +
+  ylim(0,1e7) +
+  facet_wrap(~SSB, scales = "free_y")
+
+############# ZOOM IN ON STATES WITH SMALL RANGES NOT VERY VISIBLE IN RDM GAM 1 STATE FACET ##############
+
+#NC 
+
+RDMoutputscramble_facetNC <- inputdata %>% mutate(Pred = g1pred) %>% filter(state == "NC") 
+
+#Bag
+ggplot(RDMoutputscramble_facetNC, mapping=aes(x=Pred, y = tot_keep, col = Bag)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  xlim(0,3e5) +
+  ylim(0,3e5) +
+  facet_wrap(~Bag, scales = "free_y")
+
+#MinLen
+ggplot(RDMoutputscramble_facetNC, mapping=aes(x=Pred, y = tot_keep, col = MinLen)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  xlim(0,3e5) +
+  ylim(0,3e5) +
+  facet_wrap(~MinLen, scales = "free_y")
+
+#SeasonLen
+ggplot(RDMoutputscramble_facetNC, mapping=aes(x=Pred, y = tot_keep, col = SeasonLen)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  xlim(0,3e5) +
+  ylim(0,3e5) +
+  facet_wrap(~SeasonLen, scales = "free_y")
+
+#SSB
+ggplot(RDMoutputscramble_facetNC, mapping=aes(x=Pred, y = tot_keep, col = SSB)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  xlim(0,3e5) +
+  ylim(0,3e5) +
+  facet_wrap(~SSB, scales = "free_y")
+
+#MA
+
+RDMoutputscramble_facetMA <- inputdata %>% mutate(Pred = g1pred) %>% filter(state == "MA") 
+
+#Bag
+ggplot(RDMoutputscramble_facetMA, mapping=aes(x=Pred, y = tot_keep, col = Bag)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  xlim(0,2.5e6) +
+  ylim(0,2.5e6) +
+  facet_wrap(~Bag, scales = "free_y")
+
+#MinLen
+ggplot(RDMoutputscramble_facetMA, mapping=aes(x=Pred, y = tot_keep, col = MinLen)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  xlim(0,2.5e6) +
+  ylim(0,2.5e6) +
+  facet_wrap(~MinLen, scales = "free_y")
+
+#SeasonLen
+ggplot(RDMoutputscramble_facetMA, mapping=aes(x=Pred, y = tot_keep, col = SeasonLen)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  xlim(0,2.5e6) +
+  ylim(0,2.5e6) +
+  facet_wrap(~SeasonLen, scales = "free_y")
+
+#SSB
+ggplot(RDMoutputscramble_facetMA, mapping=aes(x=Pred, y = tot_keep, col = SSB)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  xlim(0,2.5e6) +
+  ylim(0,2.5e6) +
+  facet_wrap(~SSB, scales = "free_y")
+
+#DE
+
+RDMoutputscramble_facetDE <- inputdata %>% mutate(Pred = g1pred) %>% filter(state == "DE") 
+
+#Bag
+ggplot(RDMoutputscramble_facetDE, mapping=aes(x=Pred, y = tot_keep, col = Bag)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  xlim(0,2.5e6) +
+  ylim(0,2.5e6) +
+  facet_wrap(~Bag, scales = "free_y")
+
+#MinLen
+ggplot(RDMoutputscramble_facetDE, mapping=aes(x=Pred, y = tot_keep, col = MinLen)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  xlim(0,2.5e6) +
+  ylim(0,2.5e6) +
+  facet_wrap(~MinLen, scales = "free_y")
+
+#SeasonLen
+ggplot(RDMoutputscramble_facetDE, mapping=aes(x=Pred, y = tot_keep, col = SeasonLen)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  xlim(0,2.5e6) +
+  ylim(0,2.5e6) +
+  facet_wrap(~SeasonLen, scales = "free_y")
+
+#SSB
+ggplot(RDMoutputscramble_facetDE, mapping=aes(x=Pred, y = tot_keep, col = SSB)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  xlim(0,2.5e6) +
+  ylim(0,2.5e6) +
+  facet_wrap(~SSB, scales = "free_y")
+
+
+############## MEAN SQUARED ERROR ANALYSIS OF RDM GAM 1 OUTPUT ##################
+
+#response space 
+
+RDMoutputscramble_facet_mse <- RDMoutputscramble_facet %>% mutate(mse = (tot_keep - Pred)^2)
+
+upper_quartile_mse <- quantile(RDMoutputscramble_facet_mse$mse, probs = 0.75)
+
+RDMoutputscramble_facet_mse_upperquartile <- RDMoutputscramble_facet_mse %>% filter(mse > upper_quartile_mse)
+
+#state
+ggplot(RDMoutputscramble_facet_mse_upperquartile, mapping=aes(y = tot_keep, x = Pred, col = state)) + 
+  geom_point() + 
+  xlim(0,1e7) +
+  ylim(0,1e7) +
+  geom_abline(slope = 1, intercept = 0) + 
+  facet_wrap(~state, scales = "free_y")
+
+# get state quartiles 
+state_quartiles <- RDMoutputscramble_facet_mse %>%
+  group_by(state) %>%
+  summarise(
+    state_quart = quantile(mse, probs = 0.75)
+  )
+
+CTstatequart <- state_quartiles[1,]$state_quart
+DEstatequart <- state_quartiles[2,]$state_quart
+MAstatequart <- state_quartiles[3,]$state_quart
+MDstatequart <- state_quartiles[4,]$state_quart
+NCstatequart <- state_quartiles[5,]$state_quart
+NJstatequart <- state_quartiles[6,]$state_quart
+NYstatequart <- state_quartiles[7,]$state_quart
+RIstatequart <- state_quartiles[8,]$state_quart
+VAstatequart <- state_quartiles[9,]$state_quart
+
+#CT
+RDMoutputscramble_facet_mse_CT <- RDMoutputscramble_facet_mse %>% filter(state == "CT") %>%
+  filter(mse > CTstatequart)
+  
+  #Bag
+  ggplot(RDMoutputscramble_facet_mse_CT, mapping=aes(x=Pred, y = tot_keep, col = Bag)) + 
+    geom_point() + 
+    geom_abline(slope = 1, intercept = 0) + 
+    xlim(0,1e7) +
+    ylim(0,1e7) +
+    facet_wrap(~Bag, scales = "free_y")
+  
+  #MinLen
+  ggplot(RDMoutputscramble_facet_mse_CT, mapping=aes(x=Pred, y = tot_keep, col = MinLen)) + 
+    geom_point() + 
+    geom_abline(slope = 1, intercept = 0) + 
+    xlim(0,1e7) +
+    ylim(0,1e7) +
+    facet_wrap(~MinLen, scales = "free_y")
+  
+  #SeasonLen
+  ggplot(RDMoutputscramble_facet_mse_CT, mapping=aes(x=Pred, y = tot_keep, col = SeasonLen)) + 
+    geom_point() + 
+    geom_abline(slope = 1, intercept = 0) + 
+    xlim(0,1e7) +
+    ylim(0,1e7) +
+    facet_wrap(~SeasonLen, scales = "free_y")
+  
+  #SSB
+  ggplot(RDMoutputscramble_facet_mse_CT, mapping=aes(x=Pred, y = tot_keep, col = SSB)) + 
+    geom_point() + 
+    geom_abline(slope = 1, intercept = 0) + 
+    xlim(0,1e7) +
+    ylim(0,1e7) +
+    facet_wrap(~SSB, scales = "free_y")
+  
+hist(RDMoutputscramble_facet_mse_CT$Bag)
+hist(RDMoutputscramble_facet_mse_CT$MinLen)
+hist(RDMoutputscramble_facet_mse_CT$SeasonLen)
+hist(RDMoutputscramble_facet_mse_CT$SSB)
+
+#DE
+RDMoutputscramble_facet_mse_DE <- RDMoutputscramble_facet_mse %>% filter(state == "DE") %>%
+  filter(mse > DEstatequart)
+
+#Bag
+ggplot(RDMoutputscramble_facet_mse_DE, mapping=aes(x=Pred, y = tot_keep, col = Bag)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  xlim(0,5e6) +
+  ylim(0,5e6) +
+  facet_wrap(~Bag, scales = "free_y")
+
+#MinLen
+ggplot(RDMoutputscramble_facet_mse_DE, mapping=aes(x=Pred, y = tot_keep, col = MinLen)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  xlim(0,5e6) +
+  ylim(0,5e6) +
+  facet_wrap(~MinLen, scales = "free_y")
+
+#SeasonLen
+ggplot(RDMoutputscramble_facet_mse_DE, mapping=aes(x=Pred, y = tot_keep, col = SeasonLen)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  xlim(0,5e6) +
+  ylim(0,5e6) +
+  facet_wrap(~SeasonLen, scales = "free_y")
+
+#SSB
+ggplot(RDMoutputscramble_facet_mse_DE, mapping=aes(x=Pred, y = tot_keep, col = SSB)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  xlim(0,5e6) +
+  ylim(0,5e6) +
+  facet_wrap(~SSB, scales = "free_y")
+
+hist(RDMoutputscramble_facet_mse_DE$Bag)
+hist(RDMoutputscramble_facet_mse_DE$MinLen)
+hist(RDMoutputscramble_facet_mse_DE$SeasonLen)
+hist(RDMoutputscramble_facet_mse_DE$SSB)
+
+#MA
+RDMoutputscramble_facet_mse_MA <- RDMoutputscramble_facet_mse %>% filter(state == "MA") %>%
+  filter(mse > MAstatequart)
+
+#Bag
+ggplot(RDMoutputscramble_facet_mse_MA, mapping=aes(x=Pred, y = tot_keep, col = Bag)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  xlim(0,5e6) +
+  ylim(0,5e6) +
+  facet_wrap(~Bag, scales = "free_y")
+
+#MinLen
+ggplot(RDMoutputscramble_facet_mse_MA, mapping=aes(x=Pred, y = tot_keep, col = MinLen)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  xlim(0,5e6) +
+  ylim(0,5e6) +
+  facet_wrap(~MinLen, scales = "free_y")
+
+#SeasonLen
+ggplot(RDMoutputscramble_facet_mse_MA, mapping=aes(x=Pred, y = tot_keep, col = SeasonLen)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  xlim(0,5e6) +
+  ylim(0,5e6) +
+  facet_wrap(~SeasonLen, scales = "free_y")
+
+#SSB
+ggplot(RDMoutputscramble_facet_mse_MA, mapping=aes(x=Pred, y = tot_keep, col = SSB)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  xlim(0,5e6) +
+  ylim(0,5e6) +
+  facet_wrap(~SSB, scales = "free_y")
+
+hist(RDMoutputscramble_facet_mse_MA$Bag)
+hist(RDMoutputscramble_facet_mse_MA$MinLen)
+hist(RDMoutputscramble_facet_mse_MA$SeasonLen)
+hist(RDMoutputscramble_facet_mse_MA$SSB)
+
+#MA
+RDMoutputscramble_facet_mse_NC <- RDMoutputscramble_facet_mse %>% filter(state == "NC") %>%
+  filter(mse > NCstatequart)
+
+#Bag
+ggplot(RDMoutputscramble_facet_mse_NC, mapping=aes(x=Pred, y = tot_keep, col = Bag)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  xlim(0,5e5) +
+  ylim(0,5e5) +
+  facet_wrap(~Bag, scales = "free_y")
+
+#MinLen
+ggplot(RDMoutputscramble_facet_mse_NC, mapping=aes(x=Pred, y = tot_keep, col = MinLen)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  xlim(0,5e5) +
+  ylim(0,5e5) +
+  facet_wrap(~MinLen, scales = "free_y")
+
+#SeasonLen
+ggplot(RDMoutputscramble_facet_mse_NC, mapping=aes(x=Pred, y = tot_keep, col = SeasonLen)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  xlim(0,5e5) +
+  ylim(0,5e5) +
+  facet_wrap(~SeasonLen, scales = "free_y")
+
+#SSB
+ggplot(RDMoutputscramble_facet_mse_NC, mapping=aes(x=Pred, y = tot_keep, col = SSB)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  xlim(0,5e5) +
+  ylim(0,5e5) +
+  facet_wrap(~SSB, scales = "free_y")
+
+hist(RDMoutputscramble_facet_mse_NC$Bag)
+hist(RDMoutputscramble_facet_mse_NC$MinLen)
+hist(RDMoutputscramble_facet_mse_NC$SeasonLen)
+hist(RDMoutputscramble_facet_mse_NC$SSB)
+
+#NJ
+RDMoutputscramble_facet_mse_NJ <- RDMoutputscramble_facet_mse %>% filter(state == "NJ") %>%
+  filter(mse > NJstatequart)
+
+#Bag
+ggplot(RDMoutputscramble_facet_mse_NJ, mapping=aes(x=Pred, y = tot_keep, col = Bag)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  xlim(0,3e7) +
+  ylim(0,3e7) +
+  facet_wrap(~Bag, scales = "free_y")
+
+#MinLen
+ggplot(RDMoutputscramble_facet_mse_NJ, mapping=aes(x=Pred, y = tot_keep, col = MinLen)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  xlim(0,3e7) +
+  ylim(0,3e7) +
+  facet_wrap(~MinLen, scales = "free_y")
+
+#SeasonLen
+ggplot(RDMoutputscramble_facet_mse_NJ, mapping=aes(x=Pred, y = tot_keep, col = SeasonLen)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  xlim(0,3e7) +
+  ylim(0,3e7) +
+  facet_wrap(~SeasonLen, scales = "free_y")
+
+#SSB
+ggplot(RDMoutputscramble_facet_mse_NJ, mapping=aes(x=Pred, y = tot_keep, col = SSB)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  xlim(0,3e7) +
+  ylim(0,3e7) +
+  facet_wrap(~SSB, scales = "free_y")
+
+hist(RDMoutputscramble_facet_mse_NJ$Bag)
+hist(RDMoutputscramble_facet_mse_NJ$MinLen)
+hist(RDMoutputscramble_facet_mse_NJ$SeasonLen)
+hist(RDMoutputscramble_facet_mse_NJ$SSB)
+
+#NY
+RDMoutputscramble_facet_mse_NY <- RDMoutputscramble_facet_mse %>% filter(state == "NY") %>%
+  filter(mse > NYstatequart)
+
+#Bag
+ggplot(RDMoutputscramble_facet_mse_NY, mapping=aes(x=Pred, y = tot_keep, col = Bag)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  xlim(0,3e7) +
+  ylim(0,3e7) +
+  facet_wrap(~Bag, scales = "free_y")
+
+#MinLen
+ggplot(RDMoutputscramble_facet_mse_NY, mapping=aes(x=Pred, y = tot_keep, col = MinLen)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  xlim(0,3e7) +
+  ylim(0,3e7) +
+  facet_wrap(~MinLen, scales = "free_y")
+
+#SeasonLen
+ggplot(RDMoutputscramble_facet_mse_NY, mapping=aes(x=Pred, y = tot_keep, col = SeasonLen)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  xlim(0,3e7) +
+  ylim(0,3e7) +
+  facet_wrap(~SeasonLen, scales = "free_y")
+
+#SSB
+ggplot(RDMoutputscramble_facet_mse_NY, mapping=aes(x=Pred, y = tot_keep, col = SSB)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  xlim(0,3e7) +
+  ylim(0,3e7) +
+  facet_wrap(~SSB, scales = "free_y")
+
+hist(RDMoutputscramble_facet_mse_NY$Bag)
+hist(RDMoutputscramble_facet_mse_NY$MinLen)
+hist(RDMoutputscramble_facet_mse_NY$SeasonLen)
+hist(RDMoutputscramble_facet_mse_NY$SSB)
+
+#RI
+RDMoutputscramble_facet_mse_RI <- RDMoutputscramble_facet_mse %>% filter(state == "RI") %>%
+  filter(mse > RIstatequart)
+
+#Bag
+ggplot(RDMoutputscramble_facet_mse_RI, mapping=aes(x=Pred, y = tot_keep, col = Bag)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  xlim(0,1e7) +
+  ylim(0,1e7) +
+  facet_wrap(~Bag, scales = "free_y")
+
+#MinLen
+ggplot(RDMoutputscramble_facet_mse_RI, mapping=aes(x=Pred, y = tot_keep, col = MinLen)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  xlim(0,1e7) +
+  ylim(0,1e7) +
+  facet_wrap(~MinLen, scales = "free_y")
+
+#SeasonLen
+ggplot(RDMoutputscramble_facet_mse_RI, mapping=aes(x=Pred, y = tot_keep, col = SeasonLen)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  xlim(0,1e7) +
+  ylim(0,1e7) +
+  facet_wrap(~SeasonLen, scales = "free_y")
+
+#SSB
+ggplot(RDMoutputscramble_facet_mse_RI, mapping=aes(x=Pred, y = tot_keep, col = SSB)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  xlim(0,1e7) +
+  ylim(0,1e7) +
+  facet_wrap(~SSB, scales = "free_y")
+
+hist(RDMoutputscramble_facet_mse_RI$Bag)
+hist(RDMoutputscramble_facet_mse_RI$MinLen)
+hist(RDMoutputscramble_facet_mse_RI$SeasonLen)
+hist(RDMoutputscramble_facet_mse_RI$SSB)
+
+#RI
+RDMoutputscramble_facet_mse_VA <- RDMoutputscramble_facet_mse %>% filter(state == "VA") %>%
+  filter(mse > VAstatequart)
+
+#Bag
+ggplot(RDMoutputscramble_facet_mse_VA, mapping=aes(x=Pred, y = tot_keep, col = Bag)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  xlim(0,5e6) +
+  ylim(0,5e6) +
+  facet_wrap(~Bag, scales = "free_y")
+
+#MinLen
+ggplot(RDMoutputscramble_facet_mse_VA, mapping=aes(x=Pred, y = tot_keep, col = MinLen)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  xlim(0,5e6) +
+  ylim(0,5e6) +
+  facet_wrap(~MinLen, scales = "free_y")
+
+#SeasonLen
+ggplot(RDMoutputscramble_facet_mse_VA, mapping=aes(x=Pred, y = tot_keep, col = SeasonLen)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  xlim(0,5e6) +
+  ylim(0,5e6) +
+  facet_wrap(~SeasonLen, scales = "free_y")
+
+#SSB
+ggplot(RDMoutputscramble_facet_mse_VA, mapping=aes(x=Pred, y = tot_keep, col = SSB)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  xlim(0,5e6) +
+  ylim(0,5e6) +
+  facet_wrap(~SSB, scales = "free_y")
+
+hist(RDMoutputscramble_facet_mse_VA$Bag)
+hist(RDMoutputscramble_facet_mse_VA$MinLen)
+hist(RDMoutputscramble_facet_mse_VA$SeasonLen)
+hist(RDMoutputscramble_facet_mse_VA$SSB)
+
+# logspace 
+
+g1pred_log <- predict(g1, type = "link") #if not 
+
+RDMoutputscramble_facet <- inputdata %>% mutate(Pred = g1pred_log)
+
+RDMoutputscramble_facet_mse <- RDMoutputscramble_facet %>% mutate(mse = (log(tot_keep) - Pred)^2)
+
+upper_quartile_mse <- quantile(RDMoutputscramble_facet_mse$mse, probs = 0.75)
+
+RDMoutputscramble_facet_mse_upperquartile <- RDMoutputscramble_facet_mse %>% filter(mse > upper_quartile_mse)
+
+#state
+
+#all
+ggplot(RDMoutputscramble_facet_mse, mapping=aes(y = log(tot_keep), x = Pred, col = state)) + 
+  geom_point() + 
+  xlim(5,20) +
+  ylim(5,20) +
+  geom_abline(slope = 1, intercept = 0) + 
+  facet_wrap(~state, scales = "free_y")
+
+#mse
+ggplot(RDMoutputscramble_facet_mse_upperquartile, mapping=aes(y = log(tot_keep), x = Pred, col = state)) + 
+  geom_point() + 
+  xlim(5,20) +
+  ylim(5,20) +
+  geom_abline(slope = 1, intercept = 0) + 
+  facet_wrap(~state, scales = "free_y")
+
+#are any states more represented?
+RDMoutputscramble_facet_mse_upperquartileRI <- RDMoutputscramble_facet_mse_upperquartile %>% filter(state == "RI")
+nrow(RDMoutputscramble_facet_mse_upperquartileRI) #136
+RDMoutputscramble_facet_mse_upperquartileCT <- RDMoutputscramble_facet_mse_upperquartile %>% filter(state == "CT")
+nrow(RDMoutputscramble_facet_mse_upperquartileCT) #83
+RDMoutputscramble_facet_mse_upperquartileNY <- RDMoutputscramble_facet_mse_upperquartile %>% filter(state == "NY")
+nrow(RDMoutputscramble_facet_mse_upperquartileNY) #40
+RDMoutputscramble_facet_mse_upperquartileNJ <- RDMoutputscramble_facet_mse_upperquartile %>% filter(state == "NJ")
+nrow(RDMoutputscramble_facet_mse_upperquartileNJ) #76
+RDMoutputscramble_facet_mse_upperquartileMA <- RDMoutputscramble_facet_mse_upperquartile %>% filter(state == "MA")
+nrow(RDMoutputscramble_facet_mse_upperquartileMA) #87
+RDMoutputscramble_facet_mse_upperquartileDE <- RDMoutputscramble_facet_mse_upperquartile %>% filter(state == "DE")
+nrow(RDMoutputscramble_facet_mse_upperquartileDE) #127
+RDMoutputscramble_facet_mse_upperquartileNC <- RDMoutputscramble_facet_mse_upperquartile %>% filter(state == "NC")
+nrow(RDMoutputscramble_facet_mse_upperquartileNC) #53
+RDMoutputscramble_facet_mse_upperquartileMD <- RDMoutputscramble_facet_mse_upperquartile %>% filter(state == "MD")
+nrow(RDMoutputscramble_facet_mse_upperquartileMD) #63
+RDMoutputscramble_facet_mse_upperquartileVA <- RDMoutputscramble_facet_mse_upperquartile %>% filter(state == "VA")
+nrow(RDMoutputscramble_facet_mse_upperquartileVA) #44
+
+############## FIT GAM TO SUMMED COASTWIDE HARVEST ##################
+RDMoutputscramble_facet_coastwide <- RDMoutputscramble_facet %>%
+  mutate(group = ceiling(row_number() / 9)) %>%  
+  group_by(group) %>%
+  summarise(
+    across(tot_keep, sum, .names = "tot_keep"), 
+  #  across(Pred, sum, .names = "Pred"), 
+    .groups = "drop"
+  ) 
+
+regstable <- RDMoutputscramble_facet %>% filter(state == "CT") %>% 
+  select( Bag, MinLen, SeasonLen, SSB) %>%
+  mutate(tot_keep = RDMoutputscramble_facet_coastwide$tot_keep) 
+
+g2 <- gam(tot_keep ~ s(SSB, k = 3) + s(SeasonLen, k = 3) + 
+            s(Bag, k = 3) + s(MinLen, k = 3), data = regstable, 
+          family = Gamma(link = log), method = "REML") 
+summary(g2)
+appraise(g2)
+g2pred <- predict(g2, type = "response")
+plot(regstable$tot_keep ~ g2pred) + abline(b = 1, a = 0, col = "red")
+
+#View(regstable)
+#View(RDMoutputscramble_facet)
+
+################# FIT TO ALL MSE RDM RUNS ###################
+
+#FIRST TIME -> ALL OUTPUT 
+
+#base
+Bag <- all_results$bag
+MinLen <- all_results$minlen
+SeasonLen <- all_results$seaslen
+tot_keep <- all_results$n_keep
+SSB <- all_results$biomass
+state <- all_results$state
+
+rel_num <- all_results$n_release
+
+#2BBMSY
+BagL <- all_results1$bag
+MinS <- all_results1$minlen
+SeasL <- all_results1$seaslen
+keep_num <- all_results1$n_keep
+SSBcov <- all_results1$biomass
+state <- all_results1$state
+
+#0.3BBMSY
+BagL <- all_results7$bag
+MinS <- all_results7$minlen
+SeasL <- all_results7$seaslen
+keep_num <- all_results7$n_keep
+SSBcov <- all_results7$biomass
+state <- all_results7$state
+
+inputdata_mseruns <- data.frame(Bag, MinLen, SeasonLen, tot_keep, rel_num, SSB, state)
+
+#for trying other ssb scenarios 
+inputdata_mseruns1 <- data.frame(BagL, MinS, SeasL, keep_num, SSBcov, state)
+inputdata_mseruns7 <- data.frame(BagL, MinS, SeasL, keep_num, SSBcov, state)
+
+inputdata_mseruns <- na.omit(inputdata_mseruns) #change this depending on which scenario is run
+inputdata_mseruns <- inputdata_mseruns %>% filter(tot_keep != 0)
+
+#testing to see if RI reg table issue 
+inputdata_mseruns2 <- inputdata_mseruns %>% mutate(Pred = g2pred) %>% mutate(SeasL = ifelse(SeasL > 165 & state == "RI", SeasL - 15, SeasL))
+inputdata_mseruns2 <- inputdata_mseruns %>% filter(SeasL <= 150)
+
+#gam
+g2 <- gam(tot_keep ~  state + s(SSB, k = 3) + s(SeasonLen, k = 3) + #9,5,7 partial effect of smooths look strange with k any higher
+            s(Bag, k = 3) + s(MinLen, k = 3), data = inputdata_mseruns,
+          family = Gamma(link = log), method = "REML")
+summary(g2)
+appraise(g2)
+draw(g2)
+g2pred <- predict(g2, type = "response") #if not
+plot(inputdata_mseruns$tot_keep ~ g2pred, xlim = c(0,2e7), ylim = c(0,2e7)) + abline(b = 1, a = 0, col = "red")
+#saveRDS(g2, "~/Desktop/FlounderMSE/RDMgam/gam_RDM_allMSE.rds") #disordered length
+#g1 <- readRDS("~/Desktop/FlounderMSE/RDMgam/gam_RDM_allMSE.rds") #disordered length
+
+scalarinput <- dplyr::select(inputdata_mseruns[1:9,], state, SeasonLen, Bag, MinLen, SSB) # pick number where "CT" is first state in list 
+scalaroutput = list()
+scalaroutput = vector("list", length = nrow(scalarinput))
+
+for(x in 1:length(scalarinput$SeasonLen)){
+  scalarinput2 <- scalarinput[x,]
+  gamfit_scalar <- predict.gam(g1, newdata = scalarinput2, type = "response" , se.fit = TRUE)
+  scalaroutput[[x]] <- scalarinput[x,] %>% mutate(land = gamfit_scalar$fit)
+}
+scalaroutput2 <- bind_rows(scalaroutput)
+
+CTscalar <- scalaroutput2$land[1]/sum(scalaroutput2$land) #scalarinput states should start with "CT"
+DEscalar <- scalaroutput2$land[2]/sum(scalaroutput2$land)
+MAscalar <- scalaroutput2$land[3]/sum(scalaroutput2$land)
+MDscalar <- scalaroutput2$land[4]/sum(scalaroutput2$land)
+NCscalar <- scalaroutput2$land[5]/sum(scalaroutput2$land)
+NJscalar <- scalaroutput2$land[6]/sum(scalaroutput2$land)
+NYscalar <- scalaroutput2$land[7]/sum(scalaroutput2$land)
+RIscalar <- scalaroutput2$land[8]/sum(scalaroutput2$land)
+VAscalar <- scalaroutput2$land[9]/sum(scalaroutput2$land)
+
+GAMscalar <- data.frame(CTscalar, DEscalar, MAscalar, MDscalar, NCscalar, NJscalar, NYscalar, RIscalar, VAscalar)
+#so far these values have been the same no matter which SSB or regulation scenario we start on 
+#saveRDS(GAMscalar, "~/Desktop/FlounderMSE/RDMGam/GAMscalar_allMSE.rds")
+#readRDS("~/Desktop/FlounderMSE/RDMGam/GAMscalar_allMSE.rds")
+
+#look at how things change across set of starting regulations
+inputdata_mseruns3 <- inputdata_mseruns2 %>% mutate(Pred = g2pred) %>% filter(state == "MA", MinS == 17.5, SeasL == 150, BagL == 4)
+
+ggplot(inputdata_mseruns3, mapping=aes(x=Pred, y = keep_num, col = SSBcov)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+ # xlim(0,1.5e6) +
+ # ylim(0,1.5e6) +
+  facet_wrap(~state, scales = "free_y")
+
+inputdata_mseruns2_mse <- inputdata_mseruns2 %>% mutate(Pred = g2pred) %>% mutate(mse = (log(keep_num) - log(Pred))^2)
+
+inputdata_mseruns2_upperquart <- quantile(inputdata_mseruns2_mse$mse, probs = 0.75)
+
+inputdata_mseruns2_mse_upperquartile <- inputdata_mseruns2_mse %>% filter(mse > inputdata_mseruns2_upperquart)
+
+#mse
+ggplot(inputdata_mseruns2_mse_upperquartile, mapping=aes(y = log(keep_num), x = log(Pred), col = state)) + 
+  geom_point() + 
+  xlim(10,20) +
+  ylim(10,20) +
+  geom_abline(slope = 1, intercept = 0) + 
+  facet_wrap(~state, scales = "free_y")
+
+#are any states more represented?
+inputdata_mseruns2_mse_upperquartileRI <- inputdata_mseruns2_mse_upperquartile %>% filter(state == "RI")
+nrow(inputdata_mseruns2_mse_upperquartileRI) #8012
+inputdata_mseruns2_mse_upperquartileCT <- inputdata_mseruns2_mse_upperquartile %>% filter(state == "CT")
+nrow(inputdata_mseruns2_mse_upperquartileCT) #5722
+inputdata_mseruns2_mse_upperquartileNY <- inputdata_mseruns2_mse_upperquartile %>% filter(state == "NY")
+nrow(inputdata_mseruns2_mse_upperquartileNY) #2600
+inputdata_mseruns2_mse_upperquartileNJ <- inputdata_mseruns2_mse_upperquartile %>% filter(state == "NJ")
+nrow(inputdata_mseruns2_mse_upperquartileNJ) #2936
+inputdata_mseruns2_mse_upperquartileMA <- inputdata_mseruns2_mse_upperquartile %>% filter(state == "MA")
+nrow(inputdata_mseruns2_mse_upperquartileMA) #4611
+inputdata_mseruns2_mse_upperquartileDE <- inputdata_mseruns2_mse_upperquartile %>% filter(state == "DE")
+nrow(inputdata_mseruns2_mse_upperquartileDE) #4142
+inputdata_mseruns2_mse_upperquartileNC <- inputdata_mseruns2_mse_upperquartile %>% filter(state == "NC")
+nrow(inputdata_mseruns2_mse_upperquartileNC) #3610
+inputdata_mseruns2_mse_upperquartileMD <- inputdata_mseruns2_mse_upperquartile %>% filter(state == "MD")
+nrow(inputdata_mseruns2_mse_upperquartileMD) #4276
+inputdata_mseruns2_mse_upperquartileVA <- inputdata_mseruns2_mse_upperquartile %>% filter(state == "VA")
+nrow(inputdata_mseruns2_mse_upperquartileVA) #3470
+
+##############. SECOND TIME FIT TO OUTPUT -> MORE EQUAL REG DISTRIBUTION ###############
+all_results #RDMGAM_hierarchical1 Bin3
+#View(all_results)
+
+Bag <- all_results$bag
+MinLen <- all_results$minlen
+SeasonLen <- all_results$seaslen
+tot_keep <- all_results$n_keep
+SSB <- all_results$biomass
+state <- all_results$state
+
+#BBM
+rbctrack <- read.table(("~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin3/50BBM2/sim1_bag/rbctrack.out"), header = FALSE, skip = 1)
+rbctrack_doubled <- rbctrack %>%
+  slice(rep(1:n(), each = 18))
+rbctrack2 <- read.table(("~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin3/50BBM2/sim2_length/rbctrack.out"), header = FALSE, skip = 1)
+rbctrack_doubled2 <- rbctrack2 %>%
+  slice(rep(1:n(), each = 18))
+rbctrack3 <- read.table(("~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin3/50BBM2/sim3_season/rbctrack.out"), header = FALSE, skip = 1)
+rbctrack_doubled3 <- rbctrack3 %>%
+  slice(rep(1:n(), each = 18))
+rbctrack4 <- read.table(("~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin3/50BBM2/sim4_all/rbctrack.out"), header = FALSE, skip = 1)
+rbctrack_doubled4 <- rbctrack4 %>%
+  slice(rep(1:n(), each = 18))
+#BRP
+rbctrack5 <- read.table(("~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin3/50BRP/sim1_bag/rbctrack.out"), header = FALSE, skip = 1)
+rbctrack_doubled5 <- rbctrack5 %>%
+  slice(rep(1:n(), each = 18))
+rbctrack6 <- read.table(("~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin3/50BRP/sim2_length/rbctrack.out"), header = FALSE, skip = 1)
+rbctrack_doubled6 <- rbctrack6 %>%
+  slice(rep(1:n(), each = 18))
+rbctrack7 <- read.table(("~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin3/50BRP/sim3_season/rbctrack.out"), header = FALSE, skip = 1)
+rbctrack_doubled7 <- rbctrack7 %>%
+  slice(rep(1:n(), each = 18))
+rbctrack8 <- read.table(("~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin3/50BRP/sim4_all/rbctrack.out"), header = FALSE, skip = 1)
+rbctrack_doubled8 <- rbctrack8 %>%
+  slice(rep(1:n(), each = 18))
+#PCA
+rbctrack9 <- read.table(("~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin3/50PCA/sim1_bag/rbctrack.out"), header = FALSE, skip = 1)
+rbctrack_doubled9 <- rbctrack9 %>%
+  slice(rep(1:n(), each = 18))
+rbctrack10 <- read.table(("~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin3/50PCA/sim2_length/rbctrack.out"), header = FALSE, skip = 1)
+rbctrack_doubled10 <- rbctrack10 %>%
+  slice(rep(1:n(), each = 18))
+rbctrack11 <- read.table(("~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin3/50PCA/sim3_season/rbctrack.out"), header = FALSE, skip = 1)
+rbctrack_doubled11 <- rbctrack11 %>%
+  slice(rep(1:n(), each = 18))
+rbctrack12 <- read.table(("~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin3/50PCA/sim4_all/rbctrack.out"), header = FALSE, skip = 1)
+rbctrack_doubled12 <- rbctrack12 %>%
+  slice(rep(1:n(), each = 18))
+#NCA
+rbctrack13 <- read.table(("~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin3/50NCA/sim1_bag/rbctrack.out"), header = FALSE, skip = 1)
+rbctrack_doubled13 <- rbctrack13 %>%
+  slice(rep(1:n(), each = 18))
+rbctrack14 <- read.table(("~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin3/50NCA/sim2_length/rbctrack.out"), header = FALSE, skip = 1)
+rbctrack_doubled14 <- rbctrack14 %>%
+  slice(rep(1:n(), each = 18))
+rbctrack15 <- read.table(("~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin3/50NCA/sim3_season/rbctrack.out"), header = FALSE, skip = 1)
+rbctrack_doubled15 <- rbctrack15 %>%
+  slice(rep(1:n(), each = 18))
+rbctrack16 <- read.table(("~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin3/50NCA/sim4_all/rbctrack.out"), header = FALSE, skip = 1)
+rbctrack_doubled16 <- rbctrack16 %>%
+  slice(rep(1:n(), each = 18))
+
+rbctrack_all <- rbind(rbctrack_doubled, rbctrack_doubled2, rbctrack_doubled3, rbctrack_doubled4,
+                      rbctrack_doubled5, rbctrack_doubled6, rbctrack_doubled7, rbctrack_doubled8,
+                      rbctrack_doubled9, rbctrack_doubled10, rbctrack_doubled11, rbctrack_doubled12,
+                      rbctrack_doubled13, rbctrack_doubled14, rbctrack_doubled15, rbctrack_doubled16)
+#nrow(rbctrack_all) 
+
+#rbctrack_doubled <- rbctrack_doubled %>% mutate(SSB = rbctrack_doubled$V28)
+rbctrack_all <- rbctrack_all %>% mutate(SSB = rbctrack_all$V28)
+
+all_results_test <- all_results_test %>% mutate(SSB = rbctrack_all$V28)
+#View(all_results_test)
+
+all_results_single <- all_results_test %>% filter(state == "NJ", 
+                                                  bag == 4,
+                                                  minlen == 17.5,
+                                                  seaslen == 150)
+plot(all_results_single$biomass~all_results_single$n_keep)
+plot(all_results_single$biomass~all_results_single$SSB)
+
+Bag <- all_results_test$bag
+MinLen <- all_results_test$minlen
+SeasonLen <- all_results_test$seaslen
+tot_keep <- all_results_test$n_keep
+SSB <- all_results_test$biomass
+state <- all_results_test$state
+year <- all_results_test$year
+
+#find unique number of regulations, fit to that 
+inputdata_mseruns <- data.frame(Bag, MinLen, SeasonLen, tot_keep, SSB, state, year)
+
+#dont need to run this in rbctrack merged dataframe
+#inputdata_mseruns <- na.omit(inputdata_mseruns) #change this depending on which scenario is run
+#inputdata_mseruns <- inputdata_mseruns %>% filter(tot_keep != 0)
+
+#find number of unique regulations and keep first 45 of each seasonlen
+inputdata_uniqueruns <- inputdata_mseruns %>% 
+  distinct(Bag, MinLen, SeasonLen, state, SSB, .keep_all = TRUE) #%>%
+ # group_by(Bag) %>%
+ # slice((1:45)) %>% 
+ # ungroup()
+
+#hist(inputdata_uniqueruns$SeasonLen)
+
+#data frame of unique regulations per state 
+
+#fit to rbctrack.out files as well 
+
+#View(inputdata_sampled)
+
+inputdata_uniqueruns$state <- as.factor(inputdata_uniqueruns$state)
+inputdata_uniqueruns$year <- as.factor(inputdata_uniqueruns$year)
+
+
+#fit gam if necessary 
+g1.1 <- gam(tot_keep ~ s(SSB, state, bs = "fs", k = 3) + 
+              s(SeasonLen, state, bs = "fs", k = 3) + #9,5,7 partial effect of smooths look strange with k any higher 
+              s(Bag, state, bs = "fs", k = 3) + s(MinLen, state, bs = "fs", k = 3), 
+            data = inputdata_uniqueruns, #either isolated RDM runs or total 
+            family = Gamma(link = log), method = "REML") #random effect on spline for minlen that introduces  a sort of random effect by state 
+summary(g1.1)
+draw(g1.1)
+appraise(g1.1)
+g1.1pred <- predict(g1.1, type = "response") #if not 
+plot(inputdata_uniqueruns$tot_keep ~ g1.1pred, xlim = c(0,5e6), ylim = c(0,5e6)) + abline(b = 1, a = 0, col = "red")
+
+#tensor smooth
+g1.3 <- gam(tot_keep ~ t2(SSB, state, bs = c("tp", "re")) + 
+              t2(SeasonLen, state, bs = c("tp", "re")) + #9,5,7 partial effect of smooths look strange with k any higher 
+              t2(Bag, state, bs = c("tp", "re")) + t2(MinLen, state, bs = c("tp", "re")), 
+            data = inputdata_uniqueruns, #either isolated RDM runs or total 
+            family = Gamma(link = log), method = "REML")
+#g1.3 <- readRDS("~/Desktop/FlounderMSE/RDMgam/gam_RDMland_tensorsmooth_allmse.rds") #disordered length
+#saveRDS(g1.3, "~/Desktop/FlounderMSE/RDMgam/gam_RDMland_tensorsmooth_allmse.rds") #disordered length
+summary(g1.3)
+draw(g1.3) #not sure how to plot partial effects
+appraise(g1.3)
+g1.3pred <- predict(g1.3, type = "response") #if not 
+plot(inputdata_uniqueruns$tot_keep ~ g1.3pred, xlim = c(0,5e6), ylim = c(0,5e6)) + abline(b = 1, a = 0, col = "red")
+
+sm <- smooth_estimates(g1.3)
+sm_fs <- sm[grep("SSB", sm$.smooth), ]
+ggplot(sm_fs, aes(x = SSB, y = .estimate, colour = state)) +
+  geom_line() +
+  # geom_ribbon(aes(ymin = est - 2 * se, ymax = est + 2 * se, fill = by), alpha = 0.2) +
+  theme_minimal() +
+  labs(title = "SSB", color = "state", fill = "state")
+
+sm <- smooth_estimates(g1.3)
+sm_fs <- sm[grep("SeasonLen", sm$.smooth), ]
+ggplot(sm_fs, aes(x = SeasonLen, y = .estimate, colour = state)) +
+  geom_line() +
+  # geom_ribbon(aes(ymin = est - 2 * se, ymax = est + 2 * se, fill = by), alpha = 0.2) +
+  theme_minimal() +
+  labs(title = "SeasonLen", color = "state", fill = "state")
+
+sm <- smooth_estimates(g1.3)
+sm_fs <- sm[grep("MinLen", sm$.smooth), ]
+ggplot(sm_fs, aes(x = MinLen, y = .estimate, colour = state)) +
+  geom_line() +
+  # geom_ribbon(aes(ymin = est - 2 * se, ymax = est + 2 * se, fill = by), alpha = 0.2) +
+  theme_minimal() +
+  labs(title = "MinLen", color = "state", fill = "state")
+
+sm <- smooth_estimates(g1.3)
+sm_fs <- sm[grep("Bag", sm$.smooth), ]
+ggplot(sm_fs, aes(x = Bag, y = .estimate, colour = state)) +
+  geom_line() +
+  # geom_ribbon(aes(ymin = est - 2 * se, ymax = est + 2 * se, fill = by), alpha = 0.2) +
+  theme_minimal() +
+  labs(title = "Bag", color = "state", fill = "state")
+
+AIC(g1.1, g1.3) #g1.3 is better
+
+
+########## FORM PREDICTIONS OF OUTPUT FILE ###############
+
+all_results_test <- all_results %>% filter(
+  #scenario %in% c("BTable3", "LTable3", "STable3", "ATable3"), 
+  year != 2019)
+
+
+#predict data frame: same time step
+
+predict_frame <- data.frame(Bag = all_results_test$bag,
+                            MinLen = all_results_test$minlen, 
+                            SeasonLen = all_results_test$seaslen,
+                            state = all_results_test$state,
+                            n_keep = all_results_test$n_keep,
+                       #     SSB_1 = all_results_test$SSB, #rbctrack
+                            SSB = all_results_test$biomass #spawbio
+                            )# %>% mutate(Scen = "2BBMSY")
+
+gamfit2 <- predict.gam(g1.1, newdata = predict_frame, type = "response" , se.fit = TRUE)
+#gamfit2 <- predict.gam(g1.3, newdata = predict_frame, type = "response" , se.fit = TRUE)
+
+#for plotting (includes n_keep)
+predict_frame_gg <- data.frame(Bag = all_results_test$bag,
+                            MinLen = all_results_test$minlen, 
+                            SeasonLen = all_results_test$seaslen,
+                            state = all_results_test$state,
+                            n_keep = all_results_test$n_keep,
+                         #  SSB_1 = all_results_test$SSB, #rbctrack 
+                            SSB = all_results_test$biomass, #spawbio
+                           exp_keep = gamfit2$fit) #if doing other two
+
+predict_frame_gg %>% 
+  #filter(bag == 4, seaslen == 150) %>% 
+  drop_na() %>% 
+  ggplot() + 
+  aes(y = n_keep, x = exp_keep, col = SSB) + #scaler?
+  geom_point(alpha=0.1) + 
+  #geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  scale_color_viridis_c() +
+  labs(
+    y = "harvest number from RDM",
+    x = "expected harvest from GAM"
+  ) +
+#  facet_wrap(~state) +
+  xlim(0,4e+07) + #2e7
+  ylim(0,4e+07) +
+  NULL
+
+#facet by regulations
+predict_frame_gg %>% filter(state == "MA") %>% 
+  #filter(bag == 4, seaslen == 150) %>% 
+  drop_na() %>% 
+  ggplot() + 
+  aes(y = n_keep, x = exp_keep, col = SSB) + #scaler?
+  geom_point(alpha=0.1) + 
+  #geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  scale_color_viridis_c() +
+  labs(
+    y = "harvest number from RDM",
+    x = "expected harvest from GAM"
+  ) +
+  facet_wrap(~MinLen) +
+  xlim(0,1e+06) + #2e7
+  ylim(0,1e+06) +
+  NULL
+
+#double spawbio
+predict_frame <- data.frame(Bag = all_results_test$bag,
+                            MinLen = all_results_test$minlen, 
+                            SeasonLen = all_results_test$seaslen,
+                            state = all_results_test$state,
+                            n_keep = all_results_test$n_keep,
+                            #     SSB_1 = all_results_test$SSB, #rbctrack
+                            SSB_1 = all_results_test$biomass #spawbio
+                            ) %>%
+  mutate(SSB = rep(SSB_1[seq(1, n(), by = 18)], each = 18)[seq_len(n())])
+
+
+
+#predict using GAM
+gamfit2 <- predict.gam(g1.1, newdata = predict_frame, type = "response" , se.fit = TRUE)
+
+#for double spawbio
+predict_frame_gg2 <- data.frame(Bag = all_results_test$bag,
+                                MinLen = all_results_test$minlen, 
+                                SeasonLen = all_results_test$seaslen,
+                                state = all_results_test$state,
+                                SSB = predict_frame$SSB, #make sure this is different
+                                n_keep = all_results_test$n_keep,
+                                #SSB_1 = all_results_test$SSB,
+                                exp_keep = gamfit2$fit)
+
+predict_frame_gg2 %>% 
+  #filter(bag == 4, seaslen == 150) %>% 
+  drop_na() %>% 
+  ggplot() + 
+  aes(y = n_keep, x = exp_keep, col = SSB) + #scaler?
+  geom_point(alpha=0.1) + 
+  #geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  scale_color_viridis_c() +
+  labs(
+    y = "harvest number from RDM",
+    x = "expected harvest from GAM"
+  ) +
+  #facet_wrap(~bag) +
+  xlim(0,5e+07) + #2e7
+  ylim(0,5e+07) +
+  NULL
+
+#preceding time step of spawbio 
+predict_frame3 <- data.frame(Bag = all_results$bag,
+                            MinLen = all_results$minlen, 
+                            SeasonLen = all_results$seaslen,
+                            tot_keep = all_results$n_keep,
+                            state = all_results$state,
+                            SSB = all_results$biomass,
+                            year = all_results$year,
+                            scenario = all_results$scenario,
+                            isim = all_results$isim) 
+
+split_predict_frame3 <- split(predict_frame3, predict_frame3$isim)
+  
+  all_storeframes = list()
+  all_storeframes = vector("list", length = length(split_predict_frame3))
+  
+for (x in 1:length(split_predict_frame3)){
+  predict_frame4 <- split_predict_frame3[[x]]
+  
+  storeframe = list()
+  storeframe = vector("list", length = length(unique(predict_frame4$scenario)))
+for (i in unique(predict_frame4$scenario)){
+predict_frame5 <- predict_frame4 %>% filter(scenario == i) %>% 
+  mutate(spawbio3 = c(NA, rep(SSB[seq(1, n() - 18, by = 18)], each = 18))[seq_len(n())])
+storeframe[[i]] <- predict_frame5
+}
+  all_storeframes[[x]] <- rbindlist(storeframe)
+}
+
+bound_storeframes <- rbindlist(all_storeframes) %>% filter(year != 2019)
+
+#View(all_storeframes[[40]])
+#View(storeframe[[i]])
+#View(predict_frame4)
+
+#only run this if using previous time step approach
+predict_frame <- data.frame(Bag = bound_storeframes$Bag,
+                            MinLen = bound_storeframes$MinLen, 
+                            SeasonLen = bound_storeframes$SeasonLen,
+                            state = bound_storeframes$state,
+                            SSB = bound_storeframes$spawbio3,
+                            SSB_1 = bound_storeframes$SSB) #spawbio
+
+#predict using GAM
+gamfit2 <- predict.gam(g1.1, newdata = predict_frame, type = "response" , se.fit = TRUE)
+
+#for prev time step approach
+predict_frame_gg3 <- data.frame(Bag = bound_storeframes$Bag,
+                                MinLen = bound_storeframes$MinLen, 
+                                SeasonLen = bound_storeframes$SeasonLen,
+                                state = bound_storeframes$state,
+                                n_keep = bound_storeframes$tot_keep,
+                                SSB = bound_storeframes$spawbio3,
+                                SSB_1 = bound_storeframes$SSB,
+                                exp_keep = gamfit2$fit)
+
+predict_frame_gg3 %>% 
+  #filter(bag == 4, seaslen == 150) %>% 
+  drop_na() %>% 
+  ggplot() + 
+  aes(y = n_keep, x = exp_keep, col = SSB) + #scaler?
+  geom_point(alpha=0.1) + 
+  #geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  scale_color_viridis_c() +
+  labs(
+    y = "harvest number from RDM",
+    x = "expected harvest from GAM"
+  ) +
+  #facet_wrap(~bag) +
+  xlim(0,5e+07) + #2e7
+  ylim(0,5e+07) +
+  NULL
+
+############### SPLIT UP ALL MSE RDM RUNS BY STATE ###############
+all_results
+
+#base
+BagL <- all_results$bag
+MinS <- all_results$minlen
+SeasL <- all_results$seaslen
+keep_num <- all_results$n_keep
+exp_keep <- all_results$exp_keep
+SSBcov <- all_results$biomass
+state <- all_results$state
+
+
+GAMscaler <- readRDS("~/Desktop/FlounderMSE/RDMGam/GAMscalar.rds")
+
+#can't use this for hierarchical GAM
+CTscaler <- GAMscaler$CTscalar
+DEscaler <- GAMscaler$DEscalar
+MAscaler <- GAMscaler$MAscalar
+MDscaler <- GAMscaler$MDscalar
+NCscaler <- GAMscaler$NCscalar
+NJscaler <- GAMscaler$NJscalar
+NYscaler <- GAMscaler$NYscalar
+RIscaler <- GAMscaler$RIscalar
+VAscaler <- GAMscaler$VAscalar
+
+inputdata_mseruns <- data.frame(BagL, MinS, SeasL, keep_num, exp_keep, SSBcov, state)
+inputdata_mseruns <- na.omit(inputdata_mseruns) #change this depending on which scenario is run
+inputdata_mseruns <- inputdata_mseruns %>% mutate(exp_keep = ifelse(
+  state == "CT", exp_keep*CTscaler, ifelse(
+    state == "DE", exp_keep*DEscaler, ifelse(
+      state == "MA", exp_keep*MAscaler, ifelse(
+        state == "MD", exp_keep*MDscaler, ifelse(
+          state == "NC", exp_keep*NCscaler, ifelse(
+            state == "NJ", exp_keep*NJscaler, ifelse(
+              state == "NY", exp_keep*NYscaler, ifelse(
+                state == "RI", exp_keep*RIscaler, ifelse(
+                  state == "VA", exp_keep*VAscaler, 0))))))))))
+#View(inputdata_mseruns)
+
+#state
+ggplot(inputdata_mseruns, mapping=aes(y = keep_num, x = exp_keep, col = SeasL)) + 
+  geom_point() + 
+  xlim(0,2.5e7) +
+  ylim(0,2.5e7) +
+  geom_abline(slope = 1, intercept = 0) + 
+  facet_wrap(~SeasL, scales = "free_y")
+
+#individual states 
+
+inputdata_mseruns %>% filter(state == "CT") %>%
+  ggplot() +
+  geom_point(mapping=aes(y = keep_num, x = exp_keep, col = state)) + 
+ # xlim(0,2.5e6) + #base
+ # ylim(0,2.5e6) +
+  xlim(0,5e6) + #lowbbmsy
+  ylim(0,5e6) +
+  geom_abline(slope = 1, intercept = 0) + 
+  facet_wrap(~state, scales = "free_y")
+
+inputdata_mseruns %>% filter(state == "DE") %>%
+  ggplot() +
+  geom_point(mapping=aes(y = keep_num, x = exp_keep, col = state)) + 
+ # xlim(0,7.5e5) + #base
+ # ylim(0,7.5e5) +
+   xlim(0,2e6) + #lowbbmsy
+   ylim(0,2e6) +
+  geom_abline(slope = 1, intercept = 0) + 
+  facet_wrap(~state, scales = "free_y")
+
+inputdata_mseruns %>% filter(state == "MA") %>%
+  ggplot() +
+  geom_point(mapping=aes(y = keep_num, x = exp_keep, col = state)) + 
+  #xlim(0,7.5e5) + #base
+ # ylim(0,7.5e5) +
+  xlim(0,1e6) + #lowbbmsy
+  ylim(0,1e6) +
+  geom_abline(slope = 1, intercept = 0) + 
+  facet_wrap(~state, scales = "free_y")
+
+inputdata_mseruns %>% filter(state == "MD") %>%
+  ggplot() +
+  geom_point(mapping=aes(y = keep_num, x = exp_keep, col = state)) + 
+ # xlim(0,6e5) + #base
+ # ylim(0,6e5) +
+   xlim(0,1.5e6) + #low bbmsy
+   ylim(0,1.5e6) +
+  geom_abline(slope = 1, intercept = 0) + 
+  facet_wrap(~state, scales = "free_y")
+
+inputdata_mseruns %>% filter(state == "NC") %>%
+  ggplot() +
+  geom_point(mapping=aes(y = keep_num, x = exp_keep, col = state)) + 
+#  xlim(0,1e5) + #base
+#  ylim(0,1e5) +
+  xlim(0,2.5e5) + #lowbmsy
+  ylim(0,2.5e5) +
+  geom_abline(slope = 1, intercept = 0) + 
+  facet_wrap(~state, scales = "free_y")
+
+inputdata_mseruns %>% filter(state == "NJ") %>%
+  ggplot() +
+  geom_point(mapping=aes(y = keep_num, x = exp_keep, col = state)) + 
+ # xlim(0,1e7) + #base
+ # ylim(0,1e7) +
+  xlim(0,3e7) + #low bbmsy
+  ylim(0,3e7) +
+  geom_abline(slope = 1, intercept = 0) + 
+  facet_wrap(~state, scales = "free_y")
+
+inputdata_mseruns %>% filter(state == "NY") %>%
+  ggplot() +
+  geom_point(mapping=aes(y = keep_num, x = exp_keep, col = state)) + 
+ # xlim(0,1e7) + #base
+ # ylim(0,1e7) +
+   xlim(0,2.5e7) + #low bbmsy
+   ylim(0,2.5e7) +
+  geom_abline(slope = 1, intercept = 0) + 
+  facet_wrap(~state, scales = "free_y")
+
+inputdata_mseruns %>% filter(state == "RI") %>%
+  ggplot() +
+  geom_point(mapping=aes(y = keep_num, x = exp_keep, col = state)) + 
+#  xlim(0,2.5e6) + #base
+#  ylim(0,2.5e6) +
+  xlim(0,5e6) + #low bbmsy
+  ylim(0,5e6) +
+  geom_abline(slope = 1, intercept = 0) + 
+  facet_wrap(~state, scales = "free_y")
+
+inputdata_mseruns %>% filter(state == "VA") %>%
+  ggplot() +
+  geom_point(mapping=aes(y = keep_num, x = exp_keep, col = state)) + 
+ # xlim(0,5e5) + #base
+ # ylim(0,5e5) +
+  xlim(0,2.5e6) + #low bbmsy
+  ylim(0,2.5e6) +
+  geom_abline(slope = 1, intercept = 0) + 
+  facet_wrap(~state, scales = "free_y")
+
+#look into other factors potentially driving this consistent issue
+all_results %>% mutate(exp_keep = ifelse(
+  state == "CT", exp_keep*CTscaler, ifelse(
+    state == "DE", exp_keep*DEscaler, ifelse(
+      state == "MA", exp_keep*MAscaler, ifelse(
+        state == "MD", exp_keep*MDscaler, ifelse(
+          state == "NC", exp_keep*NCscaler, ifelse(
+            state == "NJ", exp_keep*NJscaler, ifelse(
+              state == "NY", exp_keep*NYscaler, ifelse(
+                state == "RI", exp_keep*RIscaler, ifelse(
+                  state == "VA", exp_keep*VAscaler, 0)))))))))) %>%
+#filter(state == "VA") %>% 
+ # filter(isim %in% c(41:50)) %>%
+  ggplot() +
+  geom_point(mapping=aes(y = n_keep, x = exp_keep, col = scenario)) + 
+ # xlim(0,5e5) +
+ # ylim(0,5e5) +
+  geom_abline(slope = 1, intercept = 0) + 
+  facet_wrap(~scenario, scales = "free_y")
+
+########### MEAN SQUARED ERROR FOR TOTAL IN LOGSPACE AND STATES SEPARATELY FOR ALL MSE RDM RUNS ############
+
+#logspace for all
+all_results_mse_all <- all_results %>% filter(complete.cases(.)) %>%
+  mutate(exp_keep = ifelse(
+    state == "CT", exp_keep*CTscaler, ifelse(
+      state == "DE", exp_keep*DEscaler, ifelse(
+        state == "MA", exp_keep*MAscaler, ifelse(
+          state == "MD", exp_keep*MDscaler, ifelse(
+            state == "NC", exp_keep*NCscaler, ifelse(
+              state == "NJ", exp_keep*NJscaler, ifelse(
+                state == "NY", exp_keep*NYscaler, ifelse(
+                  state == "RI", exp_keep*RIscaler, ifelse(
+                    state == "VA", exp_keep*VAscaler, 0)))))))))) %>%
+  mutate(mse = (log(n_keep) - log(exp_keep))^2)
+
+all_results_all_mse <- quantile(all_results_mse_all$mse, probs = 0.75)
+
+all_results_all_upper_quartile_mse <- all_results_mse_all %>% filter(mse > all_results_all_mse)
+
+#mse
+ggplot(all_results_all_upper_quartile_mse, mapping=aes(y = log(n_keep), x = log(exp_keep), col = state)) + 
+  geom_point() + 
+  xlim(5,15) +
+  ylim(5,15) +
+  geom_abline(slope = 1, intercept = 0) + 
+  facet_wrap(~state, scales = "free_y")
+
+#are any states more represented?
+all_results_all_upper_quartile_mseRI <- all_results_all_upper_quartile_mse %>% filter(state == "RI")
+nrow(all_results_all_upper_quartile_mseRI) #2532 for base; 5724 for low
+all_results_all_upper_quartile_mseCT <- all_results_all_upper_quartile_mse %>% filter(state == "CT")
+nrow(all_results_all_upper_quartile_mseCT) #2481 for base; 3944 for low
+all_results_all_upper_quartile_mseNY <- all_results_all_upper_quartile_mse %>% filter(state == "NY")
+nrow(all_results_all_upper_quartile_mseNY) #3578 for base; 4061 for low 
+all_results_all_upper_quartile_mseNJ <- all_results_all_upper_quartile_mse %>% filter(state == "NJ")
+nrow(all_results_all_upper_quartile_mseNJ) #6164 for base; 5337 for low
+all_results_all_upper_quartile_mseMA <- all_results_all_upper_quartile_mse %>% filter(state == "MA")
+nrow(all_results_all_upper_quartile_mseMA) #5419 for base; 5640 for low
+all_results_all_upper_quartile_mseDE <- all_results_all_upper_quartile_mse %>% filter(state == "DE")
+nrow(all_results_all_upper_quartile_mseDE) #9089 for base; 7560 for low
+all_results_all_upper_quartile_mseNC <- all_results_all_upper_quartile_mse %>% filter(state == "NC")
+nrow(all_results_all_upper_quartile_mseNC) #3727 for base; 3582 for low
+all_results_all_upper_quartile_mseMD <- all_results_all_upper_quartile_mse %>% filter(state == "MD")
+nrow(all_results_all_upper_quartile_mseMD) #7484 for base; 6046 for low
+all_results_all_upper_quartile_mseVA <- all_results_all_upper_quartile_mse %>% filter(state == "VA")
+nrow(all_results_all_upper_quartile_mseVA) #6238 for base; 4881 for low
+
+#states in response space
+all_results_mse <- inputdata_mseruns %>% mutate(mse = (keep_num-exp_keep)^2)
+
+state_quartiles <- all_results_mse %>%
+  group_by(state) %>%
+  summarise(
+    state_quart = quantile(mse, probs = 0.75)
+  )
+
+CTstatequart <- state_quartiles[1,]$state_quart
+DEstatequart <- state_quartiles[2,]$state_quart
+MAstatequart <- state_quartiles[3,]$state_quart
+MDstatequart <- state_quartiles[4,]$state_quart
+NCstatequart <- state_quartiles[5,]$state_quart
+NJstatequart <- state_quartiles[6,]$state_quart
+NYstatequart <- state_quartiles[7,]$state_quart
+RIstatequart <- state_quartiles[8,]$state_quart
+VAstatequart <- state_quartiles[9,]$state_quart
+
+#CT
+RDMoutputscramble_facet_mse_CT <- all_results_mse %>% filter(state == "CT") %>%
+  filter(mse > CTstatequart)
+
+#Bag
+ggplot(RDMoutputscramble_facet_mse_CT, mapping=aes(x=exp_keep, y = keep_num, col = BagL)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+ # xlim(0,2.5e6) + base 
+ # ylim(0,2.5e6) +
+  xlim(0,5e6) + #lowbbmsy
+  ylim(0,5e6) +
+  facet_wrap(~BagL, scales = "free_y")
+
+#MinLen
+ggplot(RDMoutputscramble_facet_mse_CT, mapping=aes(x=exp_keep, y = keep_num, col = MinS)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  # xlim(0,2.5e6) + base 
+  # ylim(0,2.5e6) +
+  xlim(0,5e6) + #lowbbmsy
+  ylim(0,5e6) +
+  facet_wrap(~MinS, scales = "free_y")
+
+#SeasonLen
+ggplot(RDMoutputscramble_facet_mse_CT, mapping=aes(x=exp_keep, y = keep_num, col = SeasL)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  # xlim(0,2.5e6) + base 
+  # ylim(0,2.5e6) +
+  xlim(0,5e6) + #lowbbmsy
+  ylim(0,5e6) +
+  facet_wrap(~SeasL, scales = "free_y")
+
+hist(RDMoutputscramble_facet_mse_CT$BagL)
+hist(RDMoutputscramble_facet_mse_CT$MinS)
+hist(RDMoutputscramble_facet_mse_CT$SeasL)
+hist(RDMoutputscramble_facet_mse_CT$SSBcov)
+
+#DE
+RDMoutputscramble_facet_mse_DE <- all_results_mse %>% filter(state == "DE") %>%
+  filter(mse > DEstatequart)
+
+#Bag
+ggplot(RDMoutputscramble_facet_mse_DE, mapping=aes(x=exp_keep, y = keep_num, col = BagL)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+ # xlim(0,5e5) +
+ # ylim(0,5e5) +
+  xlim(0,2e6) + #lowbbmsy
+  ylim(0,2e6) +
+  facet_wrap(~BagL, scales = "free_y")
+
+#MinLen
+ggplot(RDMoutputscramble_facet_mse_DE, mapping=aes(x=exp_keep, y = keep_num, col = MinS)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  # xlim(0,5e5) +
+  # ylim(0,5e5) +
+  xlim(0,2e6) + #lowbbmsy
+  ylim(0,2e6) +
+  facet_wrap(~MinS, scales = "free_y")
+
+#SeasonLen
+ggplot(RDMoutputscramble_facet_mse_DE, mapping=aes(x=exp_keep, y = keep_num, col = SeasL)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  # xlim(0,5e5) +
+  # ylim(0,5e5) +
+  xlim(0,2e6) + #lowbbmsy
+  ylim(0,2e6) +
+  facet_wrap(~SeasL, scales = "free_y")
+
+hist(RDMoutputscramble_facet_mse_DE$BagL)
+hist(RDMoutputscramble_facet_mse_DE$MinS)
+hist(RDMoutputscramble_facet_mse_DE$SeasL)
+hist(RDMoutputscramble_facet_mse_DE$SSBcov)
+
+#MA
+RDMoutputscramble_facet_mse_MA <- all_results_mse %>% filter(state == "MA") %>%
+  filter(mse > MAstatequart)
+
+#Bag
+ggplot(RDMoutputscramble_facet_mse_MA, mapping=aes(x=exp_keep, y = keep_num, col = BagL)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+ # xlim(0,5e5) +
+ # ylim(0,5e5) +
+  xlim(0,1e6) + #lowbbmsy
+  ylim(0,1e6) +
+  facet_wrap(~BagL, scales = "free_y")
+
+#MinLen
+ggplot(RDMoutputscramble_facet_mse_MA, mapping=aes(x=exp_keep, y = keep_num, col = MinS)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  # xlim(0,5e5) +
+  # ylim(0,5e5) +
+  xlim(0,1e6) + #lowbbmsy
+  ylim(0,1e6) +
+  facet_wrap(~MinS, scales = "free_y")
+
+#SeasonLen
+ggplot(RDMoutputscramble_facet_mse_MA, mapping=aes(x=exp_keep, y = keep_num, col = SeasL)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  # xlim(0,5e5) +
+  # ylim(0,5e5) +
+  xlim(0,1e6) + #lowbbmsy
+  ylim(0,1e6) +
+  facet_wrap(~SeasL, scales = "free_y")
+
+hist(RDMoutputscramble_facet_mse_MA$BagL)
+hist(RDMoutputscramble_facet_mse_MA$MinS)
+hist(RDMoutputscramble_facet_mse_MA$SeasL)
+hist(RDMoutputscramble_facet_mse_MA$SSBcov)
+
+#MD
+RDMoutputscramble_facet_mse_MD <- all_results_mse %>% filter(state == "MD") %>%
+  filter(mse > MDstatequart)
+
+#Bag
+ggplot(RDMoutputscramble_facet_mse_MD, mapping=aes(x=exp_keep, y = keep_num, col = BagL)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+ # xlim(0,5e5) +
+ # ylim(0,5e5) +
+  xlim(0,1.5e6) + #low bbmsy
+  ylim(0,1.5e6) +
+  facet_wrap(~BagL, scales = "free_y")
+
+#MinLen
+ggplot(RDMoutputscramble_facet_mse_MD, mapping=aes(x=exp_keep, y = keep_num, col = MinS)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  # xlim(0,5e5) +
+  # ylim(0,5e5) +
+  xlim(0,1.5e6) + #low bbmsy
+  ylim(0,1.5e6) +
+  facet_wrap(~MinS, scales = "free_y")
+
+#SeasonLen
+ggplot(RDMoutputscramble_facet_mse_MD, mapping=aes(x=exp_keep, y = keep_num, col = SeasL)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  # xlim(0,5e5) +
+  # ylim(0,5e5) +
+  xlim(0,1.5e6) + #low bbmsy
+  ylim(0,1.5e6) +
+  facet_wrap(~SeasL, scales = "free_y")
+
+hist(RDMoutputscramble_facet_mse_MD$BagL)
+hist(RDMoutputscramble_facet_mse_MD$MinS)
+hist(RDMoutputscramble_facet_mse_MD$SeasL)
+hist(RDMoutputscramble_facet_mse_MD$SSBcov)
+
+#NC
+
+RDMoutputscramble_facet_mse_NC <- all_results_mse %>% filter(state == "NC") %>%
+  filter(mse > NCstatequart)
+
+#Bag
+ggplot(RDMoutputscramble_facet_mse_NC, mapping=aes(x=exp_keep, y = keep_num, col = BagL)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+ # xlim(0,1e5) +
+ # ylim(0,1e5) +
+  xlim(0,2.5e5) + #lowbmsy
+  ylim(0,2.5e5) +
+  facet_wrap(~BagL, scales = "free_y")
+
+#MinLen
+ggplot(RDMoutputscramble_facet_mse_NC, mapping=aes(x=exp_keep, y = keep_num, col = MinS)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  # xlim(0,1e5) +
+  # ylim(0,1e5) +
+  xlim(0,2.5e5) + #lowbmsy
+  ylim(0,2.5e5) +
+  facet_wrap(~MinS, scales = "free_y")
+
+#SeasonLen
+ggplot(RDMoutputscramble_facet_mse_NC, mapping=aes(x=exp_keep, y = keep_num, col = SeasL)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  # xlim(0,1e5) +
+  # ylim(0,1e5) +
+  xlim(0,2.5e5) + #lowbmsy
+  ylim(0,2.5e5) +
+  facet_wrap(~SeasL, scales = "free_y")
+
+hist(RDMoutputscramble_facet_mse_NC$BagL)
+hist(RDMoutputscramble_facet_mse_NC$MinS)
+hist(RDMoutputscramble_facet_mse_NC$SeasL)
+hist(RDMoutputscramble_facet_mse_NC$SSBcov)
+
+#NJ
+
+RDMoutputscramble_facet_mse_NJ <- all_results_mse %>% filter(state == "NJ") %>%
+  filter(mse > NJstatequart)
+
+#Bag
+ggplot(RDMoutputscramble_facet_mse_NJ, mapping=aes(x=exp_keep, y = keep_num, col = BagL)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+ # xlim(0,1e7) +
+ # ylim(0,1e7) +
+  xlim(0,3e7) + #low bbmsy
+  ylim(0,3e7) +
+  facet_wrap(~BagL, scales = "free_y")
+
+#MinLen
+ggplot(RDMoutputscramble_facet_mse_NJ, mapping=aes(x=exp_keep, y = keep_num, col = MinS)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  # xlim(0,1e7) +
+  # ylim(0,1e7) +
+  xlim(0,3e7) + #low bbmsy
+  ylim(0,3e7) +
+  facet_wrap(~MinS, scales = "free_y")
+
+#SeasonLen
+ggplot(RDMoutputscramble_facet_mse_NJ, mapping=aes(x=exp_keep, y = keep_num, col = SeasL)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  # xlim(0,1e7) +
+  # ylim(0,1e7) +
+  xlim(0,3e7) + #low bbmsy
+  ylim(0,3e7) +
+  facet_wrap(~SeasL, scales = "free_y")
+
+hist(RDMoutputscramble_facet_mse_NJ$BagL)
+hist(RDMoutputscramble_facet_mse_NJ$MinS)
+hist(RDMoutputscramble_facet_mse_NJ$SeasL)
+hist(RDMoutputscramble_facet_mse_NJ$SSBcov)
+
+#NY
+
+RDMoutputscramble_facet_mse_NY <- all_results_mse %>% filter(state == "NY") %>%
+  filter(mse > NYstatequart)
+
+#Bag
+ggplot(RDMoutputscramble_facet_mse_NY, mapping=aes(x=exp_keep, y = keep_num, col = BagL)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+ # xlim(0,1e7) +
+ # ylim(0,1e7) +
+  xlim(0,2.5e7) + #low bbmsy
+  ylim(0,2.5e7) +
+  facet_wrap(~BagL, scales = "free_y")
+
+#MinLen
+ggplot(RDMoutputscramble_facet_mse_NY, mapping=aes(x=exp_keep, y = keep_num, col = MinS)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  # xlim(0,1e7) +
+  # ylim(0,1e7) +
+  xlim(0,2.5e7) + #low bbmsy
+  ylim(0,2.5e7) +
+  facet_wrap(~MinS, scales = "free_y")
+
+#SeasonLen
+ggplot(RDMoutputscramble_facet_mse_NY, mapping=aes(x=exp_keep, y = keep_num, col = SeasL)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  # xlim(0,1e7) +
+  # ylim(0,1e7) +
+  xlim(0,2.5e7) + #low bbmsy
+  ylim(0,2.5e7) +
+  facet_wrap(~SeasL, scales = "free_y")
+
+hist(RDMoutputscramble_facet_mse_NY$BagL)
+hist(RDMoutputscramble_facet_mse_NY$MinS)
+hist(RDMoutputscramble_facet_mse_NY$SeasL)
+hist(RDMoutputscramble_facet_mse_NY$SSBcov)
+
+#RI
+
+RDMoutputscramble_facet_mse_RI <- all_results_mse %>% filter(state == "RI") %>%
+  filter(mse > RIstatequart)
+
+#Bag
+ggplot(RDMoutputscramble_facet_mse_RI, mapping=aes(x=exp_keep, y = keep_num, col = BagL)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+ # xlim(0,2.5e6) +
+ # ylim(0,2.5e6) +
+  xlim(0,5e6) + #low bbmsy
+  ylim(0,5e6) +
+  facet_wrap(~BagL, scales = "free_y")
+
+#MinLen
+ggplot(RDMoutputscramble_facet_mse_RI, mapping=aes(x=exp_keep, y = keep_num, col = MinS)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  # xlim(0,2.5e6) +
+  # ylim(0,2.5e6) +
+  xlim(0,5e6) + #low bbmsy
+  ylim(0,5e6) +
+  facet_wrap(~MinS, scales = "free_y")
+
+#SeasonLen
+ggplot(RDMoutputscramble_facet_mse_RI, mapping=aes(x=exp_keep, y = keep_num, col = SeasL)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  # xlim(0,2.5e6) +
+  # ylim(0,2.5e6) +
+  xlim(0,5e6) + #low bbmsy
+  ylim(0,5e6) +
+  facet_wrap(~SeasL, scales = "free_y")
+
+hist(RDMoutputscramble_facet_mse_RI$BagL)
+hist(RDMoutputscramble_facet_mse_RI$MinS)
+hist(RDMoutputscramble_facet_mse_RI$SeasL)
+hist(RDMoutputscramble_facet_mse_RI$SSBcov)
+
+#VA
+RDMoutputscramble_facet_mse_VA <- all_results_mse %>% filter(state == "VA") %>%
+  filter(mse > VAstatequart)
+
+#Bag
+ggplot(RDMoutputscramble_facet_mse_VA, mapping=aes(x=exp_keep, y = keep_num, col = BagL)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+ # xlim(0,1e6) +
+ # ylim(0,1e6) +
+  xlim(0,2.5e6) + #low bbmsy
+  ylim(0,2.5e6) +
+  facet_wrap(~BagL, scales = "free_y")
+
+#MinLen
+ggplot(RDMoutputscramble_facet_mse_VA, mapping=aes(x=exp_keep, y = keep_num, col = MinS)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  # xlim(0,1e6) +
+  # ylim(0,1e6) +
+  xlim(0,2.5e6) + #low bbmsy
+  ylim(0,2.5e6) +
+  facet_wrap(~MinS, scales = "free_y")
+
+#SeasonLen
+ggplot(RDMoutputscramble_facet_mse_VA, mapping=aes(x=exp_keep, y = keep_num, col = SeasL)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  # xlim(0,1e6) +
+  # ylim(0,1e6) +
+  xlim(0,2.5e6) + #low bbmsy
+  ylim(0,2.5e6) +
+  facet_wrap(~SeasL, scales = "free_y")
+
+hist(RDMoutputscramble_facet_mse_VA$BagL)
+hist(RDMoutputscramble_facet_mse_VA$MinS)
+hist(RDMoutputscramble_facet_mse_VA$SeasL)
+hist(RDMoutputscramble_facet_mse_VA$SSBcov)
+
+########  comparing GAM predictions in here to do_recmeasures_hcr.R -> they're the same #############
+Bag <- all_results[2:10,]$bag #4
+MinLen <- all_results[2:10,]$minlen #17.5
+SeasonLen <- all_results[2:10,]$seaslen #150
+SSB <- all_results[2:10,]$biomass #26051.37 SSB <- 30155
+state <- all_results[2:10,]$state
+testdata <- data.frame(Bag, MinLen, SeasonLen, SSB, state)
+
+all_results[2,]$exp_keep
+
+View(all_results)
+
+g2pred <- predict.gam(g1, newdata = testdata, type = "response") 
+
+sum(g2pred)
+
+################ DISCARDS ################
 
 # ------------------------------- DISC GAM 1-------------------------------------------------#
 d1 <- gam(tot_rel ~  state + s(SSB, k = 3) + s(SeasonLen, k = 3) + 
@@ -871,340 +2619,211 @@ gam.check(d1)
 #saveRDS(d1, "~/Desktop/FlounderMSE/RDMgam/gam_RDM_disc.rds") #disordered length
 #d1 <- readRDS("~/Desktop/FlounderMSE/RDMgam/gam_RDM_disc.rds") #disordered length
 
-################### DISC GAM TROUBLESHOOTING ######################
+inputdatadisc$state <- as.factor(inputdatadisc$state)
 
-#extracting data for each state 
-inputdataVA <- inputdatadisc %>% filter(state == "VA")
-inputdataNC <- inputdatadisc %>% filter(state == "NC")
-inputdataMD <- inputdatadisc %>% filter(state == "MD")
-inputdataMA <- inputdatadisc %>% filter(state == "MA")
-inputdataCT <- inputdatadisc %>% filter(state == "CT")
-inputdataDE <- inputdatadisc %>% filter(state == "DE")
-inputdataRI <- inputdatadisc %>% filter(state == "RI")
-inputdataNY <- inputdatadisc %>% filter(state == "NY")
-inputdataNJ <- inputdatadisc %>% filter(state == "NJ")
-target <- c("NC", "CT", "DE", "RI", "NY", "NJ")
-
-#looking at partial effects in residual distributions
-
-#discard predictions
-gamfit <- predict(d2)
-resid2 <- residuals(d2, type = c("deviance"))
-
-#visualize
-pred <- gamfit #change this depending on model 
-simdata <- data.frame(inputdata$Bag, pred, resid2) 
-
-#bag
-simdata4 <- simdata %>% filter(inputdata.Bag == 4)
-simdata5 <- simdata %>% filter(inputdata.Bag == 5)
-simdata6 <- simdata %>% filter(inputdata.Bag == 6)
-simdata7 <- simdata %>% filter(inputdata.Bag == 7)
-simdata8 <- simdata %>% filter(inputdata.Bag == 8)
-
-#length
-simdata4 <- simdata %>% filter(inputdata$MinLen == 14)
-simdata5 <- simdata %>% filter(inputdata$MinLen == 15)
-simdata6 <- simdata %>% filter(inputdata$MinLen == 16)
-simdata7 <- simdata %>% filter(inputdata$MinLen == 17)
-simdata8 <- simdata %>% filter(inputdata$MinLen == 18)
-simdata9 <- simdata %>% filter(inputdata$MinLen == 19)
-simdata10 <- simdata %>% filter(inputdata$MinLen == 20)
-
-#seasonlen
-simdata4 <- simdata %>% filter(inputdata$SeasonLen == 60)
-simdata5 <- simdata %>% filter(inputdata$SeasonLen == 90)
-simdata6 <- simdata %>% filter(inputdata$SeasonLen == 120)
-simdata7 <- simdata %>% filter(inputdata$SeasonLen == 150)
-simdata8 <- simdata %>% filter(inputdata$SeasonLen == 210)
-simdata9 <- simdata %>% filter(inputdata$SeasonLen == 240)
-simdata10 <- simdata %>% filter(inputdata$SeasonLen == 270)
-simdata11 <- simdata %>% filter(inputdata$SeasonLen == 300)
-
-#state
-simdataNC <- simdata %>% filter(inputdatadisc$state == "NC")
-simdataVA <- simdata %>% filter(inputdatadisc$state == "VA")
-simdataNJ <- simdata %>% filter(inputdatadisc$state == "NJ")
-simdataNY <- simdata %>% filter(inputdatadisc$state == "NY")
-simdataCT <- simdata %>% filter(inputdatadisc$state == "CT")
-simdataDE <- simdata %>% filter(inputdatadisc$state == "DE")
-simdataMA <- simdata %>% filter(inputdatadisc$state == "MA")
-simdataRI <- simdata %>% filter(inputdatadisc$state == "RI")
-simdataMD <- simdata %>% filter(inputdatadisc$state == "MD")
-
-#plot, just change data names or composition 
-plot(resid2~pred, data = simdataNC, xlim = c(10,21), ylim = c(-2,2), xlab = "Linear Predictor", ylab = "Deviance Residuals")
-points(resid2~pred, data = simdataVA, col= "blue")
-points(resid2~pred, data = simdataNJ, col= "red")
-points(resid2~pred, data = simdataNY, col= "yellow")
-points(resid2~pred, data = simdataCT, col= "green")
-points(resid2~pred, data = simdataDE, col= "orange")
-points(resid2~pred, data = simdataMA, col= "purple")
-points(resid2~pred, data = simdataRI, col= "pink")
-points(resid2~pred, data = simdataMD, col= "brown")
-legend(20, 1, legend=c("NC","VA", "NJ","NY","CT", "DE","MA", "RI", "MD"),  
-       fill = c("black","blue", "red", "yellow", "green", "orange", "purple",
-                "pink", "brown") )
-
-#incorporating size structure into discards GAM
-
-Nlen <- 42
-
-omlength2978111 <- {scan("~/Desktop/FlounderMSE/RDMgam/storelengths/sim_storelength/om-length2020.dat",n=Nlen+1)} #29781.11
-omlength2978111_nodate <- omlength2978111[2:43]
-omlength2978111_sum <- sum(omlength2978111[2:43])
-omlength2978111_nodatedata <- as.data.frame(as.list(omlength2978111_nodate))
-colnames(omlength2978111_nodatedata) <- paste0( seq(10, 92, by = 2))
-omlength2978111_nodatedata <- omlength2978111_nodatedata %>% mutate(SSBcov = 29781.11)
-
-omlength4233281 <- {scan("~/Desktop/FlounderMSE/RDMgam/storelengths/sim_storelength/om-length2021.dat",n=Nlen+1)}  #42332.81
-omlength4233281_nodate <- omlength4233281[2:43]
-omlength4233281_sum <- sum(omlength4233281[2:43])
-omlength4233281_nodatedata <- as.data.frame(as.list(omlength4233281_nodate))
-colnames(omlength4233281_nodatedata) <- paste0( seq(10, 92, by = 2))
-omlength4233281_nodatedata <- omlength4233281_nodatedata %>% mutate(SSBcov = 42332.81)
-
-omlength5668865 <- {scan("~/Desktop/FlounderMSE/RDMgam/storelengths/sim_storelength/om-length2022.dat",n=Nlen+1)}  #56688.65
-omlength5668865_nodate <- omlength5668865[2:43]
-omlength5668865_sum <- sum(omlength5668865[2:43])
-omlength5668865_nodatedata <- as.data.frame(as.list(omlength5668865_nodate))
-colnames(omlength5668865_nodatedata) <- paste0( seq(10, 92, by = 2))
-omlength5668865_nodatedata <- omlength5668865_nodatedata %>% mutate(SSBcov = 56688.65)
-
-omlength6450683 <- {scan("~/Desktop/FlounderMSE/RDMgam/storelengths/sim_storelength/om-length2039.dat",n=Nlen+1)}  #64506.83 
-omlength6450683_nodate <- omlength6450683[2:43]
-omlength6450683_sum <- sum(omlength6450683[2:43])
-omlength6450683_nodatedata <- as.data.frame(as.list(omlength6450683_nodate))
-colnames(omlength6450683_nodatedata) <- paste0( seq(10, 92, by = 2))
-omlength6450683_nodatedata <- omlength6450683_nodatedata %>% mutate(SSBcov = 64506.83)
-
-omlength7623342 <- {scan("~/Desktop/FlounderMSE/RDMgam/storelengths/sim_storelength/om-length2024.dat",n=Nlen+1)}   #76233.42        
-omlength7623342_nodate <- omlength7623342[2:43]
-omlength7623342_sum <- sum(omlength7623342[2:43])
-omlength7623342_nodatedata <- as.data.frame(as.list(omlength7623342_nodate))
-colnames(omlength7623342_nodatedata) <- paste0( seq(10, 92, by = 2))
-omlength7623342_nodatedata <- omlength7623342_nodatedata %>% mutate(SSBcov = 76233.42)
-
-omlength8636419 <- {scan("~/Desktop/FlounderMSE/RDMgam/storelengths/sim_storelength/om-length2027.dat",n=Nlen+1)}  #86364.19
-omlength8636419_nodate <- omlength8636419[2:43]
-omlength8636419_sum <- sum(omlength8636419[2:43])
-omlength8636419_nodatedata <- as.data.frame(as.list(omlength8636419_nodate))
-colnames(omlength8636419_nodatedata) <- paste0( seq(10, 92, by = 2))
-omlength8636419_nodatedata <- omlength8636419_nodatedata %>% mutate(SSBcov = 86364.19)
-
-omlength9226567 <- {scan("~/Desktop/FlounderMSE/RDMgam/storelengths/sim_storelength/om-length2045.dat",n=Nlen+1)}  #92265.67 
-omlength9226567_nodate <- omlength9226567[2:43]
-omlength9226567_sum <- sum(omlength9226567[2:43])
-omlength9226567_nodatedata <- as.data.frame(as.list(omlength9226567_nodate))
-colnames(omlength9226567_nodatedata) <- paste0( seq(10, 92, by = 2))
-omlength9226567_nodatedata <- omlength9226567_nodatedata %>% mutate(SSBcov = 92265.67)
-
-omlength10191523 <- {scan("~/Desktop/FlounderMSE/RDMgam/storelengths/sim_storelength_contrast/om-length2025.dat",n=Nlen+1)}  #101915.23 2025
-omlength10191523_nodate <- omlength10191523[2:43]
-omlength10191523_sum <- sum(omlength10191523[2:43])
-omlength10191523_nodatedata <- as.data.frame(as.list(omlength10191523_nodate))
-colnames(omlength10191523_nodatedata) <- paste0( seq(10, 92, by = 2))
-omlength10191523_nodatedata <- omlength10191523_nodatedata %>% mutate(SSBcov = 101915.23)
-
-omlength11028124 <- {scan("~/Desktop/FlounderMSE/RDMgam/storelengths/sim_storelength_contrast/om-length2045.dat",n=Nlen+1)}  #110281.24 2045
-omlength11028124_nodate <- omlength11028124[2:43]
-omlength11028124_sum <- sum(omlength11028124[2:43])
-omlength11028124_nodatedata <- as.data.frame(as.list(omlength11028124_nodate))
-colnames(omlength11028124_nodatedata) <- paste0( seq(10, 92, by = 2))
-omlength11028124_nodatedata <- omlength11028124_nodatedata %>% mutate(SSBcov = 110281.24)
-
-omlength15247371 <- {scan("~/Desktop/FlounderMSE/RDMgam/storelengths/sim_storelength_contrast/om-length2037.dat",n=Nlen+1)}  #152473.71 2037 
-omlength15247371_nodate <- omlength15247371[2:43]
-omlength15247371_sum <- sum(omlength15247371[2:43])
-omlength15247371_nodatedata <- as.data.frame(as.list(omlength15247371_nodate))
-colnames(omlength15247371_nodatedata) <- paste0( seq(10, 92, by = 2))
-omlength15247371_nodatedata <- omlength15247371_nodatedata %>% mutate(SSBcov = 152473.71)
-
-omlength16704276 <- {scan("~/Desktop/FlounderMSE/RDMgam/storelengths/sim_storelength_contrast/om-length2032.dat",n=Nlen+1)}  #167042.76 2032
-omlength16704276_nodate <- omlength16704276[2:43]
-omlength16704276_sum <- sum(omlength16704276[2:43])
-omlength16704276_nodatedata <- as.data.frame(as.list(omlength16704276_nodate))
-colnames(omlength16704276_nodatedata) <- paste0( seq(10, 92, by = 2))
-omlength16704276_nodatedata <- omlength16704276_nodatedata %>% mutate(SSBcov = 167042.76)
-
-omlength18125726 <- {scan("~/Desktop/FlounderMSE/RDMgam/storelengths/sim_storelength_contrast/om-length2026.dat",n=Nlen+1)}  #181257.26 2026  
-omlength18125726_nodate <- omlength18125726[2:43]
-omlength18125726_sum <- sum(omlength18125726[2:43])
-omlength18125726_nodatedata <- as.data.frame(as.list(omlength18125726_nodate))
-colnames(omlength18125726_nodatedata) <- paste0( seq(10, 92, by = 2))
-omlength18125726_nodatedata <- omlength18125726_nodatedata %>% mutate(SSBcov = 181257.26)
-
-omlength21039415 <- {scan("~/Desktop/FlounderMSE/RDMgam/storelengths/sim_storelength_contrast/om-length2027.dat",n=Nlen+1)}  #210394.15 2027
-omlength21039415_nodate <- omlength21039415[2:43]
-omlength21039415_sum <- sum(omlength21039415[2:43])
-omlength21039415_nodatedata <- as.data.frame(as.list(omlength21039415_nodate))
-colnames(omlength21039415_nodatedata) <- paste0( seq(10, 92, by = 2))
-omlength21039415_nodatedata <- omlength21039415_nodatedata %>% mutate(SSBcov = 210394.15)
-
-omlength22546028 <- {scan("~/Desktop/FlounderMSE/RDMgam/storelengths/sim_storelength_contrast/om-length2028.dat",n=Nlen+1)}  #225460.28 2028 
-omlength22546028_nodate <- omlength22546028[2:43]
-omlength22546028_sum <- sum(omlength22546028[2:43])
-omlength22546028_nodatedata <- as.data.frame(as.list(omlength22546028_nodate))
-colnames(omlength22546028_nodatedata) <- paste0( seq(10, 92, by = 2))
-omlength22546028_nodatedata <- omlength22546028_nodatedata %>% mutate(SSBcov = 225460.28)
-
-omlength25461289 <- {scan("~/Desktop/FlounderMSE/RDMgam/storelengths/sim_storelength_contrast/om-length2034.dat",n=Nlen+1)} #254612.89 2034
-omlength25461289_nodate <- omlength25461289[2:43]
-omlength25461289_sum <- sum(omlength25461289[2:43])
-omlength25461289_nodatedata <- as.data.frame(as.list(omlength25461289_nodate))
-colnames(omlength25461289_nodatedata) <- paste0( seq(10, 92, by = 2))
-omlength25461289_nodatedata <- omlength25461289_nodatedata %>% mutate(SSBcov = 254612.89)
-
-#FOR NUMBER OF FISH, PROPORTIONS OF FISH LOWER THAN MIN SIZE
-omlengthdata <- rbind(omlength2978111_nodatedata, omlength4233281_nodatedata,
-                      omlength5668865_nodatedata, omlength6450683_nodatedata,
-                      omlength7623342_nodatedata, omlength8636419_nodatedata,
-                      omlength9226567_nodatedata, omlength10191523_nodatedata,
-                      omlength11028124_nodatedata, omlength15247371_nodatedata,
-                      omlength16704276_nodatedata, omlength18125726_nodatedata,
-                      omlength21039415_nodatedata, omlength22546028_nodatedata,
-                      omlength25461289_nodatedata)
-
-RDMoutputbind_disc1 <- left_join(RDMoutputbind_edit, omlengthdata, by = c("SSBcov"))
-
-RDMoutputbind_disc2 <- RDMoutputbind_disc1 %>% mutate(LengthSize = ifelse(
-  SSBcov == 29781.11, omlength2978111_sum, ifelse(
-    SSBcov == 42332.81, omlength4233281_sum, ifelse(
-      SSBcov == 56688.65, omlength5668865_sum, ifelse(
-        SSBcov == 64506.83, omlength6450683_sum, ifelse(
-          SSBcov == 76233.42, omlength7623342_sum, ifelse(
-            SSBcov == 86364.19, omlength8636419_sum, ifelse(
-              SSBcov == 92265.67, omlength9226567_sum, ifelse(
-                SSBcov == 101915.23, omlength10191523_sum, ifelse(
-                  SSBcov == 110281.24, omlength11028124_sum, ifelse(
-                    SSBcov == 152473.71, omlength15247371_sum, ifelse(
-                      SSBcov == 167042.76, omlength16704276_sum, ifelse(
-                        SSBcov == 181257.26, omlength18125726_sum, ifelse(
-                          SSBcov == 210394.15, omlength21039415_sum, ifelse(
-                            SSBcov == 225460.28, omlength22546028_sum, ifelse(
-                              SSBcov == 254612.89, omlength25461289_sum, 0))))))))))))))))
-#View(RDMoutputbind_disc4)
-
-#NUMBER UNDER MINSIZE
-RDMoutputbind_disc3 <- RDMoutputbind_disc2 %>% mutate(SumRel = ifelse(
-  MinLen == 14, rowSums(RDMoutputbind_disc2[, 8:21], na.rm = TRUE), ifelse(
-    MinLen == 15, rowSums(RDMoutputbind_disc2[, 8:22], na.rm = TRUE), ifelse(
-      MinLen == 16, rowSums(RDMoutputbind_disc2[, 8:23], na.rm = TRUE), ifelse(
-        MinLen == 17, rowSums(RDMoutputbind_disc2[, 8:25], na.rm = TRUE), ifelse(
-          MinLen == 18, rowSums(RDMoutputbind_disc2[, 8:26], na.rm = TRUE), ifelse(
-            MinLen == 19, rowSums(RDMoutputbind_disc2[, 8:27], na.rm = TRUE), ifelse(
-              MinLen == 20, rowSums(RDMoutputbind_disc2[, 8:28], na.rm = TRUE), NA
-              ))))))))
-
-#MED LENGTH AT MATURITY FROM 2013 BENCHMARK STOCK ASSESSMENT - 26.8cm, 10.5 inches
-RDMoutputbind_disc4 <- RDMoutputbind_disc3 %>% mutate(PropRel = SumRel/LengthSize,
-                                                      LenMat = rowSums(RDMoutputbind_disc3[,8:16], na.rm = TRUE),
-                                                      PropLenMat = LenMat/LengthSize)
-
-#SUMMED SIZE STRUCTURE ONLY 
-RDMoutputbind_disc <- RDMoutputbind_edit %>% mutate(LengthSize = ifelse(
-  SSBcov == 29781.11, omlength2978111_sum, ifelse(
-    SSBcov == 42332.81, omlength4233281_sum, ifelse(
-      SSBcov == 56688.65, omlength5668865_sum, ifelse(
-        SSBcov == 64506.83, omlength6450683_sum, ifelse(
-          SSBcov == 76233.42, omlength7623342_sum, ifelse(
-            SSBcov == 86364.19, omlength8636419_sum, ifelse(
-              SSBcov == 92265.67, omlength9226567_sum, ifelse(
-                SSBcov == 101915.23, omlength10191523_sum, ifelse(
-                  SSBcov == 110281.24, omlength11028124_sum, ifelse(
-                    SSBcov == 152473.71, omlength15247371_sum, ifelse(
-                      SSBcov == 167042.76, omlength16704276_sum, ifelse(
-                        SSBcov == 181257.26, omlength18125726_sum, ifelse(
-                          SSBcov == 210394.15, omlength21039415_sum, ifelse(
-                            SSBcov == 225460.28, omlength22546028_sum, ifelse(
-                              SSBcov == 254612.89, omlength25461289_sum, 0))))))))))))))))
-
-#for summed size structure only 
-tot_rel <- RDMoutputbind_disc$tot_rel
-state <- RDMoutputbind_disc$state
-SeasonLen <- RDMoutputbind_disc$SeasonLen
-Bag <- RDMoutputbind_disc$Bag
-MinLen <- RDMoutputbind_disc$MinLen
-SSB <- RDMoutputbind_disc$SSBcov
-LengthSize <- RDMoutputbind_disc$LengthSize
-
-#for sum or proportion below min size, size at maturity  
-tot_rel <- RDMoutputbind_disc4$tot_rel
-state <- RDMoutputbind_disc4$state
-SeasonLen <- RDMoutputbind_disc4$SeasonLen
-Bag <- RDMoutputbind_disc4$Bag
-MinLen <- RDMoutputbind_disc4$MinLen
-SSB <- RDMoutputbind_disc4$SSBcov
-LengthSize <- RDMoutputbind_disc4$LengthSize
-SumRel <- RDMoutputbind_disc4$SumRel
-PropRel <- RDMoutputbind_disc4$PropRel
-LenMat <- RDMoutputbind_disc4$LenMat
-PropLenMat <- RDMoutputbind_disc4$PropLenMat
-
-#make data frame 
-inputdatadisc <- data.frame(tot_rel,
-                        state, SeasonLen, Bag, MinLen, SSB, LengthSize, SumRel, PropRel, LenMat, PropLenMat) 
-
-
-# ------------------------------- DISC GAM 2 SUMMED LENGTHS -------------------------------------------------#
-d2 <- gam(tot_rel ~  state + s(SSB, k = 3) + s(SeasonLen, k = 3) + 
-            s(Bag, k = 3) + s(MinLen, k = 3) + s(LengthSize, k = 3), data = inputdatadisc, 
+d2 <- gam(tot_rel ~ # s(SSB, state, bs = "fs", k = 3) + 
+            s(SeasonLen, state, bs = "fs", k = 3) + 
+            s(Bag, state, bs = "fs", k = 3) +
+            s(MinLen, state, bs = "fs", k = 3) + 
+            s(SumRel, SSB, k = 3), 
+          data = inputdatadisc, #run troubleshootdiscardsGAM code for inputdatadisc
           family = Gamma(link = log), method = "REML") 
-summary(d2) #summed length bins
-#gam.check(d2)
+summary(d2)
 appraise(d2)
 draw(d2)
 
-# ------------------------------- DISC GAM 3 SUMMED LENGTHS <MIN SIZE-------------------------------------------------#
-d3 <- gam(tot_rel ~  state + s(SSB, k = 3) + s(SeasonLen, k = 3) + 
-            s(Bag, k = 3) + s(MinLen, k = 3) + s(SumRel, k = 3), data = inputdatadisc, 
-          family = Gamma(link = log), method = "REML") 
-summary(d3) #summed length bins ~ =< a given minimum size 
-#gam.check(d3)
-appraise(d3)
-draw(d3)
-#saveRDS(d3, "~/Desktop/FlounderMSE/RDMgam/gam_RDM_disc_superscramble12424.rds") #disordered length
-#d3 <- readRDS("~/Desktop/FlounderMSE/RDMgam/gam_RDM_disc_superscramble12424.rds") #disordered length
+########  hierarchical GAM ################
 
-# ------------------------------- DISC GAM 4 PROPORTION <MIN SIZE-------------------------------------------------#
-d4 <- gam(tot_rel ~  state + s(SSB, k = 3) + s(SeasonLen, k = 3) + 
-           s(Bag, k = 3) + s(MinLen, PropRel), data = inputdatadisc, #interaction seems to reduce confounding between two variables
-          family = Gamma(link = log), method = "REML") 
-summary(d4) #proportion of length bins ~ =< a given minimum size 
-#gam.check(d4)
-appraise(d4)
-library(ggplot2)
-smooth_plot <- draw(d4) +
-  scale_x_continuous(trans = "log") 
-#interaction between minlen and proprel makes sense, but doesn't fix seasonlen issue
+inputdata$state <- as.factor(inputdata$state)
+#inputdata_mseruns$state <- as.factor(inputdata_mseruns$state)
 
-# ------------------------------- DISC GAM 5 SUM <SIZE AT MATURITY -------------------------------------------------#
-d5 <- gam(tot_rel ~  state + s(SSB, k = 3) + s(SeasonLen, k = 3) + 
-            s(Bag, k = 3) + s(MinLen, k = 3) + s(LenMat, k = 3), data = inputdatadisc, 
-          family = Gamma(link = log), method = "REML") 
-summary(d5) #proportion of length bins ~ =< size at maturity  
-#gam.check(d5)
-appraise(d5)
-draw(d5)
-#this doesn't improve anything -> in fact makes fit worse
+#hierarchical GAM
 
-# ------------------------------- DISC GAM 6 SUM <SIZE AT MATURITY -------------------------------------------------#
-d6 <- gam(tot_rel ~  state + s(SSB, k = 3) + s(SeasonLen, k = 3) + 
-            s(Bag, k = 3) + s(MinLen, PropLenMat), data = inputdatadisc, 
-          family = Gamma(link = log), method = "REML") 
-summary(d6) #proportion of length bins ~ =< size at maturity  
-#gam.check(d6)
-appraise(d6) #a little better than d5 with and without interaction
-draw(d6) +
-  scale_x_continuous(trans = "log") 
+#group-level smoothers that all have the same wiggliness
+g1.1 <- gam(tot_keep ~  s(SSB, state, bs = "fs", k = 3) + 
+            s(SeasonLen, state, bs = "fs", k = 3) + #9,5,7 partial effect of smooths look strange with k any higher 
+            s(Bag, state, bs = "fs", k = 3) + s(MinLen, state, bs = "fs", k = 3), 
+          data = inputdata, #either isolated RDM runs or total 
+          family = Gamma(link = log), method = "REML") #random effect on spline for minlen that introduces  a sort of random effect by state 
+#saveRDS(g1.1, "~/Desktop/FlounderMSE/RDMgam/gam_RDMland_factored.rds") #disordered length
+#g1.1 <- readRDS("~/Desktop/FlounderMSE/RDMgam/gam_RDMland_factored.rds") #disordered length
+summary(g1.1)
+draw(g1.1)
+appraise(g1.1)
+g1.1pred <- predict(g1.1, type = "response") #if not 
+plot(inputdata$tot_keep ~ g1.1pred, xlim = c(0,1e7), ylim = c(0,1e7)) + abline(b = 1, a = 0, col = "red")
+#looks pretty good
+
+#plot partial effects with legend 
+sm <- smooth_estimates(g1.1)
+sm_fs <- sm[grep("SSB", sm$.smooth), ]
+ggplot(sm_fs, aes(x = SSB, y = .estimate, colour = state)) +
+  geom_line() +
+ # geom_ribbon(aes(ymin = est - 2 * se, ymax = est + 2 * se, fill = by), alpha = 0.2) +
+  theme_minimal() +
+  labs(title = "SSB", color = "state", fill = "state")
+
+sm <- smooth_estimates(g1.1)
+sm_fs <- sm[grep("SeasonLen", sm$.smooth), ]
+ggplot(sm_fs, aes(x = SeasonLen, y = .estimate, colour = state)) +
+  geom_line() +
+  # geom_ribbon(aes(ymin = est - 2 * se, ymax = est + 2 * se, fill = by), alpha = 0.2) +
+  theme_minimal() +
+  labs(title = "SeasonLen", color = "state", fill = "state")
+
+sm <- smooth_estimates(g1.1)
+sm_fs <- sm[grep("MinLen", sm$.smooth), ]
+ggplot(sm_fs, aes(x = MinLen, y = .estimate, colour = state)) +
+  geom_line() +
+  # geom_ribbon(aes(ymin = est - 2 * se, ymax = est + 2 * se, fill = by), alpha = 0.2) +
+  theme_minimal() +
+  labs(title = "MinLen", color = "state", fill = "state")
+
+sm <- smooth_estimates(g1.1)
+sm_fs <- sm[grep("Bag", sm$.smooth), ]
+ggplot(sm_fs, aes(x = Bag, y = .estimate, colour = state)) +
+  geom_line() +
+  # geom_ribbon(aes(ymin = est - 2 * se, ymax = est + 2 * se, fill = by), alpha = 0.2) +
+  theme_minimal() +
+  labs(title = "Bag", color = "state", fill = "state")
+
+#global smoother, random effect on state
+#random effect smooth -> k is always set equal to number of levels in grouping variable
+g1.2 <- gam(tot_keep ~  s(state, bs = "re") + s(SSB, bs = "tp", k = 3) + 
+              s(SeasonLen, bs = "tp", k = 3) + #9,5,7 partial effect of smooths look strange with k any higher 
+              s(Bag, bs = "tp", k = 3) + s(MinLen, bs = "tp", k = 3), 
+            data = inputdata, #either isolated RDM runs or total 
+            family = Gamma(link = log), method = "REML")
+summary(g1.2)
+draw(g1.2)
+appraise(g1.2)
+g1.2pred <- predict(g1.2, type = "response") #if not 
+plot(inputdata$tot_keep ~ g1.2pred, xlim = c(0,1e7), ylim = c(0,1e7)) + abline(b = 1, a = 0, col = "red")
+#does not fix the state deviation
+
+#tensor product of continuous smoothers and random effect for the grouping parameter 
+g1.3 <- gam(tot_keep ~ t2(SSB, state, bs = c("tp", "re")) + 
+              t2(SeasonLen, state, bs = c("tp", "re")) + #9,5,7 partial effect of smooths look strange with k any higher 
+              t2(Bag, state, bs = c("tp", "re")) + t2(MinLen, state, bs = c("tp", "re")), 
+            data = inputdata, #either isolated RDM runs or total 
+            family = Gamma(link = log), method = "REML")
+summary(g1.3)
+draw(g1.3) #not sure how to plot partial effects
+appraise(g1.3)
+g1.3pred <- predict(g1.3, type = "response") #if not 
+plot(inputdata$tot_keep ~ g1.3pred, xlim = c(0,1e7), ylim = c(0,1e7)) + abline(b = 1, a = 0, col = "red")
+
+#library(visreg)
+#visreg2d(g1.3, xvar = "SSB", yvar = "state")
+#visreg2d(g1.3, xvar = "MinLen", yvar = "state")
+#visreg2d(g1.3, xvar = "Bag", yvar = "state")
+#visreg2d(g1.3, xvar = "SeasonLen", yvar = "state")
+
+#plot partial effects with legend 
+sm <- smooth_estimates(g1.3)
+sm_fs <- sm[grep("SSB", sm$.smooth), ]
+ggplot(sm_fs, aes(x = SSB, y = .estimate, colour = state)) +
+  geom_line() +
+  # geom_ribbon(aes(ymin = est - 2 * se, ymax = est + 2 * se, fill = by), alpha = 0.2) +
+  theme_minimal() +
+  labs(title = "SSB", color = "state", fill = "state")
+
+sm <- smooth_estimates(g1.3)
+sm_fs <- sm[grep("SeasonLen", sm$.smooth), ]
+ggplot(sm_fs, aes(x = SeasonLen, y = .estimate, colour = state)) +
+  geom_line() +
+  # geom_ribbon(aes(ymin = est - 2 * se, ymax = est + 2 * se, fill = by), alpha = 0.2) +
+  theme_minimal() +
+  labs(title = "SeasonLen", color = "state", fill = "state")
+
+sm <- smooth_estimates(g1.3)
+sm_fs <- sm[grep("MinLen", sm$.smooth), ]
+ggplot(sm_fs, aes(x = MinLen, y = .estimate, colour = state)) +
+  geom_line() +
+  # geom_ribbon(aes(ymin = est - 2 * se, ymax = est + 2 * se, fill = by), alpha = 0.2) +
+  theme_minimal() +
+  labs(title = "MinLen", color = "state", fill = "state")
+
+sm <- smooth_estimates(g1.3)
+sm_fs <- sm[grep("Bag", sm$.smooth), ]
+ggplot(sm_fs, aes(x = Bag, y = .estimate, colour = state)) +
+  geom_line() +
+  # geom_ribbon(aes(ymin = est - 2 * se, ymax = est + 2 * se, fill = by), alpha = 0.2) +
+  theme_minimal() +
+  labs(title = "Bag", color = "state", fill = "state")
+
+#allow group-level wiggliness for factor smooth with thin plate  
+g1.4 <- gam(tot_keep ~  s(SSB, state, bs = "fs", m = 1,  k = 3) + 
+              s(SeasonLen, state, bs = "fs", m = 1,  k = 3) + #9,5,7 partial effect of smooths look strange with k any higher 
+              s(Bag, state, bs = "fs", m = 1, k = 3) + s(MinLen, state, bs = "fs", m = 1, k = 3), 
+            data = inputdata, #either isolated RDM runs or total 
+            family = Gamma(link = log), method = "REML") #random effect on spline for minlen that introduces  a sort of random effect by state 
+summary(g1.4)
+draw(g1.4)
+appraise(g1.4)
+g1.4pred <- predict(g1.4, type = "response") #if not 
+plot(inputdata$tot_keep ~ g1.4pred, xlim = c(0,1e7), ylim = c(0,1e7)) + abline(b = 1, a = 0, col = "red")
+#not sure if this really adds any improvement -> AIC update: does not, is actually worse than common wiggliness
+
+#allow group-level wiggliness for tensor product 
+g1.5 <- gam(tot_keep ~ t2(SSB, state, bs = c("tp", "re"), m = 1) + 
+              t2(SeasonLen, state, bs = c("tp", "re"), m = 1) + #9,5,7 partial effect of smooths look strange with k any higher 
+              t2(Bag, state, bs = c("tp", "re"), m = 1) + t2(MinLen, state, bs = c("tp", "re"), m = 1), 
+            data = inputdata, #either isolated RDM runs or total 
+            family = Gamma(link = log), method = "REML")
+summary(g1.5)
+draw(g1.5) 
+appraise(g1.5)
+g1.5pred <- predict(g1.5, type = "response") #if not 
+plot(inputdata$tot_keep ~ g1.5pred, xlim = c(0,1e7), ylim = c(0,1e7)) + abline(b = 1, a = 0, col = "red")
+#does not help compared to g1.3
+
+#AIC
+AIC(g1.1, g1.2, g1.3, g1.4, g1.5)
+
+#test runtime
+input_seas2 <- c( 60,
+                  75,
+                  90,
+                  105,
+                  120,
+                  135,
+                  150, 
+                  165,
+                  180, 
+                  195,
+                  210,
+                  225,
+                  240,
+                  255,
+                  270, 
+                  285,
+                  300)
+input_bag2 <- c(4,5,6,7,8)
+input_minlen2 <- c(14,14.5,15,15.5,16,16.5,17,17.5,18,18.5,19,19.5,20,20.5,21)
+state2 <- c("NC", "VA", "MA", "RI", "NY", "NJ", "CT", "DE", "MD")
+SSB <- inputdata$SSB[1]
+comb_input2 <- expand.grid(SeasonLen = unique(input_seas2), Bag = unique(input_bag2),
+                           MinLen = unique(input_minlen2), state = unique(state2))
+comb_input2 <- comb_input2 %>% mutate(SSB = SSB)
+
+#newer way
+gamfit2 <- predict.gam(g1.1, newdata = comb_input2, type = "response" , se.fit = TRUE)
+flukecatch1 <- comb_input2 %>% mutate(land = gamfit2$fit)
+View(flukecatch)
+View(flukecatch1)
+# I can't believe I didn't just do this in the first place 
 
 ################### --------------- PREDICTIONS ---------------- #####################
 
 #WITHIN SAMPLE 
 
 #land 
-preddata1 <- dplyr::select(inputdata, state, SeasonLen, Bag, MinLen, SSB)
+preddata1 <- dplyr::select(inputdata[1:9,], state, SeasonLen, Bag, MinLen, SSB)
+#preddata1 <- preddata1 %>% mutate(SeasonLen = 150, Bag = 4, MinLen = 17.5, SSB = 30155)
+
 gamfit2 <- predict.gam(g1, newdata = preddata1, type = "link" , se.fit = TRUE)
+exp(gamfit2$fit)
 
 #disc
 preddata2 <- dplyr::select(inputdatadisc, state, SeasonLen, Bag, MinLen, SSB, SumRel)
@@ -1231,13 +2850,13 @@ for (i in 1:n) {
 loo_predictions <- readRDS("~/Desktop/FlounderMSE/LOOCV_g1.rds") #very similar but not exactly the same as in-sample
 
 # performance metrics 
-mse <- mean((loo_predictions - log(data$tot_keep))^2) #keep in logspace since model was fit in logspace
-rmse <- sqrt(mse)
-mae <- mean(abs(loo_predictions - log(data$tot_keep)))
+mse <- mean((loo_predictions - log(data$tot_keep))^2) #keep in logspace since model was fit in logspace 0.1376026
+rmse <- sqrt(mse) #0.3709482
+mae <- mean(abs(loo_predictions - log(data$tot_keep))) #0.2902894
 
 #residuals and predictions
 residuals <- data$tot_keep - exp(loo_predictions)
-plot(residuals ~data$tot_keep)
+plot(residuals ~ data$tot_keep)
 
 plot(data$tot_keep~exp(gamfit2$fit))
 plot(data$tot_keep~exp(loo_predictions))
@@ -1278,12 +2897,10 @@ draw(g1)
 appraise(d1)
 draw(d1)
 
-#for logged response
-#plot(inputdata$tot_keep ~ exp(gamfit2$fit))
 
-############# FOR DETERMINING SCALARS FOR do_recmeasures_hcr.R ##########################################
+############# FOR DETERMINING SCALARS FOR do_recmeasures_hcr.R: NO LONGER USED ##########################################
 
-scalarinput <- dplyr::select(inputdata[100:108,], state, SeasonLen, Bag, MinLen, SSB) # pick number where "CT" is first state in list 
+scalarinput <- dplyr::select(inputdata[10:18,], state, SeasonLen, Bag, MinLen, SSB) # pick number where "CT" is first state in list 
 scalaroutput = list()
 scalaroutput = vector("list", length = nrow(scalarinput))
 
@@ -1306,8 +2923,8 @@ VAscalar <- scalaroutput2$land[9]/sum(scalaroutput2$land)
 
 GAMscalar <- data.frame(CTscalar, DEscalar, MAscalar, MDscalar, NCscalar, NJscalar, NYscalar, RIscalar, VAscalar)
 #so far these values have been the same no matter which SSB or regulation scenario we start on 
-#saveRDS(GAMscalar, "~/Desktop/FlounderMSE/GAMscalar.rds")
-#readRDS("~/Desktop/FlounderMSE/GAMscalar.rds")
+#saveRDS(GAMscalar, "~/Desktop/FlounderMSE/RDMGam/GAMscalar.rds")
+#readRDS("~/Desktop/FlounderMSE/RDMGam/GAMscalar.rds")
 
 #ORIGINAL GAMS FOR COMPARISON
 
