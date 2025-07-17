@@ -1,0 +1,354 @@
+ Stepping into ReadIn
+ HERE!
+ ReadIN finished
+ Starting Historical Projection
+ Stepping into Set-Up
+ Finished with Set-Up
+ Initializing
+  0.50000000000000000     
+ Finished with Initialization
+ Doing historical projection
+ ...check histproj.junk
+   25959.532090684195        26051.372470624799        26051.372470624799     
+ Finished historical projection
+ Historical Projection finished
+ ISEEDX      -34020
+ ISEEDZ           1
+ Stepping into Set-Up
+        2020
+ loading RBC
+ Finished with Set-Up
+ Doing future projection
+   25959.532090684195        28544.679942291965        28544.679942291965     
+   25959.532090684195        30072.652817579670        30072.652817579670     
+ Finished future projection
+ Stepping into Set-Up
+        2022
+ loading RBC
+ Finished with Set-Up
+ Doing future projection
+   25959.532090684195        41322.759911861314        41322.759911861314     
+   25959.532090684195        60259.307403151637        60259.307403151637     
+ Finished future projection
+ Stepping into Set-Up
+        2024
+ loading RBC
+ Finished with Set-Up
+ Doing future projection
+   25959.532090684195        69295.728737799931        69295.728737799931     
+   25959.532090684195        71858.388753463310        71858.388753463310     
+ Finished future projection
+ Stepping into Set-Up
+        2026
+ loading RBC
+ Finished with Set-Up
+ Doing future projection
+   25959.532090684195        57150.296838053720        57150.296838053720     
+   25959.532090684195        42749.269602985274        42749.269602985274     
+ Finished future projection
+ Stepping into Set-Up
+        2028
+ loading RBC
+ Finished with Set-Up
+ Doing future projection
+   25959.532090684195        34641.581250469855        34641.581250469855     
+   25959.532090684195        28002.922900863578        28002.922900863578     
+ Finished future projection
+ Stepping into Set-Up
+        2030
+ loading RBC
+ Finished with Set-Up
+ Doing future projection
+   25959.532090684195        25189.744329435642        25189.744329435642     
+   25959.532090684195        21605.993245758804        21605.993245758804     
+ Finished future projection
+ Stepping into Set-Up
+        2032
+ loading RBC
+ Finished with Set-Up
+ Doing future projection
+   25959.532090684195        19885.252483071730        19885.252483071730     
+   25959.532090684195        20052.657356539956        20052.657356539956     
+ Finished future projection
+ Stepping into Set-Up
+        2034
+ loading RBC
+ Finished with Set-Up
+ Doing future projection
+   25959.532090684195        17563.611511921281        17563.611511921281     
+   25959.532090684195        13220.882183403812        13220.882183403812     
+ Finished future projection
+ Stepping into Set-Up
+        2036
+ loading RBC
+ Finished with Set-Up
+ Doing future projection
+   25959.532090684195        13400.010980413248        13400.010980413248     
+   25959.532090684195        16812.306981966554        16812.306981966554     
+ Finished future projection
+ Stepping into Set-Up
+        2038
+ loading RBC
+ Finished with Set-Up
+ Doing future projection
+   25959.532090684195        24119.476945543509        24119.476945543509     
+   25959.532090684195        31607.784912573628        31607.784912573628     
+ Finished future projection
+ Stepping into Set-Up
+        2040
+ loading RBC
+ Finished with Set-Up
+ Doing future projection
+   25959.532090684195        35845.533266143990        35845.533266143990     
+   25959.532090684195        43156.384707600184        43156.384707600184     
+ Finished future projection
+ Stepping into Set-Up
+        2042
+ loading RBC
+ Finished with Set-Up
+ Doing future projection
+   25959.532090684195        40621.359811632865        40621.359811632865     
+   25959.532090684195        35352.063168716442        35352.063168716442     
+ Finished future projection
+ Stepping into Set-Up
+        2044
+ loading RBC
+ Finished with Set-Up
+ Doing future projection
+   25959.532090684195        31140.268847226671        31140.268847226671     
+   25959.532090684195        25283.390467876772        25283.390467876772     
+ Finished future projection
+ Starting Historical Projection
+ Stepping into Set-Up
+ Finished with Set-Up
+ Initializing
+  0.50000000000000000     
+ Finished with Initialization
+ Doing historical projection
+ ...check histproj.junk
+   26666.725560387920        26817.681859317767        26817.681859317767     
+ Finished historical projection
+ Historical Projection finished
+ ISEEDX      -65242
+ ISEEDZ           1
+ Stepping into Set-Up
+        2020
+ loading RBC
+ Finished with Set-Up
+ Doing future projection
+   26666.725560387920        29186.171966579634        29186.171966579634     
+   26666.725560387920        31033.011964927726        31033.011964927726     
+ Finished future projection
+ Stepping into Set-Up
+        2022
+ loading RBC
+ Finished with Set-Up
+ Doing future projection
+   26666.725560387920        25544.476842529679        25544.476842529679     
+   26666.725560387920        23385.337761686940        23385.337761686940     
+ Finished future projection
+ Stepping into Set-Up
+        2024
+ loading RBC
+ Finished with Set-Up
+ Doing future projection
+   26666.725560387920        27836.676403669568        27836.676403669568     
+   26666.725560387920        30495.884145572225        30495.884145572225     
+ Finished future projection
+ Stepping into Set-Up
+        2026
+ loading RBC
+ Finished with Set-Up
+ Doing future projection
+   26666.725560387920        32463.691963040637        32463.691963040637     
+   26666.725560387920        35033.376361192255        35033.376361192255     
+ Finished future projection
+ Stepping into Set-Up
+        2028
+ loading RBC
+ Finished with Set-Up
+ Doing future projection
+   26666.725560387920        36415.813700646904        36415.813700646904     
+   26666.725560387920        37497.848389399645        37497.848389399645     
+ Finished future projection
+ Stepping into Set-Up
+        2030
+ loading RBC
+ Finished with Set-Up
+ Doing future projection
+   26666.725560387920        36883.445000918116        36883.445000918116     
+   26666.725560387920        35604.618519421470        35604.618519421470     
+ Finished future projection
+ Stepping into Set-Up
+        2032
+ loading RBC
+ Finished with Set-Up
+ Doing future projection
+   26666.725560387920        37895.457424273714        37895.457424273714     
+   26666.725560387920        37833.179980329951        37833.179980329951     
+ Finished future projection
+ Stepping into Set-Up
+        2034
+ loading RBC
+ Finished with Set-Up
+ Doing future projection
+   26666.725560387920        42820.664708203163        42820.664708203163     
+   26666.725560387920        52616.232704057918        52616.232704057918     
+ Finished future projection
+ Stepping into Set-Up
+        2036
+ loading RBC
+ Finished with Set-Up
+ Doing future projection
+   26666.725560387920        58046.160942667018        58046.160942667018     
+   26666.725560387920        60847.034733499706        60847.034733499706     
+ Finished future projection
+ Stepping into Set-Up
+        2038
+ loading RBC
+ Finished with Set-Up
+ Doing future projection
+   26666.725560387920        35758.357819747274        35758.357819747274     
+   26666.725560387920        17428.477095678500        17428.477095678500     
+ Finished future projection
+ Stepping into Set-Up
+        2040
+ loading RBC
+ Finished with Set-Up
+ Doing future projection
+   26666.725560387920        15550.366284338628        15550.366284338628     
+   26666.725560387920        11478.069529358752        11478.069529358752     
+ Finished future projection
+ Stepping into Set-Up
+        2042
+ loading RBC
+ Finished with Set-Up
+ Doing future projection
+   26666.725560387920        12341.578234902592        12341.578234902592     
+   26666.725560387920        14279.563360158916        14279.563360158916     
+ Finished future projection
+ Stepping into Set-Up
+        2044
+ loading RBC
+ Finished with Set-Up
+ Doing future projection
+   26666.725560387920        17768.396844597763        17768.396844597763     
+   26666.725560387920        21152.295340918754        21152.295340918754     
+ Finished future projection
+ Starting Historical Projection
+ Stepping into Set-Up
+ Finished with Set-Up
+ Initializing
+  0.50000000000000000     
+ Finished with Initialization
+ Doing historical projection
+ ...check histproj.junk
+   27337.969436186369        27563.256383159904        27563.256383159904     
+ Finished historical projection
+ Historical Projection finished
+ ISEEDX      -13555
+ ISEEDZ           1
+ Stepping into Set-Up
+        2020
+ loading RBC
+ Finished with Set-Up
+ Doing future projection
+   27337.969436186369        28393.199996034884        28393.199996034884     
+   27337.969436186369        31342.824155547565        31342.824155547565     
+ Finished future projection
+ Stepping into Set-Up
+        2022
+ loading RBC
+ Finished with Set-Up
+ Doing future projection
+   27337.969436186369        30748.832558990758        30748.832558990758     
+   27337.969436186369        27284.471959965242        27284.471959965242     
+ Finished future projection
+ Stepping into Set-Up
+        2024
+ loading RBC
+ Finished with Set-Up
+ Doing future projection
+   27337.969436186369        24318.717180760937        24318.717180760937     
+   27337.969436186369        22434.395148921427        22434.395148921427     
+ Finished future projection
+ Stepping into Set-Up
+        2026
+ loading RBC
+ Finished with Set-Up
+ Doing future projection
+   27337.969436186369        22147.914094262385        22147.914094262385     
+   27337.969436186369        20327.147565589199        20327.147565589199     
+ Finished future projection
+ Stepping into Set-Up
+        2028
+ loading RBC
+ Finished with Set-Up
+ Doing future projection
+   27337.969436186369        20970.683324139245        20970.683324139245     
+   27337.969436186369        22403.500059497146        22403.500059497146     
+ Finished future projection
+ Stepping into Set-Up
+        2030
+ loading RBC
+ Finished with Set-Up
+ Doing future projection
+   27337.969436186369        22845.225546797355        22845.225546797355     
+   27337.969436186369        22086.207748898603        22086.207748898603     
+ Finished future projection
+ Stepping into Set-Up
+        2032
+ loading RBC
+ Finished with Set-Up
+ Doing future projection
+   27337.969436186369        25600.433559590714        25600.433559590714     
+   27337.969436186369        29116.032825364629        29116.032825364629     
+ Finished future projection
+ Stepping into Set-Up
+        2034
+ loading RBC
+ Finished with Set-Up
+ Doing future projection
+   27337.969436186369        26518.273559471570        26518.273559471570     
+   27337.969436186369        24768.365729275280        24768.365729275280     
+ Finished future projection
+ Stepping into Set-Up
+        2036
+ loading RBC
+ Finished with Set-Up
+ Doing future projection
+   27337.969436186369        26557.002550594487        26557.002550594487     
+   27337.969436186369        27835.272996480497        27835.272996480497     
+ Finished future projection
+ Stepping into Set-Up
+        2038
+ loading RBC
+ Finished with Set-Up
+ Doing future projection
+   27337.969436186369        23600.541822640622        23600.541822640622     
+   27337.969436186369        18894.442302414212        18894.442302414212     
+ Finished future projection
+ Stepping into Set-Up
+        2040
+ loading RBC
+ Finished with Set-Up
+ Doing future projection
+   27337.969436186369        17492.848417172747        17492.848417172747     
+   27337.969436186369        19630.393425119408        19630.393425119408     
+ Finished future projection
+ Stepping into Set-Up
+        2042
+ loading RBC
+ Finished with Set-Up
+ Doing future projection
+   27337.969436186369        28414.071131554774        28414.071131554774     
+   27337.969436186369        36127.552985636525        36127.552985636525     
+ Finished future projection
+ Stepping into Set-Up
+        2044
+ loading RBC
+ Finished with Set-Up
+ Doing future projection
+   27337.969436186369        37949.212515559906        37949.212515559906     
+   27337.969436186369        36469.566989693565        36469.566989693565     
+ Finished future projection
