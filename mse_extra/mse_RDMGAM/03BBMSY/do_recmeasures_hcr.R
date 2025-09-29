@@ -151,7 +151,7 @@ if (args[5]==7) reg_to_change <- "LengthSeason"
 
 ######################################
 
-gamRDM2 <- readRDS("gam_RDMland_allOM_1BBMSY_1_state.rds") #disordered length
+gamRDM2 <- readRDS("gam_RDMland_allOM_1BBMSY_9_state_setseed.rds") #disordered length
 #View(RDMoutputbind_edit2)
 input_seas2 <- c( 60,
                   75,

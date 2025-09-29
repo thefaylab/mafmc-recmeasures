@@ -39,7 +39,7 @@ library(tidyverse)
 library(ggdist)
 library(scales)
 library(fmsb)
-read_results <- function(scendir =  "~/Desktop/FlounderMSE/kw_sims_test/TestingSims/testsims_old/SplittingSimsTest/"
+read_results <- function(scendir =  ""
                          ,scen.name="compare",
                          om.name = 1,
                          fsim = 1) {
@@ -130,7 +130,7 @@ names(recoutput2) <- c("isim","year","state","n_keep","n_release","ntrips","ncho
 #names(recoutput2) <- c("isim","year","state","ntrips","nchoice","change_cs","cost",
 #                       "keep_one", "mulen_keep","mulen_release","trophy")
 coast_recoutput <- recoutput2 %>% 
-  filter(state == 1)
+  filter(state == 1) #change this for coastwide, states, or both
 
 res3 <- recoutput[,1:4] %>% as_tibble()
 names(res3) <- c("isim", "year", "type", "number") #,"trips")
@@ -226,6 +226,8 @@ get_diag_ts <- function(results) {
 diag_ts <- results %>% 
   mutate(keep_to_rel = keep_num/release_num,
          change_cs = change_cs*-1,
+       #  "kept per trip" = keep_num/ntrips,
+       #  "rel per trip" = release_num/ntrips,
          "kept per trip" = 1000*keep_num/ntrips,
          "rel per trip" = 1000*release_num/ntrips,
          "F/Fref" = frate/fmsy,
@@ -234,7 +236,7 @@ diag_ts <- results %>%
          cs_per_trip = change_cs/ntrips,
          rec_removals = keep_wt + release_wt,
          keep_one = keep_one/ntrips,
-         keep_to_exp = 1000*keep_num / (0.39*exp_keep))  %>% 
+         keep_to_exp = 1000*keep_num / (exp_keep))  %>% 
   select(om, scenario, isim, year, biomass, totcat_wt, rec_removals, keep_to_rel, "kept per trip", "rel per trip",
          "F/Fref", "B/Bref",
          mulen_keep,
@@ -308,8 +310,9 @@ names(sexcatch) <- str_sub(names(sexcatch), start=2)
            isim = isim + fsim -1)
   return(results)
 }
+#metrics <- median_metrics2 %>% rename(mp = RegType)
 
-#add small radar plot
+#add small radar plot for HCR
 do_small_radar_plot <- function(metrics) {
   # metrics is a dataframe of metrics, expecting columns
   # metrics <- tibble(metric = rep(letters[1:5],each=3),
@@ -340,20 +343,23 @@ do_small_radar_plot <- function(metrics) {
     ungroup()
   
   bounds <- tibble(mp = c("max","min"),
-                   #"spawning biomass" = c(1,0),
+                   
                    #"total catch" = c(1,0),
                    "kept:released" = c(1,0),
                    "kept per trip" = c(1,0),
                    "not overfishing" = c(1,0),
                    "not overfished" = c(1,0),
-                   "change_cs" = c(1,0),
+                  # "spawning biomass" = c(1,0),
+                  # "rel per trip" = c(1,0),
+                  # "cs_per_trip" = c(1,0),
+                   #"change_cs" = c(1,0),
                    #"mulen_keep" = c(1,0),
                    #"mulen_release" = c(1,0),
-                   #"trophy" = c(1,0),
-                   #"rec_removals" = c(1,0),
-                   "keep_one" = c(1,0)) #,
-                   #"prop_female" = c(1,0),
-                   #"ntrips" = c(1,0)) #,
+                   "trophy" = c(1,0),
+                  # "rec_removals" = c(1,0),
+                   "keep_one" = c(1,0))# ,
+                 #  "prop_female" = c(1,0),
+                  # "ntrips" = c(1,0)) #,
   #filter(metric %in% c("change_cs", "kept per trip", "kept:released", "not overfished", "not overfishing")) %>% 
   #d = c(1,0),
   #e = c(1,0))
@@ -426,8 +432,7 @@ do_small_radar_plot <- function(metrics) {
 
 Switch 
 ```{r}
-
-HCRtoplot <- "SPLIT"
+HCRtoplot <- "RDMBin3"
 #change the folder names for the scenarios you want to summarize results for and give them a unique name
 ```
 
@@ -468,25 +473,8 @@ params <- if(HCRtoplot == "BASE2split"){list(
 }
 ```
 
-"BTable3", 
-"LTable3",  
-"STable3", 
-"ATable3",  
-
-"BTable3.1",
-"LTable3.1", 
-"STable3.1", 
-"ATable3.1", 
-
-"BTable3.2",
-"LTable3.2", 
-"STable3.2",
-"ATable3.2",
-
-"BTable3.3",
-"LTable3.3", 
-"STable3.3", 
-"ATable3.3"
+"BTable3", "LTable3",  "STable3", "ATable3",  "BTable3.1","LTable3.1", "STable3.1", "ATable3.1", "BTable3.2","LTable3.2", 
+"STable3.2","ATable3.2","BTable3.3","LTable3.3", "STable3.3", "ATable3.3"
 
 BASE2 sinatra original "BASE2"
 ```{r}
@@ -734,90 +722,6 @@ params <- if(HCRtoplot == "BASE3"){list( #check splits 1-80 vs 1,1,1,1,1,2,2,2,2
 }
 ```
 
-"BTable3_1",
-"BTable3_2", 
-"BTable3_3", 
-"BTable3_4", 
-"BTable3_5",  
-"LTable3_1",  
-"LTable3_2", 
-"LTable3_3", 
-"LTable3_4", 
-"LTable3_5",
-"STable3_1", 
-"STable3_2", 
-"STable3_3", 
-"STable3_4",  
-"STable3_5",  
-"ATable3_1",  
-"ATable3_2", 
-"ATable3_3", 
-"ATable3_4", 
-"ATable3_5",
-
-"BTable3.1_1",
-"BTable3.1_2",
-"BTable3.1_3", 
-"BTable3.1_4",
-"BTable3.1_5", 
-"LTable3.1_1", 
-"LTable3.1_2",
-"LTable3.1_3", 
-"LTable3.1_4",
-"LTable3.1_5",
-"STable3.1_1", 
-"STable3.1_2", 
-"STable3.1_3", 
-"STable3.1_4", 
-"STable3.1_5", 
-"ATable3.1_1", 
-"ATable3.1_2",
-"ATable3.1_3", 
-"ATable3.1_4",
-"ATable3.1_5",
-
-"BTable3.2_1",
-"BTable3.2_2",
-"BTable3.2_3",
-"BTable3.2_4",
-"BTable3.2_5",
-"LTable3.2_1", 
-"LTable3.2_2", 
-"LTable3.2_3", 
-"LTable3.2_4",
-"LTable3.2_5",
-"STable3.2_1",
-"STable3.2_2", 
-"STable3.2_3", 
-"STable3.2_4", 
-"STable3.2_5", 
-"ATable3.2_1",
-"ATable3.2_2",
-"ATable3.2_3", 
-"ATable3.2_4", 
-"ATable3.2_5",
-
-"BTable3.3_1",
-"BTable3.3_2",
-"BTable3.3_3",
-"BTable3.3_4",
-"BTable3.3_5", 
-"LTable3.3_1", 
-"LTable3.3_2",
-"LTable3.3_3", 
-"LTable3.3_4", 
-"LTable3.3_5",
-"STable3.3_1", 
-"STable3.3_2", 
-"STable3.3_3", 
-"STable3.3_4", 
-"STable3.3_5", 
-"ATable3.3_1", 
-"ATable3.3_2", 
-"ATable3.3_3", 
-"ATable3.3_4", 
-"ATable3.3_5"
-
 Splitnonsplit test "SPLIT" sinatra sequential vs. parallel testing
 ```{r}
 params <- if(HCRtoplot == "SPLIT"){list(
@@ -855,7 +759,7 @@ params <- if(HCRtoplot == "SPLIT"){list(
 }
 ```
 
-BBM "BBM"
+BBM "BBM" test
 ```{r}
 #BBM V2
 params <- if(HCRtoplot == "BBMv2"){list(
@@ -1049,7 +953,7 @@ params <- if(HCRtoplot == "BBMv2"){list(
 }
 ```
 
-BRP "BRP"
+BRP "BRP" test
 ```{r}
 params <- if(HCRtoplot == "BRP"){list(
   scendir = c("~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BRP/Table2/1_bag/sim1_10/",
@@ -1242,14 +1146,572 @@ params <- if(HCRtoplot == "BRP"){list(
 }
 ```
 
+SNEC input Bin 1
+```{r}
+params <- if(HCRtoplot == "Bin1"){list( 
+  scendir = c( #BBM
+    "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/SNECinput/Bin1/50BBM2/sim1_bag/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/SNECinput/Bin1/50BBM2/sim2_length/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/SNECinput/Bin1/50BBM2/sim3_season/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/SNECinput/Bin1/50BBM2/sim4_all/",
+       
+            #BRP
+            "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/SNECinput/Bin1/50BRP/sim1_bag/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/SNECinput/Bin1/50BRP/sim2_length/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/SNECinput/Bin1/50BRP/sim3_season/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/SNECinput/Bin1/50BRP/sim4_all/",
+  
+             #PCA 
+         "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/SNECinput/Bin1/50PCA/sim1_bag/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/SNECinput/Bin1/50PCA/sim2_length/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/SNECinput/Bin1/50PCA/sim3_season/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/SNECinput/Bin1/50PCA/sim4_all/",
+  
+               #NCA
+          "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/SNECinput/Bin1/50NCA/sim1_bag/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/SNECinput/Bin1/50NCA/sim2_length/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/SNECinput/Bin1/50NCA/sim3_season/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/SNECinput/Bin1/50NCA/sim4_all/"
+        ),
+  scen.name = c(
+"BTable3",
+"LTable3",  
+"STable3", 
+"ATable3",  
+
+"BTable3.1",
+"LTable3.1", 
+"STable3.1", 
+"ATable3.1", 
+
+"BTable3.2",
+"LTable3.2", 
+"STable3.2",
+"ATable3.2",
+
+"BTable3.3",
+"LTable3.3", 
+"STable3.3", 
+"ATable3.3"
+  ),
+  fsim = rep(1,16))
+}
+```
+
+SNEC input Bin 3
+```{r}
+params <- if(HCRtoplot == "Bin3"){list( 
+  scendir = c( #BBM
+    "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/SNECinput/Bin3/50BBM2/sim1_bag/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/SNECinput/Bin3/50BBM2/sim2_length/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/SNECinput/Bin3/50BBM2/sim3_season/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/SNECinput/Bin3/50BBM2/sim4_all/",
+       
+            #BRP
+            "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/SNECinput/Bin3/50BRP/sim1_bag/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/SNECinput/Bin3/50BRP/sim2_length/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/SNECinput/Bin3/50BRP/sim3_season/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/SNECinput/Bin3/50BRP/sim4_all/",
+  
+             #PCA 
+         "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/SNECinput/Bin3/50PCA/sim1_bag/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/SNECinput/Bin3/50PCA/sim2_length/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/SNECinput/Bin3/50PCA/sim3_season/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/SNECinput/Bin3/50PCA/sim4_all/",
+  
+               #NCA
+          "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/SNECinput/Bin3/50NCA/sim1_bag/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/SNECinput/Bin3/50NCA/sim2_length/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/SNECinput/Bin3/50NCA/sim3_season/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/SNECinput/Bin3/50NCA/sim4_all/"
+        ),
+  scen.name = c(
+"BTable3",
+"LTable3",  
+"STable3", 
+"ATable3",  
+
+"BTable3.1",
+"LTable3.1", 
+"STable3.1", 
+"ATable3.1", 
+
+"BTable3.2",
+"LTable3.2", 
+"STable3.2",
+"ATable3.2",
+
+"BTable3.3",
+"LTable3.3", 
+"STable3.3", 
+"ATable3.3"
+  ),
+  fsim = rep(1,16))
+}
+```
+
+SNEC input Bin 7 
+```{r}
+params <- if(HCRtoplot == "Bin7"){list( #was 102024 before 11/22/24
+  scendir = c( #BBM
+    "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/SNECinput/Bin7/50BBM2/sim1_bag/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/SNECinput/Bin7/50BBM2/sim2_length/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/SNECinput/Bin7/50BBM2/sim3_season/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/SNECinput/Bin7/50BBM2/sim4_all/",
+       
+            #BRP
+            "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/SNECinput/Bin7/50BRP/sim1_bag/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/SNECinput/Bin7/50BRP/sim2_length/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/SNECinput/Bin7/50BRP/sim3_season/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/SNECinput/Bin7/50BRP/sim4_all/",
+  
+             #PCA 
+         "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/SNECinput/Bin7/50PCA/sim1_bag/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/SNECinput/Bin7/50PCA/sim2_length/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/SNECinput/Bin7/50PCA/sim3_season/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/SNECinput/Bin7/50PCA/sim4_all/",
+  
+               #NCA
+          "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/SNECinput/Bin7/50NCA/sim1_bag/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/SNECinput/Bin7/50NCA/sim2_length/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/SNECinput/Bin7/50NCA/sim3_season/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/SNECinput/Bin7/50NCA/sim4_all/"
+        ),
+  scen.name = c(
+"BTable3",
+"LTable3",  
+"STable3", 
+"ATable3",  
+
+"BTable3.1",
+"LTable3.1", 
+"STable3.1", 
+"ATable3.1", 
+
+"BTable3.2",
+"LTable3.2", 
+"STable3.2",
+"ATable3.2",
+
+"BTable3.3",
+"LTable3.3", 
+"STable3.3", 
+"ATable3.3"
+  ),
+  fsim = rep(1,16))
+}
+```
+
+RDM GAM Bin 1 <- most recent version
+```{r}
+params <- if(HCRtoplot == "RDMBin1"){list( 
+  scendir = c( #BBM
+    "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin1/50BBM2/sim1_bag/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin1/50BBM2/sim2_length/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin1/50BBM2/sim3_season/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin1/50BBM2/sim4_all/",
+       
+            #BRP
+            "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin1/50BRP/sim1_bag/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin1/50BRP/sim2_length/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin1/50BRP/sim3_season/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin1/50BRP/sim4_all/",
+  
+             #PCA 
+         "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin1/50PCA/sim1_bag/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin1/50PCA/sim2_length/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin1/50PCA/sim3_season/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin1/50PCA/sim4_all/",
+  
+               #NCA
+          "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin1/50NCA/sim1_bag/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin1/50NCA/sim2_length/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin1/50NCA/sim3_season/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin1/50NCA/sim4_all/"
+        ),
+  scen.name = c(
+"BTable3",
+"LTable3",  
+"STable3", 
+"ATable3",  
+
+"BTable3.1",
+"LTable3.1", 
+"STable3.1", 
+"ATable3.1", 
+
+"BTable3.2",
+"LTable3.2", 
+"STable3.2",
+"ATable3.2",
+
+"BTable3.3",
+"LTable3.3", 
+"STable3.3", 
+"ATable3.3"
+  ),
+  fsim = rep(1,16))
+}
+```
+
+RDM GAM Bin 3 <- most recent version
+```{r}
+params <- if(HCRtoplot == "RDMBin3"){list( 
+  scendir = c( #BBM
+    "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin3/50BBM2/sim1_bag/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin3/50BBM2/sim2_length/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin3/50BBM2/sim3_season/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin3/50BBM2/sim4_all/",
+       
+            #BRP
+            "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin3/50BRP/sim1_bag/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin3/50BRP/sim2_length/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin3/50BRP/sim3_season/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin3/50BRP/sim4_all/",
+  
+             #PCA 
+         "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin3/50PCA/sim1_bag/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin3/50PCA/sim2_length/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin3/50PCA/sim3_season/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin3/50PCA/sim4_all/",
+  
+               #NCA
+          "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin3/50NCA/sim1_bag/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin3/50NCA/sim2_length/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin3/50NCA/sim3_season/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin3/50NCA/sim4_all/"
+        ),
+  scen.name = c(
+"BTable3",
+"LTable3",  
+"STable3", 
+"ATable3",  
+
+"BTable3.1",
+"LTable3.1", 
+"STable3.1", 
+"ATable3.1", 
+
+"BTable3.2",
+"LTable3.2", 
+"STable3.2",
+"ATable3.2",
+
+"BTable3.3",
+"LTable3.3", 
+"STable3.3", 
+"ATable3.3"
+  ),
+  fsim = rep(1,16))
+}
+```
+
+RDM GAM Bin 7 <- most recent version
+```{r}
+params <- if(HCRtoplot == "RDMBin7"){list( #was 102024 before 11/22/24
+  scendir = c( #BBM
+    "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin7/50BBM2/sim1_bag/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin7/50BBM2/sim2_length/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin7/50BBM2/sim3_season/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin7/50BBM2/sim4_all/",
+       
+            #BRP
+            "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin7/50BRP/sim1_bag/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin7/50BRP/sim2_length/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin7/50BRP/sim3_season/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin7/50BRP/sim4_all/",
+  
+             #PCA 
+         "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin7/50PCA/sim1_bag/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin7/50PCA/sim2_length/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin7/50PCA/sim3_season/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin7/50PCA/sim4_all/",
+  
+               #NCA
+          "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin7/50NCA/sim1_bag/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin7/50NCA/sim2_length/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin7/50NCA/sim3_season/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin7/50NCA/sim4_all/"
+        ),
+  scen.name = c(
+"BTable3",
+"LTable3",  
+"STable3", 
+"ATable3",  
+
+"BTable3.1",
+"LTable3.1", 
+"STable3.1", 
+"ATable3.1", 
+
+"BTable3.2",
+"LTable3.2", 
+"STable3.2",
+"ATable3.2",
+
+"BTable3.3",
+"LTable3.3", 
+"STable3.3", 
+"ATable3.3"
+  ),
+  fsim = rep(1,16))
+}
+```
+
+Original Runs
+```{r}
+params <- list(
+  scendir = c("~/Desktop/FlounderMSE/mafmc-recmeasures/sims/113/",
+              "~/Desktop/FlounderMSE/mafmc-recmeasures/sims/114/",
+              "~/Desktop/FlounderMSE/mafmc-recmeasures/sims/115/",
+              "~/Desktop/FlounderMSE/mafmc-recmeasures/sims/116/",
+              "~/Desktop/FlounderMSE/mafmc-recmeasures/sims/117/",
+              "~/Desktop/FlounderMSE/mafmc-recmeasures/sims/118/",
+              "~/Desktop/FlounderMSE/mafmc-recmeasures/sims/119/",
+              "~/Desktop/FlounderMSE/mafmc-recmeasures/sims/120/",
+              "~/Desktop/FlounderMSE/mafmc-recmeasures/sims/121/",
+              "~/Desktop/FlounderMSE/mafmc-recmeasures/sims/122/",
+              "~/Desktop/FlounderMSE/mafmc-recmeasures/sims/123/",
+              "~/Desktop/FlounderMSE/mafmc-recmeasures/sims/124/"
+              ),
+  scen.name = c("MP 1",
+                "MP 2",
+                "MP 3",
+                "MP 4",
+                "MP 5",
+                "MP 6",
+                "MP 7",
+                "MP 8",
+                "MP 9",
+                "MP 10",
+                "MP 11",
+                "MP 12"
+                ),
+  fsim = rep(1,12))
+
+params <- list(
+  scendir = c("~/Desktop/FlounderMSE/mafmc-recmeasures/sims/125/",
+              "~/Desktop/FlounderMSE/mafmc-recmeasures/sims/126/",
+              "~/Desktop/FlounderMSE/mafmc-recmeasures/sims/127/",
+              "~/Desktop/FlounderMSE/mafmc-recmeasures/sims/128/",
+              "~/Desktop/FlounderMSE/mafmc-recmeasures/sims/129/",
+              "~/Desktop/FlounderMSE/mafmc-recmeasures/sims/130/",
+              "~/Desktop/FlounderMSE/mafmc-recmeasures/sims/131/",
+              "~/Desktop/FlounderMSE/mafmc-recmeasures/sims/132/",
+              "~/Desktop/FlounderMSE/mafmc-recmeasures/sims/133/",
+              "~/Desktop/FlounderMSE/mafmc-recmeasures/sims/134/",
+              "~/Desktop/FlounderMSE/mafmc-recmeasures/sims/135/",
+              "~/Desktop/FlounderMSE/mafmc-recmeasures/sims/136/"
+             ),
+  scen.name = c("MP 1",
+                "MP 2",
+                "MP 3",
+                "MP 4",
+                "MP 5",
+                "MP 6",
+                "MP 7",
+                "MP 8",
+                "MP 9",
+                "MP 10",
+                "MP 11",
+                "MP 12"
+                ),
+  fsim = rep(1,12))
+
+params <- list(
+  scendir = c("~/Desktop/FlounderMSE/mafmc-recmeasures/sims/225/",
+              "~/Desktop/FlounderMSE/mafmc-recmeasures/sims/226/",
+              "~/Desktop/FlounderMSE/mafmc-recmeasures/sims/227/",
+              "~/Desktop/FlounderMSE/mafmc-recmeasures/sims/228/",
+              "~/Desktop/FlounderMSE/mafmc-recmeasures/sims/229/",
+              "~/Desktop/FlounderMSE/mafmc-recmeasures/sims/230/",
+              "~/Desktop/FlounderMSE/mafmc-recmeasures/sims/231/",
+              "~/Desktop/FlounderMSE/mafmc-recmeasures/sims/232/",
+              "~/Desktop/FlounderMSE/mafmc-recmeasures/sims/233/",
+              "~/Desktop/FlounderMSE/mafmc-recmeasures/sims/234/",
+              "~/Desktop/FlounderMSE/mafmc-recmeasures/sims/235/",
+              "~/Desktop/FlounderMSE/mafmc-recmeasures/sims/236/"
+              ),
+  scen.name = c("MP 1",
+                "MP 2",
+                "MP 3",
+                "MP 4",
+                "MP 5",
+                "MP 6",
+                "MP 7",
+                "MP 8",
+                "MP 9",
+                "MP 10",
+                "MP 11",
+                "MP 12"
+                ),
+  fsim = rep(1,12))
+```
+
+MultiRegUpdate
+```{r}
+params <- list( #was 102024 before 11/22/24
+  scendir = c( #BBM
+    "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/MultiRegUpdateTest/NewSinatra/BBM2/sim1_bag/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/MultiRegUpdateTest/NewSinatra/BBM2/sim2_length/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/MultiRegUpdateTest/NewSinatra/BBM2/sim3_season/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/MultiRegUpdateTest/NewSinatra/BBM2/sim4_all/",
+       
+            #BRP
+            "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/MultiRegUpdateTest/NewSinatra/BRP/sim1_bag/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/MultiRegUpdateTest/NewSinatra/BRP/sim2_length/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/MultiRegUpdateTest/NewSinatra/BRP/sim3_season/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/MultiRegUpdateTest/NewSinatra/BRP/sim4_all/",
+  
+             #PCA 
+         "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/MultiRegUpdateTest/NewSinatra/PCA/sim1_bag/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/MultiRegUpdateTest/NewSinatra/PCA/sim2_length/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/MultiRegUpdateTest/NewSinatra/PCA/sim3_season/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/MultiRegUpdateTest/NewSinatra/PCA/sim4_all/",
+  
+               #NCA
+          "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/MultiRegUpdateTest/NewSinatra/NCA/sim1_bag/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/MultiRegUpdateTest/NewSinatra/NCA/sim2_length/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/MultiRegUpdateTest/NewSinatra/NCA/sim3_season/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/MultiRegUpdateTest/NewSinatra/NCA/sim4_all/"
+        ),
+  scen.name = c(
+"BTable3",
+"LTable3",  
+"STable3", 
+"ATable3",  
+
+"BTable3.1",
+"LTable3.1", 
+"STable3.1", 
+"ATable3.1", 
+
+"BTable3.2",
+"LTable3.2", 
+"STable3.2",
+"ATable3.2",
+
+"BTable3.3",
+"LTable3.3", 
+"STable3.3", 
+"ATable3.3"
+  ),
+  fsim = rep(1,16))
+
+params <- list( #was 102024 before 11/22/24
+  scendir = c( #BBM
+    "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/MultiRegUpdateTest/OldSinatra/BBM2/sim1_bag/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/MultiRegUpdateTest/OldSinatra/BBM2/sim2_length/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/MultiRegUpdateTest/OldSinatra/BBM2/sim3_season/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/MultiRegUpdateTest/OldSinatra/BBM2/sim4_all/",
+       
+            #BRP
+            "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/MultiRegUpdateTest/OldSinatra/BRP/sim1_bag/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/MultiRegUpdateTest/OldSinatra/BRP/sim2_length/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/MultiRegUpdateTest/OldSinatra/BRP/sim3_season/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/MultiRegUpdateTest/OldSinatra/BRP/sim4_all/",
+  
+             #PCA 
+         "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/MultiRegUpdateTest/OldSinatra/PCA/sim1_bag/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/MultiRegUpdateTest/OldSinatra/PCA/sim2_length/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/MultiRegUpdateTest/OldSinatra/PCA/sim3_season/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/MultiRegUpdateTest/OldSinatra/PCA/sim4_all/",
+  
+               #NCA
+          "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/MultiRegUpdateTest/OldSinatra/NCA/sim1_bag/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/MultiRegUpdateTest/OldSinatra/NCA/sim2_length/",
+                 "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/MultiRegUpdateTest/OldSinatra/NCA/sim3_season/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/MultiRegUpdateTest/OldSinatra/NCA/sim4_all/"
+        ),
+  scen.name = c(
+"BTable3",
+"LTable3",  
+"STable3", 
+"ATable3",  
+
+"BTable3.1",
+"LTable3.1", 
+"STable3.1", 
+"ATable3.1", 
+
+"BTable3.2",
+"LTable3.2", 
+"STable3.2",
+"ATable3.2",
+
+"BTable3.3",
+"LTable3.3", 
+"STable3.3", 
+"ATable3.3"
+  ),
+  fsim = rep(1,16))
+```
+
+Alternative HCRs 
+```{r}
+params <- if(HCRtoplot == "AlternativeBBM"){list( 
+  scendir = c( #BBM
+    "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/AlternativeHCRs/BBM/sim1_10/",
+    "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/AlternativeHCRs/BBM/sim2_13/",
+    "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/AlternativeHCRs/BBM/sim3_14/",
+    "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/AlternativeHCRs/BBM/sim4_15/",
+    "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/AlternativeHCRs/BBM/sim5_16/",
+    "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/AlternativeHCRs/BBM/sim6_17/",
+    "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/AlternativeHCRs/BBM/sim7_18/",
+    "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/AlternativeHCRs/BBM/sim8_19/"
+            
+        ),
+  scen.name = c(
+"ATable3.0", 
+"ATable3.1",
+"ATable3.2",
+"ATable3.3",
+"ATable3.4",
+"ATable3.5",
+"ATable3.6",
+"ATable3.7"
+  ),
+  fsim = rep(1,8))
+}
+
+params <- if(HCRtoplot == "AlternativeBRP"){list( 
+  scendir = c( #BRP
+    "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/AlternativeHCRs/BRP/sim1_10/",
+    "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/AlternativeHCRs/BRP/sim2_13/",
+    "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/AlternativeHCRs/BRP/sim3_14/",
+    "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/AlternativeHCRs/BRP/sim4_15/",
+    "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/AlternativeHCRs/BRP/sim5_16/",
+    "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/AlternativeHCRs/BRP/sim6_17/",
+    "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/AlternativeHCRs/BRP/sim7_18/",
+    "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/AlternativeHCRs/BRP/sim8_19/"
+            
+        ),
+  scen.name = c(
+
+"ATable2.0", 
+"ATable2.1",
+"ATable2.2",
+"ATable2.3",
+"ATable2.4",
+"ATable2.5",
+"ATable2.6",
+"ATable2.7"
+  ),
+  fsim = rep(1,8))
+}
+```
+
 Organize Output
 ```{r}
 #summarize the output files DONT RERUN THIS UNLESS NEEDED
 all_results <- purrr::pmap_dfr(params,read_results, om.name=5)
+#View(all_results)
 ```
 
+Generate time series of metrics 
 ```{r}
 #View(all_results)
+
 #generate time series of metrics
 diag_ts <- get_diag_ts(all_results) %>% 
   mutate(nurow = ifelse(type == "spawning biomass" & value == 0,0,1),
@@ -1258,6 +1720,7 @@ diag_ts <- get_diag_ts(all_results) %>%
   select(-nurow)
 ```
 
+Categorize HCR and regulation scenarios
 ```{r}
 #if you don't want to merge with external spreadsheet, and have selected the character name option, run this:
 
@@ -1282,19 +1745,44 @@ diag_ts$isim <- ifelse(stringr::str_sub(diag_ts$scenario,-1) == "2",
                                      ifelse(stringr::str_sub(diag_ts$scenario,-1) == "5",
                                              diag_ts$isim + 40, diag_ts$isim))))
 
-#change these criteria as needed depending on scenario 
+#change what to name them to as needed depending on scenario 
 diag_ts$scenario <- ifelse(substr(diag_ts$scenario, 2,8) != "Table3.", "BBM",
                                    ifelse(substr(diag_ts$scenario, 2,9) == "Table3.1", "BRP",
                                    ifelse(substr(diag_ts$scenario, 2,9) == "Table3.2", "PCA",
                                    ifelse(substr(diag_ts$scenario, 2,9) == "Table3.3", "NCA",
-                                  ifelse(substr(diag_ts$scenario, 2,9) == "Table3.4", "Table3.4",
+                                  ifelse(substr(diag_ts$scenario, 2,9) == "Table3.4", "Table3.4", 
                                     ifelse(substr(diag_ts$scenario, 2,9) == "Table3.5", "Table3.5",
                                     ifelse(substr(diag_ts$scenario, 2,9) == "Table3.6", "Table3.6",
                                    ifelse(substr(diag_ts$scenario, 2,9) == "Table3.7", "Table3.7", NA))))))))
 
+```
+
+Label Alternative BBM and BRP
+
+```{r}
+diag_ts$scenario <- ifelse(substr(diag_ts$scenario, 2,9) == "Table3.0", "BBM",
+                                   ifelse(substr(diag_ts$scenario, 2,9) == "Table3.1", "BBM_Alternative1",
+                                   ifelse(substr(diag_ts$scenario, 2,9) == "Table3.2", "BBM_Alternative2",
+                                   ifelse(substr(diag_ts$scenario, 2,9) == "Table3.3", "BBM_Alternative3",
+                                  ifelse(substr(diag_ts$scenario, 2,9) == "Table3.4", "BBM_Alternative4",
+                                    ifelse(substr(diag_ts$scenario, 2,9) == "Table3.5", "BBM_Alternative5",
+                                    ifelse(substr(diag_ts$scenario, 2,9) == "Table3.6", "BBM_Alternative6",
+                                   ifelse(substr(diag_ts$scenario, 2,9) == "Table3.7", "BBM_Alternative7",
+                                          
+                                   ifelse(substr(diag_ts$scenario, 2,9) == "Table2.0", "BRP",
+                                   ifelse(substr(diag_ts$scenario, 2,9) == "Table2.1", "BRP_Alternative1",
+                                   ifelse(substr(diag_ts$scenario, 2,9) == "Table2.2", "BRP_Alternative2",
+                                   ifelse(substr(diag_ts$scenario, 2,9) == "Table2.3", "BRP_Alternative3",
+                                  ifelse(substr(diag_ts$scenario, 2,9) == "Table2.4", "BRP_Alternative4",
+                                    ifelse(substr(diag_ts$scenario, 2,9) == "Table2.5", "BRP_Alternative5",
+                                    ifelse(substr(diag_ts$scenario, 2,9) == "Table2.6", "BRP_Alternative6",
+                                   ifelse(substr(diag_ts$scenario, 2,9) == "Table2.7", "BRP_Alternative7",      
+                                          NA))))))))))))))))
+
  # View(diag_ts)
 ```
 
+Time series plots
 ```{r}
 # # time series plots
  p1 <- diag_ts %>% 
@@ -1305,12 +1793,13 @@ diag_ts$scenario <- ifelse(substr(diag_ts$scenario, 2,8) != "Table3.", "BBM",
    projection.plot()
 ```
 
+Summarize metrics 
 ```{r}
  ###### summarizing metrics
 
 metrics <- diag_ts %>% 
   filter(year >= 2036) %>%   #2036 in original to get end of time series
-  group_by(om, scenario, isim, 
+  group_by(om, scenario, isim,
          RegType, #for if using code, remove this if merging from spreadsheet 
            type) %>% 
   summarize(value = case_when(
@@ -1325,9 +1814,23 @@ metrics <- diag_ts %>%
     metric == "B/Bref" ~ "not overfished",
     TRUE ~ metric))
 #View(metrics)
+
 median_metrics <- metrics %>% 
   group_by(om, mp, metric) %>% 
   summarize(value = median(value, na.rm=TRUE))
+
+#test <- metrics %>% filter(mp == "BBM", metric == "trophy" )
+#median(test$value)
+
+median_metrics2 <- metrics %>% 
+  group_by(om, RegType, metric) %>% 
+  summarize(value = median(value, na.rm=TRUE))
+
+#both 
+median_metrics3 <- metrics %>% 
+  group_by(om, RegType, mp, metric) %>% 
+  summarize(value = median(value, na.rm=TRUE))
+
 #################################################
 
 #OR use this to read in a spreadsheet of scenario names and specs
@@ -1339,7 +1842,8 @@ State Information
 ```{r}
 ### state information ###
 
-read_state_results <- function(scendir = "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/82824/BBM2/",scen.name="compare",
+read_state_results <- function(scendir = "",
+                               scen.name="compare",
                                om.name = 1,
                          fsim = 1) {
 
@@ -1357,7 +1861,7 @@ state_recoutput <- recoutput2 %>%
 return(state_recoutput)
 }
 
-
+#how it originally was
 get_state_ts <- function(results) {
   
   diag_ts <- results %>% 
@@ -1422,7 +1926,8 @@ state_metrics <- get_state_ts(state_results) %>%
   # filter(nurow==1) %>% 
   # select(-nurow)
   filter(year >= 2036) %>%   #2036 in original
-  group_by(scenario, type, isim, state) %>% 
+  group_by(scenario, type, isim, state
+           ) %>% 
   summarize(#value = case_when(
     # type == "F/Fref" ~ mean(value<1, na.rm=TRUE),
     # type == "B/Bref" ~ mean(value>0.5, na.rm=TRUE),
@@ -1446,6 +1951,16 @@ state_metrics <- get_state_ts(state_results) %>%
     substr(state_metrics$mp, 1,1) == "A", "All", NA  
     ))))) 
  
+ state_metrics$mp <- ifelse(substr(state_metrics$mp, 2,8) != "Table3.", "BBM",
+                                   ifelse(substr(state_metrics$mp, 2,9) == "Table3.1", "BRP",
+                                   ifelse(substr(state_metrics$mp, 2,9) == "Table3.2", "PCA",
+                                   ifelse(substr(state_metrics$mp, 2,9) == "Table3.3", "NCA",
+                                  ifelse(substr(state_metrics$mp, 2,9) == "Table3.4", "Table3.4",
+                                    ifelse(substr(state_metrics$mp, 2,9) == "Table3.5", "Table3.5",
+                                    ifelse(substr(state_metrics$mp, 2,9) == "Table3.6", "Table3.6",
+                                   ifelse(substr(state_metrics$mp, 2,9) == "Table3.7", "Table3.7", NA))))))))
+
+ #probably not necessary -> same code for splitsims 
 state_metrics$isim <- ifelse(stringr::str_sub(state_metrics$mp,-1) == "2",
                                              state_metrics$isim + 10, 
                        ifelse(stringr::str_sub(state_metrics$mp,-1) == "3",
@@ -1458,47 +1973,130 @@ state_metrics$isim <- ifelse(stringr::str_sub(state_metrics$mp,-1) == "2",
 
 state_metrics$om <- 5.  #dummy value for 2024 rec measures modeling
 
+#state metrics plotting code from 2022 MSE
+
+#harvest control rules
+do_state_bp <- function(state_metrics = NULL) {
+  title_metric <- state_metrics$metric[1]
+  state_bp <- state_metrics %>% 
+    #filter(metric %in% c("change_cs")) %>%  #c("kept per trip")) %>% 
+  ggplot() +
+  aes(x = mp, y = value, fill = mp) +
+  geom_boxplot(outlier.shape=NA) +
+  scale_fill_brewer(type = "qual", palette = 2) +
+  facet_wrap(~state, scale = "free_y") +
+  #facet_wrap(~metric, scale = "free_y") +
+  ylab("") +
+  xlab("") +
+  theme_bw() +
+  #ylim(0,5e+06) +
+  theme(legend.position = "bottom",
+        axis.text.x = element_blank()) +
+  labs(fill = "",
+       title = title_metric) + #kept per trip") +
+  guides(fill = guide_legend(nrow = 1))
+  return(state_bp)
+}
+
+state_bp <- state_metrics %>% 
+#  filter(om == 1) %>% 
+   mutate(scenario = fct_recode(mp,
+                   "Percent Change Approach" = "PCA",
+                   "Biological Reference Point" = "BRP", 
+                   "Biomass Based Matrix" = "BBM", 
+                   "No Change Approach" = "NCA")) %>% 
+  nest_by(metric,.keep = TRUE) %>% 
+  mutate(bp = list(do_state_bp(data)))
+
+for (i in seq_along(state_bp$metric)){
+  tmp <- state_bp$bp[[i]]
+  cat("####", tmp$data$metric[1], " \n")
+  print(tmp)
+  cat(" \n\n")
+}
+
+#regulations
+do_state_bp_2 <- function(state_metrics = NULL) {
+  title_metric <- state_metrics$metric[1]
+  state_bp <- state_metrics %>% 
+    #filter(metric %in% c("change_cs")) %>%  #c("kept per trip")) %>% 
+  ggplot() +
+  aes(x = RegType, y = value, fill = RegType) +
+  geom_boxplot(outlier.shape=NA) +
+ # scale_fill_brewer(type = "qual", palette = 1) +
+  scale_fill_manual(values = c("#66a61e", "#e6ab02", "#a6761d", "#d95f02")) + 
+  facet_wrap(~state, scale = "free_y") +
+  #facet_wrap(~metric, scale = "free_y") +
+  ylab("") +
+  xlab("") +
+  theme_bw() +
+  #ylim(0,5e+06) +
+  theme(legend.position = "bottom",
+        axis.text.x = element_blank()) +
+  labs(fill = "",
+       title = title_metric) + #kept per trip") +
+  guides(fill = guide_legend(nrow = 1))
+  return(state_bp)
+}
+
+state_bp <- state_metrics %>% 
+#  filter(om == 1) %>% 
+   mutate(scenario = fct_recode(RegType,
+                   "Percent Change Approach" = "All",
+                   "Biological Reference Point" = "Bag", 
+                   "Biomass Based Matrix" = "Length", 
+                   "No Change Approach" = "Season")) %>% 
+  nest_by(metric,.keep = TRUE) %>% 
+  mutate(bp = list(do_state_bp_2(data)))
+
+for (i in seq_along(state_bp$metric)){
+  tmp <- state_bp$bp[[i]]
+  cat("####", tmp$data$metric[1], " \n")
+  print(tmp)
+  cat(" \n\n")
+}
+
+#seems like a lot of the performnace metrics used in the boxplot are coastwide (e.g. not sure how to do F/FMSY for each state without creating an extremely complicated unrealistic pseudo-assessment) and the state-specific ones are ones taken from RDM output 
 ```
 
-Save Files
+Save Files  
 ```{r}
-saveRDS(metrics,"~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/101624/baseregsposter.rds")
-saveRDS(median_metrics,"~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/101624/median_baseregsposter.rds")
+#saveRDS(metrics,"~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/101624/baseregsposter.rds")
+#saveRDS(median_metrics,"~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/101624/median_baseregsposter.rds")
 #saveRDS(state_metrics,"~/Desktop/FlounderMSE/kw_sims_test/MSE_boxplots/82824/full_state_metricsBBMv2_#regchanged.rds") 
-```
-
-Make Plots
-```{r}
 # #metrics <- readRDS("all_results_distrib.rds")
 # #median_metrics <- readRDS("all_results_medians.rds")
-metrics <- readRDS("~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/101624/baseregsposter.rds")
-median_metrics <- readRDS("~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/101624/median_baseregsposter.rds")
-state_metrics <- readRDS("~/Desktop/FlounderMSE/kw_sims_test/MSE_boxplots/82824/full_state_metricsBBMv2_regchanged.rds") %>%
-  mutate(state = fct_relevel(state,
-                             c("MA","RI","CT","NY","NJ","DE","MD","VA","NC")))
+#metrics <- readRDS("~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/101624/baseregsposter.rds")
+#median_metrics <- readRDS("~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/101624/median_baseregsposter.rds")
+#state_metrics <- readRDS("~/Desktop/FlounderMSE/kw_sims_test/MSE_boxplots/82824/full_state_metricsBBMv2_regchanged.rds") %>%
+ # mutate(state = fct_relevel(state,
+ #                            c("MA","RI","CT","NY","NJ","DE","MD","VA","NC")))
 
-state_medians <- state_metrics %>% 
-  group_by(om, mp, state, metric) %>% 
-  summarize(value = median(value, na.rm=TRUE)) %>% 
-  I()
+#state_medians <- state_metrics %>% 
+#  group_by(om, mp, state, metric) %>% 
+#  summarize(value = median(value, na.rm=TRUE)) %>% 
+#  I()
 
 #metrics3 <- rbind(metrics, metrics1)
 #View(metrics3)
+```
 
+Prepare table for plotting
+```{r}
 #prepare table for plotting 
 metrics2 <- metrics %>% 
  # left_join(scen_lookup) %>% #include this if using sheet
   mutate(om = factor(om),
       #   om = fct_recode(om, "Base" = "1","MRIP Bias" = "2","Shift" = "3"),
          mp2 = fct_recode(factor(mp), #put hcr if using sheet, mp if using code in here
-                          "BNonsplit_bag" = "BNonsplit_bag",
-                          "BSplit_bag" = "BSplit_bag",
-                           "ANonsplit_all" = "ANonsplit_all",
-                          "ASplit_all" = "ASplit_all",
-                       #   "PCA" = "PCA",
-                       #   "BRP" = "BRP",
-                       #   "BBM" = "BBM",
-                       #   "NCA" = "NCA",
+                       #   "BNonsplit_bag" = "BNonsplit_bag",
+                       #   "BSplit_bag" = "BSplit_bag",
+                       #    "ANonsplit_all" = "ANonsplit_all",
+                       #   "ASplit_all" = "ASplit_all",
+                          "Percent Change Approach" = "PCA",
+                          "Biological Ref. Point" = "BRP",
+                          "Biomass Matrix" = "BBM",
+                          "No Change (RHL as target)" = "NCA",
                           #   "Table3" = "Table3",
                        #  "Table3.1" = "Table3.1",
                        #  "Table3.2" = "Table3.2",
@@ -1508,13 +2106,13 @@ metrics2 <- metrics %>%
                      #    "Table3.6" = "Table3.6",
                      #    "Table3.7" = "Table3.7"
                         ),
-       #  mp3 = fct_collapse(factor(RegType), #reg_to_change if sheet, RegType if not
-       #              "Bag" = "Bag",
-         #             "Length" = "Length",
-            #             "Season" = "Season",
-             #         "All" = "All"
-             #        ),
-   #     mp3 = fct_relevel(mp3, "bag", "season"),
+         mp3 = fct_collapse(factor(RegType), #reg_to_change if sheet, RegType if not
+                     "Bag" = "Bag",
+                      "Len" = "Length",
+                         "Seas" = "Season",
+                      "All" = "All"
+                     ),
+        mp3 = fct_relevel(mp3, "Bag", "Len", "Seas", "All"),
          #value = ifelse(metric == "exp_keep", 0.39*value, value),
          metric = factor(metric, levels = c("keep_one",
                                             "kept per trip", #_mp1",
@@ -1539,22 +2137,97 @@ metrics2 <- metrics %>%
 #View(metrics2)
 ```
 
+Prepare table for plotting alternative HCRs
+```{r}
 
+#ALTERNATIVE HCRs
+
+metrics2 <- metrics %>% 
+ # left_join(scen_lookup) %>% #include this if using sheet
+  mutate(om = factor(om),
+      #   om = fct_recode(om, "Base" = "1","MRIP Bias" = "2","Shift" = "3"),
+         mp2 = fct_recode(factor(mp), #put hcr if using sheet, mp if using code in here
+                       #   "BNonsplit_bag" = "BNonsplit_bag",
+                       #   "BSplit_bag" = "BSplit_bag",
+                       #    "ANonsplit_all" = "ANonsplit_all",
+                       #   "ASplit_all" = "ASplit_all",
+                       #   "Percent Change Approach" = "PCA",
+                       #   "Biological Ref. Point" = "BRP",
+                       #   "Biomass Matrix" = "BBM",
+                       #   "No Change (RHL as target)" = "NCA",
+                       #   "BBM" = "BBM",
+                       #   "Alt 1" = "BBM_Alternative1",
+                       #   "Alt 2" = "BBM_Alternative2",
+                       #   "Alt 3" = "BBM_Alternative3",
+                       #   "Alt 4" = "BBM_Alternative4",
+                       #   "Alt 5" = "BBM_Alternative5",
+                       #   "Alt 6" = "BBM_Alternative6",
+                       #   "Alt 7" = "BBM_Alternative7"#,
+                          "BRP" = "BRP",
+                          "Alt 1" = "BRP_Alternative1",
+                          "Alt 2" = "BRP_Alternative2",
+                          "Alt 3" = "BRP_Alternative3",
+                          "Alt 4" = "BRP_Alternative4",
+                          "Alt 5" = "BRP_Alternative5",
+                          "Alt 6" = "BRP_Alternative6",
+                          "Alt 7" = "BRP_Alternative7"
+                        ),
+         mp3 = fct_collapse(factor(RegType), #reg_to_change if sheet, RegType if not
+                  #   "Bag" = "Bag",
+                  #    "Len" = "Length",
+                   #      "Seas" = "Season",
+                      "All" = "All"
+                     ),
+        mp3 = fct_relevel(mp3, #"Bag", "Len", "Seas",
+                          "All"),
+         #value = ifelse(metric == "exp_keep", 0.39*value, value),
+         metric = factor(metric, levels = c("keep_one",
+                                            "kept per trip", #_mp1",
+                                            "cs_per_trip",
+                                            "trophy",
+                                            #"keep_one_mp1",
+                                            "keep_one_range", #_mp1",
+                                            "kept:released", #_mp1",
+                                            #"kept:rel_range", #_mp1",
+                                            "not overfished",
+                                            "not overfishing",
+                                            "spawning biomass", #_mp1",
+                                            "rel per trip", #_mp1",
+                                            "rec_removals", #_mp1",
+                                            "prop_female",
+                                            "ntrips", #_mp1",
+                                            "change_cs"#,
+                                            #"exp_keep"
+                                            #"gdp_mp1"
+                                            ))) 
+```
+
+Boxplot
 ```{r}
 # add boxplots
+#y_limits <- data.frame(
+#  metric = c("keep_one","kept per trip","cs_per_trip","trophy","kept:released","not overfished",
+ # "not overfishing","spawning biomass","rel per trip","rec_removals","prop_female",
+ # "ntrips"),
+ # ymin = c(0,0,-20, 0,0,0,0,0,0,0,0,0),
+ # ymax = c(0.4, 0.75, 20, 0.075, 0.25, 1, 1, 6000, 5, 15000, 0.75, 1.3e7)
+#)
+#metrics2 <- metrics2 %>% left_join(y_limits, by = "metric") 
+
 p2 <- metrics2 %>% 
   drop_na() %>% 
   filter(!(metric %in% c("change_cs","keep_one_range"))) %>% 
   droplevels() %>% 
   #filter(om == "Base") %>% 
   ggplot() +
- # aes(x = mp3, y = value, fill = mp2) +
-  aes(x = mp2, y = value, fill = mp2) +
+  aes(x = mp3, y = value, fill = mp2) +
+ # aes(x = mp2, y = value, fill = mp2) +
   geom_boxplot(outlier.shape=NA) +
   scale_fill_brewer(type = "qual", palette = 2) +
-  facet_wrap(~metric, scale = "free_y", drop = F) +
-  ylab("performance metric value") +
-  xlab("regulation to change") +
+  facet_wrap(~metric, scale = "free_y",drop = F) +
+ #  coord_cartesian(ylim = c(min(metrics2$ymin), max(metrics2$ymax))) + 
+  ylab("Performance Metric Value") +
+  xlab("Regulation to Change") +
   theme_bw() +
   theme(legend.position = "bottom") + #,
         #axis.text.x = element_blank()) +
@@ -1570,21 +2243,1562 @@ p2 <- metrics2 %>%
 p2
 ```
 
-(State-by-state stuff yet to be done for 2024 -> add in below at some point)
+Radar Plots
 
-Put in organization for splitsims
-
+All on same plot:
 ```{r}
+
+#HCR
 p3 <- median_metrics %>%  
    mutate(om = factor(om), 
-          om = fct_recode(om, "Base" = "1","MRIP Bias" = "2","Shift" = "3")) %>%  
-   mutate(mp = fct_recode(mp, 
-                   "rhl" = "NCA",
-                          "perc_change" = "PCA", 
-                          "refpt" = "BRP",
-                          "bmatrix" = "BBM")) %>%  
+        om = fct_recode(om, "Base" = "5")) %>%#,"MRIP Bias" = "2","Shift" = "3")) %>%
+  filter(om == "Base") %>%
+   mutate(mp = factor(mp), mp = fct_recode(mp, 
+                   "BBM" = "BBM",
+                          "BRP" = "BRP", 
+                          "NCA" = "NCA",
+                          "PCA" = "PCA")
+          ) %>%
    #filter(!metric %in% c("change_cs", "cs_per_trip")) %>%  -->
    #filter(!metric %in% c("expense","cs_per_trip","total catch")) %>%  -->
-   filter(metric %in% c("change_cs", "kept per trip", "kept:released", "not overfished", "not overfishing", "keep_one")) %>%  
+   filter(metric %in% c("kept:released", "kept per trip", "not overfished", "not overfishing",  "keep_one", "trophy")) %>%  
    do_small_radar_plot()
+
+#REG
+p3 <- median_metrics2 %>% rename(mp = RegType) %>% 
+   mutate(om = factor(om), 
+        om = fct_recode(om, "Base" = "5")) %>%#,"MRIP Bias" = "2","Shift" = "3")) %>%
+  filter(om == "Base") %>%
+   mutate(mp = factor(mp), mp = fct_recode(mp, 
+                   "All" = "All",
+                          "Bag" = "Bag",  
+                          "Season" = "Season",
+                          "Length" = "Length")
+          ) %>%
+   #filter(!metric %in% c("change_cs", "cs_per_trip")) %>%  -->
+   #filter(!metric %in% c("expense","cs_per_trip","total catch")) %>%  -->
+   filter(metric %in% c("kept:released", "kept per trip", "not overfished", "not overfishing",  "keep_one", "trophy")) %>%  
+   do_small_radar_plot()
+
 ```
+
+1 at a time 
+```{r}
+#FOR PLOTTING SEPARATELY  (run code in next chunk first)
+p3 <- median_metrics %>%  
+   mutate(om = factor(om), 
+        om = fct_recode(om, "Base" = "5","MRIP Bias" = "2","Shift" = "3")) %>%
+  filter(om == "Base") %>%
+   mutate(mp = fct_recode(mp, 
+                   "NCA" = "NCA",
+                          "PCA" = "PCA", 
+                          "BRP" = "BRP",
+                          "BBM" = "BBM")
+                   ) %>%  
+   #filter(!metric %in% c("change_cs", "cs_per_trip")) %>%  -->
+   #filter(!metric %in% c("expense","cs_per_trip","total catch")) %>%  -->
+   filter(metric %in% c("kept per trip", "kept:released", "not overfished", "not overfishing",  "keep_one", "spawning biomass", "rel per trip")) %>%  
+   do_small_radar_plot_prep()
+
+#BBM
+p3_BBM <- p3[1:3,] 
+radarchart(p3_BBM[,-1],
+           seg=5,
+           pcol=colors_line2,
+           pfcol=colors_fill2,
+           plwd=2,
+           vlabels=names(p3_BBM)[-1],
+           vlcex=0.8,
+           title = "Biomass-Based Matrix", cex.main = 0.9)
+           #   ,
+           #  plty=c(rep(1,7),rep(2,7)),
+           #  pdensity=0)
+  #rows<<-rownames(p3_BBM[-c(1,2),])
+  #colors_line<<-colors_line2
+
+#BRP
+p3_BRP <- p3[c(1,2,4),] 
+radarchart(p3_BRP[,-1],
+           seg=5,
+           pcol=colors_line2[2],
+           pfcol=colors_fill2[2],
+           plwd=2,
+           vlabels=names(p3_BRP)[-1],
+           vlcex=0.8,
+           title = "Biological Reference Point", cex.main = 0.9)
+           #   ,
+           #  plty=c(rep(1,7),rep(2,7)),
+           #  pdensity=0)
+  #rows<<-rownames(p3_BBM[-c(1,2),])
+  #colors_line<<-colors_line2
+
+#PCA
+p3_PCA <- p3[c(1,2,6),] 
+radarchart(p3_PCA[,-1],
+           seg=5,
+           pcol=colors_line2[4],
+           pfcol=colors_fill2[4],
+           plwd=2,
+           vlabels=names(p3_PCA)[-1],
+           vlcex=0.8,
+           title = "Percent Change Approach", cex.main = 0.9)
+           #   ,
+           #  plty=c(rep(1,7),rep(2,7)),
+           #  pdensity=0)
+  #rows<<-rownames(p3_BBM[-c(1,2),])
+  #colors_line<<-colors_line2
+
+#NCA
+p3_NCA <- p3[c(1,2,5),] 
+radarchart(p3_NCA[,-1],
+           seg=5,
+           pcol=colors_line2[3],
+           pfcol=colors_fill2[3],
+           plwd=2,
+           vlabels=names(p3_NCA)[-1],
+           vlcex=0.8,
+           title = "No Change Approach", cex.main = 0.9)
+           #   ,
+  
+  #don't need this for plotting one at a time
+  legend("bottomright",inset=0,title ="",title.adj = 0.4,
+         legend=unique(d$mp),
+         pch=16,
+         col=colors_line2[1:nmp],
+         lty=1, cex=0.8, bty= 'n', y.intersp=1)
+  
+```
+
+Edited radarplot function code for 1 at a time
+```{r}
+#metrics <- p3
+do_small_radar_plot_prep <- function(metrics) {
+  # metrics is a dataframe of metrics, expecting columns
+  # metrics <- tibble(metric = rep(letters[1:5],each=3),
+  #                   value = runif(15),
+  #                   mp = as.character(rep(1:3,5)))
+  # # metric 
+  # # value
+  # # mp (management procedure)
+  summaries <- metrics %>% 
+    group_by(metric) %>% 
+    summarize(min = min(value, na.rm = TRUE),
+              max = max(value, na.rm = TRUE)) %>% 
+    #pivot_longer(cols = c(2:3),names_to = "mp",
+    #             values_to = "value") %>% 
+    #pivot_wider(names_from = metric, values_from = value) %>% 
+    #arrange(desc(mp)) %>% 
+    I()
+  #summaries  
+  nmetrics <- length(unique(metrics$metric))
+  nmp <- length(unique(metrics$mp))
+  
+  d <- metrics %>% 
+    group_by(mp) %>% 
+    left_join(summaries) %>% 
+    mutate(value = value/(max + 1e-08)) %>% 
+    select(mp, metric, value) %>% 
+    pivot_wider(names_from = metric, values_from = value) %>% 
+    ungroup()
+  
+  bounds <- tibble(mp = c("max","min"),
+                   
+                   #"total catch" = c(1,0),
+                   "kept:released" = c(1,0),
+                   "kept per trip" = c(1,0),
+                   "not overfishing" = c(1,0),
+                   "not overfished" = c(1,0),
+                   "spawning biomass" = c(1,0),
+                   "rel per trip" = c(1,0), #not sure why this one doesn't work 
+                   #"cs_per_trip" = c(1,0),
+                   #"change_cs" = c(1,0),
+                   #"mulen_keep" = c(1,0),
+                   #"mulen_release" = c(1,0),
+                   #"trophy" = c(1,0),
+                   #"rec_removals" = c(1,0),
+                   "keep_one" = c(1,0)) #,
+                   #"prop_female" = c(1,0),
+                   #"ntrips" = c(1,0)) #,
+  #filter(metric %in% c("change_cs", "kept per trip", "kept:released", "not overfished", "not overfishing")) %>% 
+  #d = c(1,0),
+  #e = c(1,0))
+        
+  dd <- bounds %>% 
+    bind_rows(d)
+}
+```
+
+Newer Runs RDM vs GAM plots
+```{r}
+#for processing RDM_ssbscramble script gam prediction testing 
+
+#from ########## FORM PREDICTIONS OF OUTPUT FILE ############### section
+
+#make sure state != 1 in first chunk of this script (if you scroll to top and control F "state" it will be the second thing)
+
+all_results_test <- all_results %>% filter(
+  #scenario %in% c("BTable3", "LTable3", "STable3", "ATable3"), 
+  year != 2019)
+
+all_results_test <- all_results_test %>%
+  mutate(RegType = ifelse( #edits start here
+    substr(all_results_test$scenario, 1,1) == "B", "Bag",
+    ifelse(
+      substr(all_results_test$scenario, 1,1) == "L", "Length",
+      ifelse(
+        substr(all_results_test$scenario, 1,1) == "S", "Season",
+        ifelse(
+          substr(all_results_test$scenario, 1,1) == "A", "All", NA  
+        )))))
+
+all_results_test$scenario <- ifelse(substr(all_results_test$scenario, 2,8) != "Table3.", "BBM",
+                           ifelse(substr(all_results_test$scenario, 2,9) == "Table3.1", "BRP",
+                                  ifelse(substr(all_results_test$scenario, 2,9) == "Table3.2", "PCA",
+                                         ifelse(substr(all_results_test$scenario, 2,9) == "Table3.3", "NCA",
+                                                ifelse(substr(all_results_test$scenario, 2,9) == "Table3.4", "Table3.4",
+                                                       ifelse(substr(all_results_test$scenario, 2,9) == "Table3.5", "Table3.5",
+                                                              ifelse(substr(all_results_test$scenario, 2,9) == "Table3.6", "Table3.6",
+                                                                     ifelse(substr(all_results_test$scenario, 2,9) == "Table3.7", "Table3.7", NA))))))))
+
+#predict data frame: same time step
+
+predict_frame <- data.frame(Bag = all_results_test$bag,
+                            MinLen = all_results_test$minlen, 
+                            SeasonLen = all_results_test$seaslen,
+                            state = all_results_test$state,
+                            n_keep = all_results_test$n_keep,
+                       #     SSB_1 = all_results_test$SSB, #rbctrack
+                            SSB = all_results_test$biomass #spawbio
+                            )# %>% mutate(Scen = "2BBMSY")
+
+gamfit2 <- predict.gam(g1.1state, newdata = predict_frame, type = "response" , se.fit = TRUE)
+#gamfit2 <- predict.gam(g1, newdata = predict_frame, type = "response" , se.fit = TRUE)
+
+#for plotting (includes n_keep)
+predict_frame_gg <- data.frame(Bag = all_results_test$bag,
+                            MinLen = all_results_test$minlen, 
+                            SeasonLen = all_results_test$seaslen,
+                            state = all_results_test$state,
+                            n_keep = all_results_test$n_keep,
+                         #  SSB_1 = all_results_test$SSB, #rbctrack 
+                            SSB = all_results_test$biomass, #spawbio
+                         #  exp_keep = exp(gamfit2$fit) + sqrt(g1$sig2)
+                         exp_keep = gamfit2$fit, #if doing other two
+                         hcr = all_results_test$scenario,
+                         reg = all_results_test$RegType) 
+
+#plot by state
+predict_frame_gg %>%
+  #filter(reg == "All") %>% 
+  drop_na() %>% 
+  ggplot() + 
+  aes(y = n_keep, x = exp_keep, col = SSB) + #scaler?
+  geom_point(alpha=0.1) + 
+  #geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  scale_color_viridis_c() +
+  labs(
+    y = "harvest number from RDM",
+    x = "expected harvest from GAM"
+  ) +
+  facet_wrap(~SeasonLen) +
+  xlim(0,1e+07) + #2e7
+  ylim(0,1e+07) +
+  NULL
+
+#sum into coastwide
+all_results <- predict_frame_gg
+all_results_summed <- all_results %>% 
+  mutate(group = rep(1:ceiling(n()/9), each = 9)[1:n()]) %>%
+  group_by(group) %>%
+  summarise(n_keep = sum(n_keep, na.rm = TRUE), exp_keep = sum(exp_keep, na.rm = TRUE))
+
+all_results <- all_results %>% filter(state == "CT") %>% 
+  select( Bag, MinLen, SeasonLen, SSB, hcr, reg) %>%
+  mutate(n_keep = all_results_summed$n_keep, exp_keep = all_results_summed$exp_keep)
+all_results$biomass <- all_results$SSB
+
+#plot coastwide; start here if plotting directly from MSE output 
+
+#total
+all_results %>% 
+  #filter(bag == 4, seaslen == 150) %>% 
+  drop_na() %>% 
+  ggplot() + 
+  aes(y = n_keep, x = exp_keep, col = biomass
+      ) + #scaler?
+  geom_point(alpha=0.1) + 
+  #geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  scale_color_viridis_c() +
+  labs(
+    y = "Realized harvest from RDM",
+    x = "Expected harvest from GAM"
+  ) + 
+  ggtitle("GAM Predictions of MSE Harvest") + 
+ # facet_wrap(~state) +
+  xlim(0,3e+07) + #2e7
+  ylim(0,3e+07) +
+  NULL
+#View(all_results)
+
+plot(all_results$n_keep~all_results$exp_keep, xlim = c(0,2e7), ylim = c(0,2e7))
+
+#facet by different regulations 
+
+#bag
+ggplot(all_results, mapping=aes(y = n_keep, x = exp_keep, col = Bag)) + 
+  geom_point() + 
+  xlim(0,2e7) +
+  ylim(0,2e7) +
+  geom_abline(slope = 1, intercept = 0) + 
+  facet_wrap(~Bag, scales = "free_y")
+
+#minlen
+ggplot(all_results, mapping=aes(y = n_keep, x = exp_keep, col = MinLen)) + 
+  geom_point() + 
+  xlim(0,2e7) +
+  ylim(0,2e7) +
+  geom_abline(slope = 1, intercept = 0) + 
+  facet_wrap(~MinLen, scales = "free_y")
+
+#seaslen
+ggplot(all_results, mapping=aes(y = n_keep, x = exp_keep, col = SeasonLen)) + 
+  geom_point() + 
+  xlim(0,2e7) +
+  ylim(0,2e7) +
+  geom_abline(slope = 1, intercept = 0) + 
+  facet_wrap(~SeasonLen, scales = "free_y")
+
+hist(all_results$bag)
+hist(all_results$seaslen)
+hist(all_results$minlen)
+
+#ssb -> too many biomass values to facet by
+
+#very small 
+#nrow(all_results %>% filter(biomass < 20000)) #2061
+
+nrow(all_results %>% filter(biomass < 20000))
+
+all_results %>% filter(biomass < 20000) %>% 
+  #filter(bag == 4, seaslen == 150) %>% 
+  drop_na() %>% 
+  ggplot() + 
+  aes(y = n_keep, x = exp_keep, col = biomass) + 
+  geom_point(alpha=0.1) + 
+  #geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  scale_color_viridis_c() +
+  labs(
+    y = "harvest number from RDM",
+    x = "expected harvest from GAM"
+  ) +
+  #facet_wrap(~bag) +
+  xlim(0,3e+07) +
+  ylim(0,3e+07) +
+  NULL
+
+#small
+#nrow(all_results %>% filter(biomass < 30000 & biomass > 20000)) #9270
+nrow(all_results %>% filter(biomass < 30000 & biomass > 20000))
+
+all_results %>% filter(biomass < 30000 & biomass > 20000) %>% 
+  #filter(bag == 4, seaslen == 150) %>% 
+  drop_na() %>% 
+  ggplot() + 
+  aes(y = n_keep, x = exp_keep, col = biomass) + 
+  geom_point(alpha=0.1) + 
+  #geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  scale_color_viridis_c() +
+  labs(
+    y = "harvest number from RDM",
+    x = "expected harvest from GAM"
+  ) +
+  #facet_wrap(~bag) +
+  xlim(0,3e+07) +
+  ylim(0,3e+07) +
+  NULL
+
+#med
+#nrow(all_results %>% filter(biomass > 30000 & biomass < 50000)) #8430
+nrow(all_results %>% filter(biomass > 30000 & biomass < 50000))
+
+all_results %>% filter(biomass > 30000 & biomass < 50000) %>% 
+  #filter(bag == 4, seaslen == 150) %>% 
+  drop_na() %>% 
+  ggplot() + 
+  aes(y = n_keep, x = exp_keep, col = biomass) + 
+  geom_point(alpha=0.1) + 
+  #geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  scale_color_viridis_c() +
+  labs(
+    y = "harvest number from RDM",
+    x = "expected harvest from GAM"
+  ) +
+  #facet_wrap(~bag) +
+  xlim(0,3e+07) +
+  ylim(0,3e+07) +
+  NULL
+
+#large 
+#nrow(all_results %>% filter(biomass > 50000 & biomass < 100000)) #1759
+nrow(all_results %>% filter(biomass > 50000 & biomass < 100000))
+
+all_results %>% filter(biomass > 50000 & biomass < 100000) %>% 
+  #filter(bag == 4, seaslen == 150) %>% 
+  drop_na() %>% 
+  ggplot() + 
+  aes(y = n_keep, x = exp_keep, col = biomass) + 
+  geom_point(alpha=0.1) + 
+  #geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  scale_color_viridis_c() +
+  labs(
+    y = "harvest number from RDM",
+    x = "expected harvest from GAM"
+  ) +
+  #facet_wrap(~bag) +
+  xlim(0,3e+07) +
+  ylim(0,3e+07) +
+  NULL
+
+#very large
+nrow(all_results %>% filter(biomass > 100000))
+
+all_results %>% filter(biomass > 100000) %>% 
+  #filter(bag == 4, seaslen == 150) %>% 
+  drop_na() %>% 
+  ggplot() + 
+  aes(y = n_keep, x = exp_keep, col = biomass) + 
+  geom_point(alpha=0.1) + 
+  #geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  scale_color_viridis_c() +
+  labs(
+    y = "harvest number from RDM",
+    x = "expected harvest from GAM"
+  ) +
+ # facet_wrap(~state) +
+  xlim(0,3e+07) +
+  ylim(0,3e+07) +
+  NULL
+
+all_results %>% 
+  mutate(ratio = 1000*keep_num / (0.39*exp_keep),
+         mp2 = fct_collapse(scenario,
+                            "rhl" = c("BTable3.3","LTable3.3","STable3.3", "ATable3.3"),
+                            "perc_change" = c("BTable3.2","LTable3.2","STable3.2", "ATable3.2"), 
+                            "refpt" = c("BTable3.1","LTable3.1","STable3.1", "ATable3.1"),
+                            "bmatrix" = c("BTable3","LTable3","STable3", "ATable3")),
+         mp3 = fct_collapse(scenario,
+                            "bag" = c("BTable3","BTable3.1","BTable3.2", "BTable3.3"),
+                            "minlen" = c("LTable3","LTable3.1","LTable3.2","LTable3.3"),
+                            "season" = c("STable3","STable3.1","STable3.2","STable3.3"),
+                            "all" = 
+                        c("ATable3","ATable3.1","ATable3.2","ATable3.3")      )) %>% 
+  ggplot() + 
+  aes(x = #0.39*
+        exp_keep, y = 1000*
+        keep_num,# size = biomass,
+      col = biomass) + #col = mulen_keep) + 
+  geom_point(alpha=0.1) + 
+  geom_abline(slope = 1, intercept = 0) + 
+ # geom_smooth(method = "glm", formula = y ~ x, method.args = list(family = #"poisson"), col ="blue") +
+  #geom_hline(yintercept = 1, lty=2) +
+  #geom_hline(yintercept = 2.564, lty=2) +
+  scale_color_viridis_c() +
+  xlim(0,5e7) +
+  ylim(0,5e7) +
+  facet_wrap(~mp3) +
+  labs(    y = "harvest number from RDM",
+           x = "expected harvest from GAM") +
+  NULL
+```
+
+Newer Runs Projection + All Other Plots 
+```{r}
+projection.plot <- function(project.results) {
+  project.results <- project.results %>% 
+    #filter(type %in% c("biomass","catch")) %>%
+    I()
+  project.results %>% 
+    #group_by(scenario, type, year) %>% 
+    #median_qi(value, .width = c(.5, .8, .95)) %>%
+    ggplot() +  
+    stat_lineribbon(aes(x = year, y = value, fill = mp2),
+                    #show.legend = FALSE,
+                    alpha = 0.35) +
+    # geom_lineribbon(aes(x = year, y = value, ymin = .lower, ymax = .upper, fill = scenario),
+    #                 show.legend = FALSE) +
+    scale_fill_brewer(type = "qual", palette = 2) +
+    facet_wrap(~mp2, scale = "free") + 
+    geom_line(aes(y=value,x=year,group=scenario),data = subset(project.results, type != "index" & isim==1), lty=1,lwd=0.5,col=gray(0.7),alpha=0.75) +
+    geom_line(aes(y=value,x=year,group=scenario),data = subset(project.results, type != "index" & isim==2), lty=1,lwd=0.5,col=gray(0.7),alpha=0.75) +
+    geom_line(aes(y=value,x=year,group=scenario),data = subset(project.results, type != "index" & isim==3), lty=1,lwd=0.5,col=gray(0.7),alpha=0.75) +
+    geom_line(aes(y=value,x=year,group=scenario),data = subset(project.results, type != "index" & isim==4), lty=1,lwd=0.5,col=gray(0.7),alpha=0.75) +
+    ylim(0,3000) + 
+    ylab("") + 
+    theme_bw() +
+    theme(legend.position= "none") + #,
+    #axis.text.y = element_blank()) +
+    labs(fill = "",
+         subtitle = "expected harvest (1000s)")
+}
+
+diag_ts %>% 
+  mutate(value = ifelse(type == "exp_keep", 0.39*value/1000, value),
+        mp2 = fct_collapse(scenario,
+                    "No Change (RHL as target)" = "NCA", #c("BTable3.3","LTable3.3","STable3.3", "ATable3.3"),
+                    "Percent Change Approach" = "PCA", #c("BTable3.2","LTable3.2","STable3.2", "ATable3.2"), 
+                    "Biological Ref. Point" = "BRP", #c("BTable3.1","LTable3.1","STable3.1", "ATable3.1"),
+                    "Biomass Matrix" = "BBM"), #c("BTable3","LTable3","STable3", "ATable3")),
+         mp3 = fct_collapse(RegType, #scenario, 
+                            "Bag" = "Bag", #c("BTable3","BTable3.1","BTable3.2", "BTable3.3"),
+                            "Minlen" = "Length", #c("LTable3","LTable3.1","LTable3.2","LTable3.3"),
+                            "Season" = "Season", #c("STable3","STable3.1","STable3.2","STable3.3"),
+                            "All" = "All"#c("ATable3","ATable3.1","ATable3.2","ATable3.3")  
+                            )) %>% 
+  filter(year != 2019) %>% 
+#  mutate(type = fct_relevel(type,c("spawning biomass", "total catch"))) %>% 
+ filter(type == "exp_keep", mp3 == "Minlen") %>% 
+  projection.plot() 
+
+diag_ts %>% 
+  mutate(value = ifelse(type == "exp_keep", 0.39*value/1000, value),
+        mp2 = fct_collapse(scenario,
+                     "No Change (RHL as target)" = "NCA", #c("BTable3.3","LTable3.3","STable3.3", "ATable3.3"),
+                    "Percent Change Approach" = "PCA", #c("BTable3.2","LTable3.2","STable3.2", "ATable3.2"), 
+                    "Biological Ref. Point" = "BRP", #c("BTable3.1","LTable3.1","STable3.1", "ATable3.1"),
+                    "Biomass Matrix" = "BBM"), #c("BTable3","LTable3","STable3", "ATable3")),
+         mp3 = fct_collapse(RegType, #scenario, 
+                            "Bag" = "Bag", #c("BTable3","BTable3.1","BTable3.2", "BTable3.3"),
+                            "Minlen" = "Length", #c("LTable3","LTable3.1","LTable3.2","LTable3.3"),
+                            "Season" = "Season", #c("STable3","STable3.1","STable3.2","STable3.3"),
+                            "All" = "All"#c("ATable3","ATable3.1","ATable3.2","ATable3.3")  
+                            )) %>% 
+  filter(year != 2019) %>% 
+#  mutate(type = fct_relevel(type,c("spawning biomass", "total catch"))) %>% 
+ filter(type == "exp_keep", mp3 == "Bag") %>% 
+  projection.plot() 
+
+diag_ts %>% 
+  mutate(value = ifelse(type == "exp_keep", 0.39*value/1000, value),
+        mp2 = fct_collapse(scenario,
+                       "No Change (RHL as target)" = "NCA", #c("BTable3.3","LTable3.3","STable3.3", "ATable3.3"),
+                    "Percent Change Approach" = "PCA", #c("BTable3.2","LTable3.2","STable3.2", "ATable3.2"), 
+                    "Biological Ref. Point" = "BRP", #c("BTable3.1","LTable3.1","STable3.1", "ATable3.1"),
+                    "Biomass Matrix" = "BBM"), #c("BTable3","LTable3","STable3", "ATable3")),
+           mp3 = fct_collapse(RegType, #scenario, 
+                            "Bag" = "Bag", #c("BTable3","BTable3.1","BTable3.2", "BTable3.3"),
+                            "Minlen" = "Length", #c("LTable3","LTable3.1","LTable3.2","LTable3.3"),
+                            "Season" = "Season", #c("STable3","STable3.1","STable3.2","STable3.3"),
+                            "All" = "All"#c("ATable3","ATable3.1","ATable3.2","ATable3.3")  
+                            )) %>% 
+  filter(year != 2019) %>% 
+#  mutate(type = fct_relevel(type,c("spawning biomass", "total catch"))) %>% 
+ filter(type == "exp_keep", mp3 == "Season") %>% 
+  projection.plot() 
+
+diag_ts %>% 
+  mutate(value = ifelse(type == "exp_keep", 0.39*value/1000, value),
+        mp2 = fct_collapse(scenario,
+                    "No Change (RHL as target)" = "NCA", #c("BTable3.3","LTable3.3","STable3.3", "ATable3.3"),
+                    "Percent Change Approach" = "PCA", #c("BTable3.2","LTable3.2","STable3.2", "ATable3.2"), 
+                    "Biological Ref. Point" = "BRP", #c("BTable3.1","LTable3.1","STable3.1", "ATable3.1"),
+                    "Biomass Matrix" = "BBM"), #c("BTable3","LTable3","STable3", "ATable3")),
+          mp3 = fct_collapse(RegType, #scenario, 
+                            "Bag" = "Bag", #c("BTable3","BTable3.1","BTable3.2", "BTable3.3"),
+                            "Minlen" = "Length", #c("LTable3","LTable3.1","LTable3.2","LTable3.3"),
+                            "Season" = "Season", #c("STable3","STable3.1","STable3.2","STable3.3"),
+                            "All" = "All"#c("ATable3","ATable3.1","ATable3.2","ATable3.3")  
+                            )) %>% 
+  filter(year != 2019) %>% 
+#  mutate(type = fct_relevel(type,c("spawning biomass", "total catch"))) %>% 
+ filter(type == "exp_keep", mp3 == "All") %>% 
+  projection.plot() 
+```
+
+Other Plots from 2024 MSE <- haven't been used since
+```{r}
+tempcat <- flukecatch %>% 
+  janitor::clean_names() %>% 
+  group_by(bag, min_len, season_len) %>% 
+  summarize(land = sum(land),
+            disc = sum(disc)) %>% 
+  ungroup()
+
+catuse <- tempcat %>%
+  filter(min_len == max(min_len),
+         bag == 4,
+         season_len == 150)
+
+tempcat <- tempcat %>% 
+  mutate(land = land/catuse$land[1],
+         disc = disc/catuse$disc[1])
+
+tempcat %>% 
+  filter(season_len == 150) %>% 
+  ggplot() +
+  aes(x = land) +
+  geom_histogram(col="white") +
+  theme_bw() +
+  facet_wrap(~bag) +
+  geom_vline(xintercept = 1.05, lty=2) +
+  geom_vline(xintercept = 1.1, lty=2) +
+  geom_vline(xintercept = 1.2, lty=2) +
+  geom_vline(xintercept = 1.3, lty=2) +
+  geom_vline(xintercept = 1.4, lty=2) +
+  geom_vline(xintercept = 1.6, lty=2) +
+  labs(x = "expected harvest compared to minimum") +
+  NULL
+
+# tempcat %>% 
+#   filter(min_len == 17.5) %>% 
+#   ggplot() +
+#   aes(x = land) +
+#   geom_histogram(col="white") +
+#   theme_bw() +
+#   facet_wrap(~bag) +
+#   NULL
+
+tempcat %>% 
+  filter(season_len == 150) %>% 
+  ggplot() +
+  aes(x = land) +
+  geom_histogram(col="white") +
+  theme_bw() +
+  #facet_wrap(~bag) +
+  geom_vline(xintercept = 1.05, lty=2) +
+  geom_vline(xintercept = 1.1, lty=2) +
+  geom_vline(xintercept = 1.2, lty=2) +
+  geom_vline(xintercept = 1.3, lty=2) +
+  geom_vline(xintercept = 1.4, lty=2) +
+  geom_vline(xintercept = 1.6, lty=2) +
+  labs(x = "expected harvest compared to minimum") +
+  NULL
+
+
+tempcat %>% 
+  #filter(season_len == 150) %>% 
+  ggplot() +
+  aes(x = land) +
+  geom_histogram(col="white") +
+  theme_bw() +
+  #facet_wrap(~bag) +
+  geom_vline(xintercept = 1.05, lty=2) +
+  geom_vline(xintercept = 1.1, lty=2) +
+  geom_vline(xintercept = 1.2, lty=2) +
+  geom_vline(xintercept = 1.3, lty=2) +
+  geom_vline(xintercept = 1.4, lty=2) +
+  geom_vline(xintercept = 1.6, lty=2) +
+  labs(x = "expected harvest compared to minimum") +
+  NULL
+
+
+#######
+
+all_results %>% 
+  mutate(ratio = 1000*keep_num / (0.39*exp_keep),
+         mp2 = fct_collapse(scenario,
+                            "rhl" = c("BTable3.3","LTable3.3","STable3.3", "ATable3.3"),
+                            "perc_change" = c("BTable3.2","LTable3.2","STable3.2", "ATable3.2"), 
+                            "refpt" = c("BTable3.1","LTable3.1","STable3.1", "ATable3.1"),
+                            "bmatrix" = c("BTable3","LTable3","STable3", "ATable3")),
+         mp3 = fct_collapse(scenario,
+                            "bag" = c("BTable3","BTable3.1","BTable3.2", "BTable3.3"),
+                            "minlen" = c("LTable3","LTable3.1","LTable3.2","LTable3.3"),
+                            "season" = c("STable3","STable3.1","STable3.2","STable3.3"),
+                            "all" = 
+                        c("ATable3","ATable3.1","ATable3.2","ATable3.3") )) %>% 
+  ggplot() + 
+  aes(x = biomass, y = ratio, col = minlen) + #col = mulen_keep) + 
+  geom_point(alpha=0.1) + 
+  #geom_abline(slope = 1, intercept = 0) + 
+  geom_hline(yintercept = 1, lty=2) +
+  geom_hline(yintercept = 2.564, lty=2) +
+  scale_color_viridis_c() +
+  ylim(0,NA) +
+  facet_wrap(~mp3) +
+  NULL
+
+
+
+all_results %>% 
+  mutate(ratio = 1000*keep_num / (0.39*exp_keep),
+        mp2 = fct_collapse(scenario,
+                            "rhl" = c("BTable3.3","LTable3.3","STable3.3", "ATable3.3"),
+                            "perc_change" = c("BTable3.2","LTable3.2","STable3.2", "ATable3.2"), 
+                            "refpt" = c("BTable3.1","LTable3.1","STable3.1", "ATable3.1"),
+                            "bmatrix" = c("BTable3","LTable3","STable3", "ATable3")),
+         mp3 = fct_collapse(scenario,
+                            "bag" = c("BTable3","BTable3.1","BTable3.2", "BTable3.3"),
+                            "minlen" = c("LTable3","LTable3.1","LTable3.2","LTable3.3"),
+                            "season" = c("STable3","STable3.1","STable3.2","STable3.3"),
+                            "all" = 
+                        c("ATable3","ATable3.1","ATable3.2","ATable3.3") )) %>% 
+  ggplot() + 
+  aes(x = biomass, y = ratio, col = seaslen) + #col = mulen_keep) + 
+  geom_point(alpha=0.1) + 
+  #geom_abline(slope = 1, intercept = 0) + 
+  geom_hline(yintercept = 1, lty=2) +
+  geom_hline(yintercept = 2.564, lty=2) +
+  scale_color_viridis_c() +
+  ylim(0,NA) +
+  facet_wrap(~mp3) +
+  NULL
+
+
+
+all_results %>% 
+  mutate(ratio = 1000*keep_num / (0.39*exp_keep),
+         mp2 = fct_collapse(scenario,
+                            "rhl" = c("BTable3.3","LTable3.3","STable3.3", "ATable3.3"),
+                            "perc_change" = c("BTable3.2","LTable3.2","STable3.2", "ATable3.2"), 
+                            "refpt" = c("BTable3.1","LTable3.1","STable3.1", "ATable3.1"),
+                            "bmatrix" = c("BTable3","LTable3","STable3", "ATable3")),
+         mp3 = fct_collapse(scenario,
+                            "bag" = c("BTable3","BTable3.1","BTable3.2", "BTable3.3"),
+                            "minlen" = c("LTable3","LTable3.1","LTable3.2","LTable3.3"),
+                            "season" = c("STable3","STable3.1","STable3.2","STable3.3"),
+                            "all" = 
+                        c("ATable3","ATable3.1","ATable3.2","ATable3.3") )) %>% 
+  ggplot() + 
+  aes(x = biomass, y = ratio, col = bag) + #col = mulen_keep) + 
+  geom_point(alpha=0.1) + 
+  #geom_abline(slope = 1, intercept = 0) + 
+  geom_hline(yintercept = 1, lty=2) +
+  geom_hline(yintercept = 2.564, lty=2) +
+  scale_color_viridis_c() +
+  ylim(0,NA) +
+  facet_wrap(~mp3) +
+  NULL
+
+
+####
+
+all_results %>% 
+  mutate(ratio = 1000*keep_num / (0.39*exp_keep),
+        mp2 = fct_collapse(scenario,
+                            "rhl" = c("BTable3.3","LTable3.3","STable3.3", "ATable3.3"),
+                            "perc_change" = c("BTable3.2","LTable3.2","STable3.2", "ATable3.2"), 
+                            "refpt" = c("BTable3.1","LTable3.1","STable3.1", "ATable3.1"),
+                            "bmatrix" = c("BTable3","LTable3","STable3", "ATable3")),
+         mp3 = fct_collapse(scenario,
+                            "bag" = c("BTable3","BTable3.1","BTable3.2", "BTable3.3"),
+                            "minlen" = c("LTable3","LTable3.1","LTable3.2","LTable3.3"),
+                            "season" = c("STable3","STable3.1","STable3.2","STable3.3"),
+                            "all" = 
+                        c("ATable3","ATable3.1","ATable3.2","ATable3.3") )) %>% 
+  ggplot() + 
+  aes(x = 0.39*exp_keep, y = 1000*keep_num, size = biomass, col = biomass) + #col = mulen_keep) + 
+  geom_point(alpha=0.1) + 
+  geom_abline(slope = 1, intercept = 0) + 
+  geom_smooth(method = "glm", formula = y ~ x, method.args = list(family = "poisson"), col ="blue") +
+  #geom_hline(yintercept = 1, lty=2) +
+  #geom_hline(yintercept = 2.564, lty=2) +
+  scale_color_viridis_c() +
+  ylim(0,NA) +
+  facet_wrap(~mp3) +
+  labs(    y = "harvest number from RDM",
+           x = "expected harvest from GAM") +
+  NULL
+
+all_results %>% 
+  mutate(ratio = 1000*keep_num / (0.39*exp_keep),
+         mp2 = fct_collapse(scenario,
+                            "rhl" = c("BTable3.3","LTable3.3","STable3.3", "ATable3.3"),
+                            "perc_change" = c("BTable3.2","LTable3.2","STable3.2", "ATable3.2"), 
+                            "refpt" = c("BTable3.1","LTable3.1","STable3.1", "ATable3.1"),
+                            "bmatrix" = c("BTable3","LTable3","STable3", "ATable3")),
+         mp3 = fct_collapse(scenario,
+                            "bag" = c("BTable3","BTable3.1","BTable3.2", "BTable3.3"),
+                            "minlen" = c("LTable3","LTable3.1","LTable3.2","LTable3.3"),
+                            "season" = c("STable3","STable3.1","STable3.2","STable3.3"),
+                            "all" = 
+                        c("ATable3","ATable3.1","ATable3.2","ATable3.3") )) %>% 
+  ggplot() + 
+  aes(x = 0.39*exp_keep, y = 1000*keep_num, col = bag) + #col = mulen_keep) + 
+  geom_point(alpha=0.1) + 
+  geom_abline(slope = 1, intercept = 0) + 
+  #geom_hline(yintercept = 1, lty=2) +
+  #geom_hline(yintercept = 2.564, lty=2) +
+  scale_color_viridis_c() +
+  ylim(0,NA) +
+  facet_wrap(~mp3) +
+  NULL
+
+all_results %>% 
+  mutate(ratio = 1000*keep_num / (0.39*exp_keep),
+       mp2 = fct_collapse(scenario,
+                            "rhl" = c("BTable3.3","LTable3.3","STable3.3", "ATable3.3"),
+                            "perc_change" = c("BTable3.2","LTable3.2","STable3.2", "ATable3.2"), 
+                            "refpt" = c("BTable3.1","LTable3.1","STable3.1", "ATable3.1"),
+                            "bmatrix" = c("BTable3","LTable3","STable3", "ATable3")),
+         mp3 = fct_collapse(scenario,
+                            "bag" = c("BTable3","BTable3.1","BTable3.2", "BTable3.3"),
+                            "minlen" = c("LTable3","LTable3.1","LTable3.2","LTable3.3"),
+                            "season" = c("STable3","STable3.1","STable3.2","STable3.3"),
+                            "all" = 
+                        c("ATable3","ATable3.1","ATable3.2","ATable3.3") )) %>% 
+  ggplot() + 
+  aes(x = 0.39*exp_keep, y = 1000*keep_num, col = seaslen) + #col = mulen_keep) + 
+  geom_point(alpha=0.1) + 
+  geom_abline(slope = 1, intercept = 0) + 
+  #geom_hline(yintercept = 1, lty=2) +
+  #geom_hline(yintercept = 2.564, lty=2) +
+  scale_color_viridis_c() +
+  ylim(0,NA) +
+  facet_wrap(~mp3) +
+  NULL
+
+
+glm1 <- all_results %>% 
+  mutate(kept = 1000*keep_num,
+         pred = 0.39*exp_keep) %>% 
+  #glm(formula = log(kept) ~ pred + biomass + bag + seaslen,data =., family = "poisson") # 
+  glm(formula = log(kept) ~ pred + biomass + bag + seaslen,data =.) #, family = "poisson") # 
+library(broom)
+bob <- augment(glm1, type.predict = "response")
+bob %>% 
+  janitor::clean_names() %>% 
+  select(-biomass,-bag,-seaslen) %>% 
+  bind_cols(all_results %>% slice(as.integer(bob$.rownames))) %>% 
+  ggplot() +
+  aes(x = log_kept, y = fitted, col = seaslen) + #biomass) +
+  geom_point(alpha = 0.2) +
+  scale_color_viridis_c() +
+  facet_wrap(~minlen, scales = "free") +
+  geom_abline(slope = 1, intercept = 0) + 
+  NULL
+
+
+glm2 <- all_results %>% 
+  mutate(kept = 1000*keep_num,
+         pred = 0.39*exp_keep) %>% 
+  #glm(formula = log(kept) ~ pred + biomass + bag + seaslen,data =., family = "poisson") # 
+  lm(formula = log(kept) ~ log(pred)*minlen + biomass + seaslen, data =.) #, family = "poisson") # 
+library(broom)
+bob <- augment(glm2, type.predict = "response")
+p2 <- bob %>% 
+  janitor::clean_names() %>% 
+  select(-biomass,-minlen, -seaslen) %>% 
+  bind_cols(all_results %>% slice(as.integer(bob$.rownames))) %>% 
+  ggplot() +
+  #aes(x = log_kept, y = fitted, col = biomass) +
+  aes(x = exp(log_kept), y = exp(fitted), col = biomass) +
+  geom_point(alpha = 0.2) +
+  scale_color_viridis_c() +
+  #facet_wrap(~minlen, scales = "free") +
+  geom_abline(slope = 1, intercept = 0) + 
+  #ylim(0, 6e+07) +
+  NULL
+
+p1 <- bob %>% 
+  janitor::clean_names() %>% 
+  select(-biomass,-minlen, -seaslen) %>% 
+  bind_cols(all_results %>% slice(as.integer(bob$.rownames))) %>% 
+  ggplot() +
+  aes(x = exp(log_kept), y = exp(log_pred), col = biomass) +
+  #aes(x = exp(log_kept), y = exp(fitted), col = biomass) +
+  geom_point(alpha = 0.2) +
+  scale_color_viridis_c() +
+  #facet_wrap(~minlen, scales = "free") +
+  geom_abline(slope = 1, intercept = 0) + 
+  #ylim(0, 6e+07) +
+  NULL
+
+p1+p2
+
+df_use <-  all_results %>% 
+  mutate(kept = 1000*keep_num,
+         pred = 0.39*exp_keep)
+df_use %>% 
+  ggplot() +
+  aes(x = pred, y = kept, col = minlen, group = as.factor(minlen)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  geom_abline(slope = 1, intercept = 0) +
+  NULL
+
+
+glm3 <- all_results %>% 
+  mutate(kept = 1000*keep_num,
+         pred = 0.39*exp_keep) %>% 
+  #glm(formula = log(kept) ~ pred + biomass + bag + seaslen,data =., family = "poisson") # 
+  lm(formula = log(kept) ~ log(pred) + biomass, data =.) #, family = "poisson") # 
+bob <- augment(glm3, type.predict = "response")
+p3 <- bob %>% 
+  janitor::clean_names() %>% 
+  select(-biomass) %>% 
+  bind_cols(all_results %>% slice(as.integer(bob$.rownames))) %>% 
+  ggplot() +
+  #aes(x = log_kept, y = fitted, col = biomass) +
+  aes(x = exp(log_kept), y = exp(fitted), col = biomass) +
+  geom_point(alpha = 0.2) +
+  scale_color_viridis_c() +
+  #facet_wrap(~minlen, scales = "free") +
+  geom_abline(slope = 1, intercept = 0) + 
+  #ylim(0, 6e+07) +
+  NULL
+
+p2 + p3  
+  
+glm4 <- all_results %>% 
+  mutate(kept = 1000*keep_num,
+         pred = exp_keep) %>% 
+  glm(formula = kept ~ pred + minlen + biomass + seaslen + bag, data =., family = "poisson") # 
+  #lm(formula = log(kept) ~ log(pred) + biomass, data =.) #, family = "poisson") # 
+bob <- augment(glm4, type.predict = "response")
+p4 <- bob %>% 
+  janitor::clean_names() %>% 
+  select(-biomass, -seaslen, -minlen, -bag) %>% 
+  bind_cols(all_results %>% slice(as.integer(bob$.rownames))) %>% 
+  ggplot() +
+  #aes(x = log_kept, y = fitted, col = biomass) +
+  aes(x = kept, y = fitted, col = biomass) +
+  geom_point(alpha = 0.2) +
+  scale_color_viridis_c() +
+  #facet_wrap(~minlen, scales = "free") +
+  #facet_wrap(~bag, scales = "free") +
+  geom_abline(slope = 1, intercept = 0) + 
+  ylim(0, 5000000) +
+  xlim(0, 5000000) +
+  labs(x = "RDM",
+       y = "fitted from GAM") +
+  NULL
+p4
+100*with(summary(glm4), 1 - deviance/null.deviance)
+
+
+  
+
+glm5 <- all_results %>% 
+  mutate(kept = 1000*keep_num,
+         pred = exp_keep) %>% 
+  glm(formula = kept ~ pred + biomass, data =., family = "poisson") # 
+#lm(formula = log(kept) ~ log(pred) + biomass, data =.) #, family = "poisson") # 
+bob <- augment(glm5, type.predict = "response")
+nudata <- expand.grid(pred = seq(0,1e+07,by=100), biomass = seq(20000,60000,by=5000)) %>% 
+  tibble()
+nudata$est <- predict(glm5, newdata = nudata, type = "response")
+
+p5 <- bob %>% 
+  janitor::clean_names() %>% 
+  select(-biomass) %>% 
+  #select(-biomass, -minlen) %>% 
+  bind_cols(all_results %>% slice(as.integer(bob$.rownames))) %>% 
+  #filter(seaslen == 150, minlen == 17.5) %>% 
+  ggplot() +
+  #aes(y = kept, x = pred, col = biomass) +
+  #aes(x = exp_keep, y = fitted, col = bag) +
+  #geom_point(alpha = 0.2) +
+  geom_line(data = nudata, aes(x = pred, y = est, group = biomass, col=biomass)) +
+  scale_color_viridis_c() +
+  #facet_wrap(~minlen, scales = "free") +
+  #facet_wrap(~bag) + #, scales = "free") +
+  #geom_abline(slope = 1, intercept = 0) + 
+  #ylim(0, 6e+07) +
+  NULL
+p5
+100*with(summary(glm5), 1 - deviance/null.deviance)
+100*with(summary(glm4), 1 - deviance/null.deviance)
+
+
+
+# gam5 <- all_results %>% 
+#   mutate(kept = 1000*keep_num,
+#          pred = exp_keep) %>% 
+#   gam(formula = kept ~ pred + s(biomass), data =., family = "poisson") # 
+# summary(gam5)
+# gratia::draw(gam5)
+
+p6 <- bob %>% 
+  janitor::clean_names() %>% 
+  select(-biomass) %>% 
+  #select(-biomass, -minlen) %>% 
+  bind_cols(all_results %>% slice(as.integer(bob$.rownames))) %>% 
+  #filter(seaslen == 150, minlen == 17.5) %>% 
+  ggplot() +
+  aes(y = kept, x = pred, col = biomass) +
+  #aes(x = kept, y = fitted, col = bag) +
+  geom_point(alpha = 0.2) +
+  #geom_point(aes(y = fitted),col = "orange", alpha = 0.2) +
+  scale_color_viridis_c() +
+  #facet_wrap(~minlen, scales = "free") +
+  #facet_wrap(~bag, scales = "free") +
+  geom_abline(slope = 1, intercept = 0) + 
+  #ylim(0, 6e+07) +
+  NULL
+p6
+p6 + p5
+
+p7 <- bob %>% 
+  janitor::clean_names() %>% 
+  select(-biomass) %>% 
+  #select(-biomass, -minlen) %>% 
+  bind_cols(all_results %>% slice(as.integer(bob$.rownames))) %>% 
+  filter(seaslen == 150, minlen == 17.5) %>% 
+  ggplot() +
+#  aes(y = kept, group = bag) +
+#  geom_boxplot()
+  aes(x = fitted, y = kept, col = biomass) +
+  #aes(x = kept, y = fitted, col = bag) +
+  geom_point(alpha = 0.2) +
+  scale_color_viridis_c() +
+  #facet_wrap(~minlen, scales = "free") +
+  facet_wrap(~bag) + #, scales = "free") +
+  geom_abline(slope = 1, intercept = 0) + 
+  #ylim(0, 6e+07) +
+  NULL
+p7
+flukecatch <- readRDS("~/Desktop/FlounderMSE/state_lookup.rds")
+dat_use <- flukecatch %>% 
+  janitor::clean_names() %>% 
+  group_by(bag, min_len, season_len) %>% 
+  summarize(land = sum(land),
+            disc = sum(disc), .groups = "drop")
+dat_use
+
+dat_use %>% 
+  ggplot() + 
+  aes(x = min_len, y = land, group = season_len, col = season_len) +
+  geom_line() +
+  facet_wrap(~bag) +
+  scale_color_viridis_c() +
+  theme_bw() + 
+  ylim(0,NA) +
+  NULL
+```
+
+Older Runs all Plots from original performance metrics/summary metrics code 
+```{r}
+#actually no more scalar for post-calib GAM
+all_results %>% 
+  #filter(bag == 4, seaslen == 150) %>% 
+  drop_na() %>% 
+  ggplot() + 
+  aes(y = 1000*keep_num, x = exp_keep, col = biomass) + 
+  geom_point(alpha=0.1) + 
+  #geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  scale_color_viridis_c() +
+  labs(
+    y = "harvest number from RDM",
+    x = "expected harvest from HCR"
+  ) +
+  #facet_wrap(~bag) +
+  xlim(1e6,1e7) +
+  ylim(0,3.5e+07) +
+  NULL
+
+#with scalar
+all_results %>% 
+  #filter(bag == 4, seaslen == 150) %>% 
+  drop_na() %>% 
+  ggplot() + 
+  aes(y = 1000*keep_num, x = 0.39*exp_keep, col = biomass) + 
+  geom_point(alpha=0.1) + 
+  #geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  scale_color_viridis_c() +
+  labs(
+    y = "harvest number from RDM",
+    x = "expected harvest from HCR"
+  ) +
+  #facet_wrap(~bag) +
+  xlim(0,1e7) +
+  ylim(0,2e+07) +
+  NULL
+
+#all_results1 <- all_results
+#View(all_results)
+flukecatch <- readRDS("~/Desktop/FlounderMSE/state_lookup.rds")
+
+projection.plot <- function(project.results) {
+  project.results <- project.results %>% 
+    #filter(type %in% c("biomass","catch")) %>%
+    I()
+  project.results %>% 
+    #group_by(scenario, type, year) %>% 
+    #median_qi(value, .width = c(.5, .8, .95)) %>%
+    ggplot() +  
+    stat_lineribbon(aes(x = year, y = value, fill = mp2),
+                    #show.legend = FALSE,
+                    alpha = 0.35) +
+    # geom_lineribbon(aes(x = year, y = value, ymin = .lower, ymax = .upper, fill = scenario),
+    #                 show.legend = FALSE) +
+    scale_fill_brewer(type = "qual", palette = 2) +
+    facet_wrap(~mp2, scale = "free") + 
+    geom_line(aes(y=value,x=year,group=scenario),data = subset(project.results, type != "index" & isim==1), lty=1,lwd=0.5,col=gray(0.7),alpha=0.75) +
+    geom_line(aes(y=value,x=year,group=scenario),data = subset(project.results, type != "index" & isim==2), lty=1,lwd=0.5,col=gray(0.7),alpha=0.75) +
+    geom_line(aes(y=value,x=year,group=scenario),data = subset(project.results, type != "index" & isim==3), lty=1,lwd=0.5,col=gray(0.7),alpha=0.75) +
+    geom_line(aes(y=value,x=year,group=scenario),data = subset(project.results, type != "index" & isim==4), lty=1,lwd=0.5,col=gray(0.7),alpha=0.75) +
+    ylim(0,3000) + 
+    ylab("") + 
+    theme_bw() +
+    theme(legend.position= "none") + #,
+    #axis.text.y = element_blank()) +
+    labs(fill = "",
+         subtitle = "expected harvest (1000s)")
+}
+
+diag_ts %>% 
+  mutate(value = ifelse(type == "exp_keep", 0.39*value/1000, value),
+         mp2 = fct_collapse(scenario,
+                            "rhl" = c("MP 4","MP 8", "MP 12"),
+                            "perc_change" = c("MP 1","MP 5","MP 9"), 
+                            "refpt" = c("MP 2", "MP 6","MP 10"),
+                            "bmatrix" = c("MP 3","MP 7","MP 11")),
+         mp3 = fct_collapse(scenario,
+                            "bag" = c("MP 4","MP 1","MP 2", "MP 3"),
+                            "minlen" = c("MP 8","MP 5","MP 6","MP 7"),
+                            "season" = c("MP 12","MP 9","MP 10","MP 11"))) %>% 
+  filter(year != 2019) %>% 
+#  mutate(type = fct_relevel(type,c("spawning biomass", "total catch"))) %>% 
+  filter(type == "exp_keep",
+         mp3 == "minlen") %>% 
+  projection.plot()
+
+tempcat <- flukecatch %>% 
+  janitor::clean_names() %>% 
+  group_by(bag, min_len, season_len) %>% 
+  summarize(land = sum(land),
+            disc = sum(disc)) %>% 
+  ungroup()
+
+catuse <- tempcat %>%
+  filter(min_len == max(min_len),
+         bag == 4,
+         season_len == 150)
+
+tempcat <- tempcat %>% 
+  mutate(land = land/catuse$land[1],
+         disc = disc/catuse$disc[1])
+
+tempcat %>% 
+  filter(season_len == 150) %>% 
+  ggplot() +
+  aes(x = land) +
+  geom_histogram(col="white") +
+  theme_bw() +
+  facet_wrap(~bag) +
+  geom_vline(xintercept = 1.05, lty=2) +
+  geom_vline(xintercept = 1.1, lty=2) +
+  geom_vline(xintercept = 1.2, lty=2) +
+  geom_vline(xintercept = 1.3, lty=2) +
+  geom_vline(xintercept = 1.4, lty=2) +
+  geom_vline(xintercept = 1.6, lty=2) +
+  labs(x = "expected harvest compared to minimum") +
+  NULL
+
+# tempcat %>% 
+#   filter(min_len == 17.5) %>% 
+#   ggplot() +
+#   aes(x = land) +
+#   geom_histogram(col="white") +
+#   theme_bw() +
+#   facet_wrap(~bag) +
+#   NULL
+
+tempcat %>% 
+  filter(season_len == 150) %>% 
+  ggplot() +
+  aes(x = land) +
+  geom_histogram(col="white") +
+  theme_bw() +
+  #facet_wrap(~bag) +
+  geom_vline(xintercept = 1.05, lty=2) +
+  geom_vline(xintercept = 1.1, lty=2) +
+  geom_vline(xintercept = 1.2, lty=2) +
+  geom_vline(xintercept = 1.3, lty=2) +
+  geom_vline(xintercept = 1.4, lty=2) +
+  geom_vline(xintercept = 1.6, lty=2) +
+  labs(x = "expected harvest compared to minimum") +
+  NULL
+
+
+tempcat %>% 
+  #filter(season_len == 150) %>% 
+  ggplot() +
+  aes(x = land) +
+  geom_histogram(col="white") +
+  theme_bw() +
+  #facet_wrap(~bag) +
+  geom_vline(xintercept = 1.05, lty=2) +
+  geom_vline(xintercept = 1.1, lty=2) +
+  geom_vline(xintercept = 1.2, lty=2) +
+  geom_vline(xintercept = 1.3, lty=2) +
+  geom_vline(xintercept = 1.4, lty=2) +
+  geom_vline(xintercept = 1.6, lty=2) +
+  labs(x = "expected harvest compared to minimum") +
+  NULL
+
+
+#######
+
+all_results %>% 
+  mutate(ratio = 1000*keep_num / (0.39*exp_keep),
+         mp2 = fct_collapse(scenario,
+                            "rhl" = c("MP 4","MP 8", "MP 12"),
+                            "perc_change" = c("MP 1","MP 5","MP 9"), 
+                            "refpt" = c("MP 2", "MP 6","MP 10"),
+                            "bmatrix" = c("MP 3","MP 7","MP 11")),
+         mp3 = fct_collapse(scenario,
+                            "bag" = c("MP 4","MP 1","MP 2", "MP 3"),
+                            "minlen" = c("MP 8","MP 5","MP 6","MP 7"),
+                            "season" = c("MP 12","MP 9","MP 10","MP 11"))) %>% 
+  ggplot() + 
+  aes(x = biomass, y = ratio, col = minlen) + #col = mulen_keep) + 
+  geom_point(alpha=0.1) + 
+  #geom_abline(slope = 1, intercept = 0) + 
+  geom_hline(yintercept = 1, lty=2) +
+  geom_hline(yintercept = 2.564, lty=2) +
+  scale_color_viridis_c() +
+  ylim(0,NA) +
+  facet_wrap(~mp3) +
+  NULL
+
+
+
+all_results %>% 
+  mutate(ratio = 1000*keep_num / (0.39*exp_keep),
+         mp2 = fct_collapse(scenario,
+                            "rhl" = c("MP 4","MP 8", "MP 12"),
+                            "perc_change" = c("MP 1","MP 5","MP 9"), 
+                            "refpt" = c("MP 2", "MP 6","MP 10"),
+                            "bmatrix" = c("MP 3","MP 7","MP 11")),
+         mp3 = fct_collapse(scenario,
+                            "bag" = c("MP 4","MP 1","MP 2", "MP 3"),
+                            "minlen" = c("MP 8","MP 5","MP 6","MP 7"),
+                            "season" = c("MP 12","MP 9","MP 10","MP 11"))) %>% 
+  ggplot() + 
+  aes(x = biomass, y = ratio, col = seaslen) + #col = mulen_keep) + 
+  geom_point(alpha=0.1) + 
+  #geom_abline(slope = 1, intercept = 0) + 
+  geom_hline(yintercept = 1, lty=2) +
+  geom_hline(yintercept = 2.564, lty=2) +
+  scale_color_viridis_c() +
+  ylim(0,NA) +
+  facet_wrap(~mp3) +
+  NULL
+
+
+
+all_results %>% 
+  mutate(ratio = 1000*keep_num / (0.39*exp_keep),
+         mp2 = fct_collapse(scenario,
+                            "rhl" = c("MP 4","MP 8", "MP 12"),
+                            "perc_change" = c("MP 1","MP 5","MP 9"), 
+                            "refpt" = c("MP 2", "MP 6","MP 10"),
+                            "bmatrix" = c("MP 3","MP 7","MP 11")),
+         mp3 = fct_collapse(scenario,
+                            "bag" = c("MP 4","MP 1","MP 2", "MP 3"),
+                            "minlen" = c("MP 8","MP 5","MP 6","MP 7"),
+                            "season" = c("MP 12","MP 9","MP 10","MP 11"))) %>% 
+  ggplot() + 
+  aes(x = biomass, y = ratio, col = bag) + #col = mulen_keep) + 
+  geom_point(alpha=0.1) + 
+  #geom_abline(slope = 1, intercept = 0) + 
+  geom_hline(yintercept = 1, lty=2) +
+  geom_hline(yintercept = 2.564, lty=2) +
+  scale_color_viridis_c() +
+  ylim(0,NA) +
+  facet_wrap(~mp3) +
+  NULL
+
+
+####
+
+all_results %>% 
+  mutate(ratio = 1000*keep_num / (0.39*exp_keep),
+         mp2 = fct_collapse(scenario,
+                            "rhl" = c("MP 4","MP 8", "MP 12"),
+                            "perc_change" = c("MP 1","MP 5","MP 9"), 
+                            "refpt" = c("MP 2", "MP 6","MP 10"),
+                            "bmatrix" = c("MP 3","MP 7","MP 11")),
+         mp3 = fct_collapse(scenario,
+                            "bag" = c("MP 4","MP 1","MP 2", "MP 3"),
+                            "minlen" = c("MP 8","MP 5","MP 6","MP 7"),
+                            "season" = c("MP 12","MP 9","MP 10","MP 11"))) %>% 
+  ggplot() + 
+  aes(x = 0.39*exp_keep, y = 1000*keep_num, size = biomass, col = biomass) + #col = mulen_keep) + 
+  geom_point(alpha=0.1) + 
+  geom_abline(slope = 1, intercept = 0) + 
+  geom_smooth(method = "glm", formula = y ~ x, method.args = list(family = "poisson"), col ="blue") +
+  #geom_hline(yintercept = 1, lty=2) +
+  #geom_hline(yintercept = 2.564, lty=2) +
+  scale_color_viridis_c() +
+  ylim(0,NA) +
+  facet_wrap(~mp3) +
+  labs(    y = "harvest number from RDM",
+           x = "expected harvest from GAM") +
+  NULL
+
+all_results %>% 
+  mutate(ratio = 1000*keep_num / (0.39*exp_keep),
+         mp2 = fct_collapse(scenario,
+                            "rhl" = c("MP 4","MP 8", "MP 12"),
+                            "perc_change" = c("MP 1","MP 5","MP 9"), 
+                            "refpt" = c("MP 2", "MP 6","MP 10"),
+                            "bmatrix" = c("MP 3","MP 7","MP 11")),
+         mp3 = fct_collapse(scenario,
+                            "bag" = c("MP 4","MP 1","MP 2", "MP 3"),
+                            "minlen" = c("MP 8","MP 5","MP 6","MP 7"),
+                            "season" = c("MP 12","MP 9","MP 10","MP 11"))) %>% 
+  ggplot() + 
+  aes(x = 0.39*exp_keep, y = 1000*keep_num, col = bag) + #col = mulen_keep) + 
+  geom_point(alpha=0.1) + 
+  geom_abline(slope = 1, intercept = 0) + 
+  #geom_hline(yintercept = 1, lty=2) +
+  #geom_hline(yintercept = 2.564, lty=2) +
+  scale_color_viridis_c() +
+  ylim(0,NA) +
+  facet_wrap(~mp3) +
+  NULL
+
+all_results %>% 
+  mutate(ratio = 1000*keep_num / (0.39*exp_keep),
+         mp2 = fct_collapse(scenario,
+                            "rhl" = c("MP 4","MP 8", "MP 12"),
+                            "perc_change" = c("MP 1","MP 5","MP 9"), 
+                            "refpt" = c("MP 2", "MP 6","MP 10"),
+                            "bmatrix" = c("MP 3","MP 7","MP 11")),
+         mp3 = fct_collapse(scenario,
+                            "bag" = c("MP 4","MP 1","MP 2", "MP 3"),
+                            "minlen" = c("MP 8","MP 5","MP 6","MP 7"),
+                            "season" = c("MP 12","MP 9","MP 10","MP 11"))) %>% 
+  ggplot() + 
+  aes(x = 0.39*exp_keep, y = 1000*keep_num, col = seaslen) + #col = mulen_keep) + 
+  geom_point(alpha=0.1) + 
+  geom_abline(slope = 1, intercept = 0) + 
+  #geom_hline(yintercept = 1, lty=2) +
+  #geom_hline(yintercept = 2.564, lty=2) +
+  scale_color_viridis_c() +
+  ylim(0,NA) +
+  facet_wrap(~mp3) +
+  NULL
+
+
+glm1 <- all_results %>% 
+  mutate(kept = 1000*keep_num,
+         pred = 0.39*exp_keep) %>% 
+  #glm(formula = log(kept) ~ pred + biomass + bag + seaslen,data =., family = "poisson") # 
+  glm(formula = log(kept) ~ pred + biomass + bag + seaslen,data =.) #, family = "poisson") # 
+library(broom)
+bob <- augment(glm1, type.predict = "response")
+bob %>% 
+  janitor::clean_names() %>% 
+  select(-biomass,-bag,-seaslen) %>% 
+  bind_cols(all_results %>% slice(as.integer(bob$.rownames))) %>% 
+  ggplot() +
+  aes(x = log_kept, y = fitted, col = seaslen) + #biomass) +
+  geom_point(alpha = 0.2) +
+  scale_color_viridis_c() +
+  facet_wrap(~minlen, scales = "free") +
+  geom_abline(slope = 1, intercept = 0) + 
+  NULL
+
+
+glm2 <- all_results %>% 
+  mutate(kept = 1000*keep_num,
+         pred = 0.39*exp_keep) %>% 
+  #glm(formula = log(kept) ~ pred + biomass + bag + seaslen,data =., family = "poisson") # 
+  lm(formula = log(kept) ~ log(pred)*minlen + biomass + seaslen, data =.) #, family = "poisson") # 
+library(broom)
+bob <- augment(glm2, type.predict = "response")
+p2 <- bob %>% 
+  janitor::clean_names() %>% 
+  select(-biomass,-minlen, -seaslen) %>% 
+  bind_cols(all_results %>% slice(as.integer(bob$.rownames))) %>% 
+  ggplot() +
+  #aes(x = log_kept, y = fitted, col = biomass) +
+  aes(x = exp(log_kept), y = exp(fitted), col = biomass) +
+  geom_point(alpha = 0.2) +
+  scale_color_viridis_c() +
+  #facet_wrap(~minlen, scales = "free") +
+  geom_abline(slope = 1, intercept = 0) + 
+  #ylim(0, 6e+07) +
+  NULL
+
+p1 <- bob %>% 
+  janitor::clean_names() %>% 
+  select(-biomass,-minlen, -seaslen) %>% 
+  bind_cols(all_results %>% slice(as.integer(bob$.rownames))) %>% 
+  ggplot() +
+  aes(x = exp(log_kept), y = exp(log_pred), col = biomass) +
+  #aes(x = exp(log_kept), y = exp(fitted), col = biomass) +
+  geom_point(alpha = 0.2) +
+  scale_color_viridis_c() +
+  #facet_wrap(~minlen, scales = "free") +
+  geom_abline(slope = 1, intercept = 0) + 
+  #ylim(0, 6e+07) +
+  NULL
+
+p1+p2
+
+df_use <-  all_results %>% 
+  mutate(kept = 1000*keep_num,
+         pred = 0.39*exp_keep)
+df_use %>% 
+  ggplot() +
+  aes(x = pred, y = kept, col = minlen, group = as.factor(minlen)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  geom_abline(slope = 1, intercept = 0) +
+  NULL
+
+
+glm3 <- all_results %>% 
+  mutate(kept = 1000*keep_num,
+         pred = 0.39*exp_keep) %>% 
+  #glm(formula = log(kept) ~ pred + biomass + bag + seaslen,data =., family = "poisson") # 
+  lm(formula = log(kept) ~ log(pred) + biomass, data =.) #, family = "poisson") # 
+bob <- augment(glm3, type.predict = "response")
+p3 <- bob %>% 
+  janitor::clean_names() %>% 
+  select(-biomass) %>% 
+  bind_cols(all_results %>% slice(as.integer(bob$.rownames))) %>% 
+  ggplot() +
+  #aes(x = log_kept, y = fitted, col = biomass) +
+  aes(x = exp(log_kept), y = exp(fitted), col = biomass) +
+  geom_point(alpha = 0.2) +
+  scale_color_viridis_c() +
+  #facet_wrap(~minlen, scales = "free") +
+  geom_abline(slope = 1, intercept = 0) + 
+  #ylim(0, 6e+07) +
+  NULL
+
+p2 + p3  
+  
+glm4 <- all_results %>% 
+  mutate(kept = 1000*keep_num,
+         pred = exp_keep) %>% 
+  glm(formula = kept ~ pred + minlen + biomass + seaslen + bag, data =., family = "poisson") # 
+  #lm(formula = log(kept) ~ log(pred) + biomass, data =.) #, family = "poisson") # 
+bob <- augment(glm4, type.predict = "response")
+p4 <- bob %>% 
+  janitor::clean_names() %>% 
+  select(-biomass, -seaslen, -minlen, -bag) %>% 
+  bind_cols(all_results %>% slice(as.integer(bob$.rownames))) %>% 
+  ggplot() +
+  #aes(x = log_kept, y = fitted, col = biomass) +
+  aes(x = kept, y = fitted, col = biomass) +
+  geom_point(alpha = 0.2) +
+  scale_color_viridis_c() +
+  #facet_wrap(~minlen, scales = "free") +
+  #facet_wrap(~bag, scales = "free") +
+  geom_abline(slope = 1, intercept = 0) + 
+  ylim(0, 5000000) +
+  xlim(0, 5000000) +
+  labs(x = "RDM",
+       y = "fitted from GAM") +
+  NULL
+p4
+100*with(summary(glm4), 1 - deviance/null.deviance)
+  
+library(broom)
+glm5 <- all_results %>% 
+  mutate(kept = 1000*keep_num,
+         pred = exp_keep) %>% 
+  glm(formula = kept ~ pred + biomass, data =., family = "poisson") # 
+#lm(formula = log(kept) ~ log(pred) + biomass, data =.) #, family = "poisson") # 
+bob <- augment(glm5, type.predict = "response")
+nudata <- expand.grid(pred = seq(0,1e+07,by=100), biomass = seq(20000,60000,by=5000)) %>% 
+  tibble()
+nudata$est <- predict(glm5, newdata = nudata, type = "response")
+
+p5 <- bob %>% 
+  janitor::clean_names() %>% 
+  select(-biomass) %>% 
+  #select(-biomass, -minlen) %>% 
+  bind_cols(all_results %>% slice(as.integer(bob$.rownames))) %>% 
+  #filter(seaslen == 150, minlen == 17.5) %>% 
+  ggplot() +
+  #aes(y = kept, x = pred, col = biomass) +
+  #aes(x = exp_keep, y = fitted, col = bag) +
+  #geom_point(alpha = 0.2) +
+  geom_line(data = nudata, aes(x = pred, y = est, group = biomass, col=biomass)) +
+  scale_color_viridis_c() +
+  #facet_wrap(~minlen, scales = "free") +
+  #facet_wrap(~bag) + #, scales = "free") +
+  #geom_abline(slope = 1, intercept = 0) + 
+  #ylim(0, 6e+07) +
+  NULL
+p5
+100*with(summary(glm5), 1 - deviance/null.deviance)
+100*with(summary(glm4), 1 - deviance/null.deviance)
+
+
+
+# gam5 <- all_results %>% 
+#   mutate(kept = 1000*keep_num,
+#          pred = exp_keep) %>% 
+#   gam(formula = kept ~ pred + s(biomass), data =., family = "poisson") # 
+# summary(gam5)
+# gratia::draw(gam5)
+
+p6 <- bob %>% 
+  janitor::clean_names() %>% 
+  select(-biomass) %>% 
+  #select(-biomass, -minlen) %>% 
+  bind_cols(all_results %>% slice(as.integer(bob$.rownames))) %>% 
+  #filter(seaslen == 150, minlen == 17.5) %>% 
+  ggplot() +
+  aes(y = kept, x = pred, col = biomass) +
+  labs(
+    y = "harvest number from RDM",
+    x = "expected harvest from HCR"
+  ) +
+  #aes(x = kept, y = fitted, col = bag) +
+  geom_point(alpha = 0.2) +
+  #geom_point(aes(y = fitted),col = "orange", alpha = 0.2) +
+  scale_color_viridis_c() +
+  #facet_wrap(~minlen, scales = "free") +
+  #facet_wrap(~bag, scales = "free") +
+  geom_abline(slope = 1, intercept = 0) + 
+  #ylim(0, 6e+07) +
+  NULL
+p6
+p6 + p5
+
+p7 <- bob %>% 
+  janitor::clean_names() %>% 
+  select(-biomass) %>% 
+  #select(-biomass, -minlen) %>% 
+  bind_cols(all_results %>% slice(as.integer(bob$.rownames))) %>% 
+  filter(seaslen == 150, minlen == 17.5) %>% 
+  ggplot() +
+#  aes(y = kept, group = bag) +
+#  geom_boxplot()
+  aes(x = fitted, y = kept, col = biomass) +
+  #aes(x = kept, y = fitted, col = bag) +
+  geom_point(alpha = 0.2) +
+  scale_color_viridis_c() +
+  #facet_wrap(~minlen, scales = "free") +
+  facet_wrap(~bag) + #, scales = "free") +
+  geom_abline(slope = 1, intercept = 0) + 
+  #ylim(0, 6e+07) +
+  NULL
+p7
+
+dat_use <- flukecatch %>% 
+  janitor::clean_names() %>% 
+  group_by(bag, min_len, season_len) %>% 
+  summarize(land = sum(land),
+            disc = sum(disc), .groups = "drop")
+dat_use
+
+dat_use %>% 
+  ggplot() + 
+  aes(x = min_len, y = land, group = season_len, col = season_len) +
+  geom_line() +
+  facet_wrap(~bag) +
+  scale_color_viridis_c() +
+  theme_bw() + 
+  ylim(0,NA) +
+  NULL
+```
+

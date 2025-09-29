@@ -9,6 +9,7 @@ library(ggplot2)
 
 setwd("~/Desktop/FlounderMSE")
 
+#use blank input table for RDM 
 blankinput <- readRDS("blankinputtables.rds")
 
 #FORM PLAUSIBLE DISTRIBUTION OF REGULATIONS 
@@ -36,7 +37,10 @@ state <- c("NC", "VA", "MA", "RI", "NY", "NJ", "CT", "DE", "MD")
 combinations_sample <- expand.grid(SeasonLen = unique(sample_seas), Bag = unique(sample_bag),
                                    MinLen = unique(sample_minlen))
 
+#df_trimmed <- combinations_sample[1:(nrow(combinations_sample) - 24),]
+
 rbc4 <- combinations_sample
+
 #View(rbc4)
 #random not necessary anymore if sampling from pool of length distributions
 #rbc4 <- rbc4[sample(nrow(rbc4)), ]
@@ -67,7 +71,7 @@ rbc4 <- rbind(rbcCT, rbcDE, rbcVA, rbcRI, rbcMA, rbcMD, rbcNY,
 filltable <- dplyr::select(rbc4[1:560,], SeasonLen, Bag, MinLen) 
 #nrow(filltable)
 
-#SET DIRECTORY TO ACCESS RDM SOURCE FILES
+#SET DIRECTORY TO ACCESS RDM SOURCE FILES <- CAN BE ANY MSE RUN DIRECTORY WITH MOST RECENT SINATRA
 Alternative = "scen1"
 #extract regulations for each time step 
 if(Alternative == "scen1"){setwd("~/Desktop/FlounderMSE/RDMgam/storelengths/allOMscen_allstartSSB_newersinatra/sim_storelength_allOMscenBin3/scen11_20/sim1_10")}
@@ -180,7 +184,6 @@ for (x in 1:length(NCtableHCR$State)){
 }
 NCbig_data = do.call(rbind, NCdatalist)
 
-
 ## -----------------------------------------------------------------------------
 
 RItableHCR <- rbc4 %>% filter(State == "RI")
@@ -213,7 +216,6 @@ for (x in 1:length(RItableHCR$State)){
   RIdatalist[[x]] <- RIinputmiddleman %>% mutate(Nsim = x)
 }
 RIbig_data = do.call(rbind, RIdatalist)
-
 
 ## -----------------------------------------------------------------------------
 
@@ -435,7 +437,7 @@ lapply(pkgs_to_use, library, character.only = TRUE, quietly = TRUE)
 # library(writexl)
 conflict_prefer("filter", "dplyr")
 conflict_prefer("select", "dplyr")
-conflicts_prefer(copula::`%in%`) #why do we need this all of a sudden?
+#conflicts_prefer(copula::`%in%`) #why do we need this all of a sudden?
 ### 
 
 #year of the prediction
@@ -448,6 +450,10 @@ n = 560
 RDMoutput_edit = list()
 RDMoutput_edit = vector("list", length = n)
 #x<-1
+
+#set seed 
+set.seed(444)
+
 for (x in 1:560){
   
   mgmt_scen <- 1
@@ -521,8 +527,11 @@ for (x in 1:560){
   # SCEN 1_10 1:112
     
     #pull out everything in parent and sub-directory
+  
+    #fitting to base scenario OM SSB 
     dat_directory <- "~/Desktop/FlounderMSE/RDMgam/storelengths/allOMscen_allstartSSB_newersinatra/sim_storelength_allOMscenBin3"
-    dat_files <- list.files(path = dat_directory, pattern = "\\.dat$", 
+
+      dat_files <- list.files(path = dat_directory, pattern = "\\.dat$", 
                             full.names = TRUE, recursive = TRUE)
     
     #keep only length structure files 
@@ -532,9 +541,11 @@ for (x in 1:560){
                                                          "om-length2035.dat", "om-length2036.dat","om-length2037.dat","om-length2038.dat","om-length2039.dat",
                                                          "om-length2040.dat", "om-length2041.dat","om-length2042.dat","om-length2043.dat","om-length2044.dat",
                                                          "om-length2045.dat")] 
+    
     #randomly sample a length structure, but re-sample if it breaks RDM 
     repeat{
       tryCatch({ 
+       
     selected_file <- sample(subset_files, 1)
     om_length_cm <- {scan(selected_file,n=Nlen+1)} 
     
@@ -550,7 +561,7 @@ for (x in 1:560){
     spawbio_character <- {scan(subdir_files, what = "spawbio.out")} 
     spawbio <- as.numeric(spawbio_character)
     
-    #match the subdir spawbio to the same timestep of the length structure file 
+    #match the subdir spawbio to the same timestep of the length structure file <- skips 2019 start values 
     if (subdir_name2 == "scen1_10" & subdir_name == "sim1_10"){spawbio_storelength <- spawbio[29:54]}
     if (subdir_name2 == "scen1_10" & subdir_name == "sim11_20"){spawbio_storelength <- spawbio[56:81]}
     if (subdir_name2 == "scen1_10" & subdir_name == "sim21_30"){spawbio_storelength <- spawbio[83:108]}
@@ -657,7 +668,7 @@ for (x in 1:560){
  
  # source("catch at length given stock structure - prediction.R")
   
-  #SOURCE START HERE
+  #SOURCE CODE START HERE
   
   numbers_at_length <- tibble(l_in_bin = lenbinuse,
                               N_l = om_length_in[1,])
@@ -1977,13 +1988,17 @@ error = function(e){
 
 RDMoutputbind_edit <- bind_rows(RDMoutput_edit)
 #View(RDMoutputbind_edit)
-#saveRDS(RDMoutputbind_edit, "~/Desktop/FlounderMSE/RDMgam/RDMoutputbind_allOM_1BBMSY_2.rds") #trial 1 <- cut at 2036
+
+#saveRDS(RDMoutputbind_edit, "~/Desktop/FlounderMSE/RDMgam/setseed/datafiles/RDMoutputbind_allOM_1BBMSY_setseed_9.rds") #trial 1 <- cut at 2036
 
 ############################# FIT MODEL ########################################
 library(mgcv)
 library(gratia)
-#RDMoutputbind_edit <- readRDS("~/Desktop/FlounderMSE/RDMgam/RDMoutputbind_allOM_1BBMSY_1.rds") 
-#RDMoutputbind_edit <- readRDS("~/Desktop/FlounderMSE/RDMgam/RDMoutputbind_allOM_1BBMSY_2.rds") 
+
+#read RDS
+#RDMoutputbind_edit <- readRDS("~/Desktop/FlounderMSE/RDMgam/setseed/datafiles/RDMoutputbind_allOM_1BBMSY_setseed_9.rds")
+
+#hist(RDMoutputbind_edit$SSBcov)
 #View(RDMoutputbind_edit)
 #RDMoutputbind_edit <- View(RDMoutputbind_edit %>% filter(tot_keep == max(tot_keep)))
 
@@ -1997,40 +2012,44 @@ SSB <- RDMoutputbind_edit$SSBcov
 
 inputdata <- data.frame(tot_keep, 
                         state, SeasonLen, Bag, MinLen, SSB) 
+
 #View(inputdata)
 hist(RDMoutputbind_edit$SSBcov, prob = TRUE, breaks = 15)
 
 # --------------------------------------- GAM -----------------------------------------------#
-#hierarchical
+#hierarchical <- need this next line for hierarchical GAM to work 
 inputdata$state <- as.factor(inputdata$state)
 
-#hierarchical without state as additional COV
+#hierarchical without state as additional COV -> no longer using this
 g1.1 <- gam(tot_keep ~  s(SSB, state, bs = "fs", k = 3) + 
               s(SeasonLen, state, bs = "fs", k = 3) + #9,5,7 partial effect of smooths look strange with k any higher 
               s(Bag, state, bs = "fs", k = 3) + s(MinLen, state, bs = "fs", k = 3), 
             data = inputdata, #either isolated RDM runs or total 
             family = Gamma(link = log), method = "REML") #random effect on spline for minlen that introduces  a sort of random effect by state 
-#saveRDS(g1.1, "~/Desktop/FlounderMSE/RDMgam/gam_RDMland_allOM_1BBMSY_1.rds") #disordered length
-#g1.1 <- readRDS("~/Desktop/FlounderMSE/RDMgam/gam_RDMland_allOM_1BBMSY_1.rds") #disordered length
-#saveRDS(g1.1, "~/Desktop/FlounderMSE/RDMgam/gam_RDMland_allOM_1BBMSY_2.rds") #disordered length
-#g1.1 <- readRDS("~/Desktop/FlounderMSE/RDMgam/gam_RDMland_allOM_1BBMSY_2.rds") #disordered length
+
 summary(g1.1)
 draw(g1.1)
 appraise(g1.1)
 g1.1pred <- predict(g1.1, type = "response") #if not 
 plot(inputdata$tot_keep ~ g1.1pred, xlim = c(0,3e7), ylim = c(0,3e7)) + abline(b = 1, a = 0, col = "red")
 
-#with state as additional COV
+#with state as additional COV -> using this 
 g1.1state <- gam(tot_keep ~  state + s(SSB, state, bs = "fs", k = 3) + 
                    s(SeasonLen, state, bs = "fs", k = 3) + #9,5,7 partial effect of smooths look strange with k any higher 
                    s(Bag, state, bs = "fs", k = 3) + s(MinLen, state, bs = "fs", k = 3), 
                  data = inputdata, #either isolated RDM runs or total 
                  family = Gamma(link = log), method = "REML") 
+
+#save RDS files 
+
+#original
 #saveRDS(g1.1state, "~/Desktop/FlounderMSE/RDMgam/gam_RDMland_allOM_1BBMSY_1_state.rds")
 #g1.1state <- readRDS("~/Desktop/FlounderMSE/RDMgam/gam_RDMland_allOM_1BBMSY_1_state.rds")
-#g1.1 <- g1.1state
-#saveRDS(g1.1state, "~/Desktop/FlounderMSE/RDMgam/gam_RDMland_allOM_1BBMSY_2_state.rds")
-#g1.1state <- readRDS("~/Desktop/FlounderMSE/RDMgam/gam_RDMland_allOM_1BBMSY_2_state.rds")
+
+#set seed
+#saveRDS(g1.1state, "~/Desktop/FlounderMSE/RDMgam/setseed/models/gam_RDMland_allOM_1BBMSY_9_state_setseed.rds")
+#g1.1state <- readRDS("~/Desktop/FlounderMSE/RDMgam/setseed/models/gam_RDMland_allOM_1BBMSY_9_state_setseed.rds")
+
 summary(g1.1state)
 draw(g1.1state)
 appraise(g1.1state)
@@ -2045,13 +2064,13 @@ g1.3 <- gam(tot_keep ~ t2(SSB, state, bs = c("tp", "re")) +
             data = inputdata, #either isolated RDM runs or total 
             family = Gamma(link = log), method = "REML")
 summary(g1.3)
-draw(g1.3) #not sure how to plot partial effects
+draw(g1.3) #this doesn't work for tensor product; use code below
 appraise(g1.3)
 g1.3pred <- predict(g1.3, type = "response") #if not 
 plot(inputdata$tot_keep ~ g1.3pred, xlim = c(0,3e7), ylim = c(0,3e7)) + abline(b = 1, a = 0, col = "red")
 
 #plot that shows each states' contribution
-g1.3 <- g1.1state
+g1.3 <- g1.1state #only if you aren't plotting tensor product 
 
 sm <- smooth_estimates(g1.3)
 sm_fs <- sm[grep("SSB", sm$.smooth), ]
@@ -2130,7 +2149,7 @@ inputdata %>%
     y = "Realized Harvest from RDM",
     x = "Expected harvest from GAM"
   ) + 
- # ggtitle("Partial Effects of Covariates") +
+  ggtitle("GAM Predictions of Recreational Demand Model Harvest") +
   #facet_wrap(~bag) +
   xlim(0,4.5e+07) + #2e7
   ylim(0,4.5e+07) + 
