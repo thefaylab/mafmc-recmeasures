@@ -7,8 +7,7 @@ PCA_BioInformed_CatchTable_NYRegs <- finaltable1
 blankinput <- readRDS("blankinputtables.rds") # here is the blank input table to populate with new regs
 
 ## -----------------------------------------------------------------------------
-NJtableHCR <- PCA_BioInformed_CatchTable_NYRegs %>%
-  filter(State == "NJ") # order of rows needs to be season, then minimum length, then bag limit. The  lookup table function sheet puts it in that order
+NJtableHCR <- PCA_BioInformed_CatchTable_NYRegs  # order of rows needs to be season, then minimum length, then bag limit. The  lookup table function sheet puts it in that order
   
 for (x in 1:7){
 NJinput2 <- blankinput$NJinput2
@@ -45,8 +44,7 @@ if (x==7){NJinputLS <- NJinputmiddleman}
 
 
 ## -----------------------------------------------------------------------------
-NYtableHCR <- PCA_BioInformed_CatchTable_NYRegs %>%
-  filter(State == "NY")
+NYtableHCR <- PCA_BioInformed_CatchTable_NYRegs 
 
 for (x in 1:7){
 NYinput2 <- blankinput$NYinput2
@@ -82,8 +80,7 @@ if (x==7){NYinputLS <- NYinputmiddleman}
 
 
 ## -----------------------------------------------------------------------------
-NCtableHCR <- PCA_BioInformed_CatchTable_NYRegs %>%
-  filter(State == "NC")
+NCtableHCR <- PCA_BioInformed_CatchTable_NYRegs 
 
 for (x in 1:7){
 NCinput2 <- blankinput$NCinput2
@@ -119,8 +116,7 @@ if (x==7){NCinputLS <- NCinputmiddleman}
 
 
 ## -----------------------------------------------------------------------------
-RItableHCR <- PCA_BioInformed_CatchTable_NYRegs %>%
-  filter(State == "RI")
+RItableHCR <- PCA_BioInformed_CatchTable_NYRegs 
  
 for (x in 1:7){
 RIinput2 <- blankinput$RIinput2
@@ -155,8 +151,7 @@ if (x==7){RIinputLS <- RIinputmiddleman}
 
 
 ## -----------------------------------------------------------------------------
-MDtableHCR <- PCA_BioInformed_CatchTable_NYRegs %>%
-  filter(State == "MD")
+MDtableHCR <- PCA_BioInformed_CatchTable_NYRegs 
 
 for (x in 1:7){
 MDinput2 <- blankinput$MDinput2
@@ -191,8 +186,7 @@ if (x==7){MDinputLS <- MDinputmiddleman}
 
 
 ## -----------------------------------------------------------------------------
-VAtableHCR <- PCA_BioInformed_CatchTable_NYRegs %>%
-  filter(State == "VA")
+VAtableHCR <- PCA_BioInformed_CatchTable_NYRegs 
 
 for (x in 1:7){
 VAinput2 <- blankinput$VAinput2
@@ -227,8 +221,7 @@ if (x==7){VAinputLS <- VAinputmiddleman}
 
 
 ## -----------------------------------------------------------------------------
-CTtableHCR <- PCA_BioInformed_CatchTable_NYRegs %>%
-  filter(State == "CT")
+CTtableHCR <- PCA_BioInformed_CatchTable_NYRegs 
 
 for (x in 1:7){
 CTinput2 <- blankinput$CTinput2
@@ -263,8 +256,7 @@ if (x==7){CTinputLS <- CTinputmiddleman}
 
 
 ## -----------------------------------------------------------------------------
-DEtableHCR <- PCA_BioInformed_CatchTable_NYRegs %>%
-  filter(State == "DE")
+DEtableHCR <- PCA_BioInformed_CatchTable_NYRegs 
 
 for (x in 1:7){
 DEinput2 <- blankinput$DEinput2
@@ -299,8 +291,7 @@ if (x==7){DEinputLS <- DEinputmiddleman}
 
 
 ## -----------------------------------------------------------------------------
-MAtableHCR <- PCA_BioInformed_CatchTable_NYRegs %>%
-  filter(State == "MA")
+MAtableHCR <- PCA_BioInformed_CatchTable_NYRegs 
 
 for (x in 1:7){
 MAinput2 <- blankinput$MAinput2
