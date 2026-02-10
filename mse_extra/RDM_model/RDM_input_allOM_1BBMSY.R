@@ -387,8 +387,12 @@ for (x in 1:length(MAtableHCR$State)){
 }
 MAbig_data = do.call(rbind, MAdatalist)
 #View(MAbig_data)
+
 Big_Data <- rbind(CTbig_data, DEbig_data, MAbig_data, MDbig_data, NCbig_data, NJbig_data, NYbig_data, 
                   RIbig_data, VAbig_data)
+
+Big_Data <- rbind(MAbig_data, RIbig_data, CTbig_data, NYbig_data, NJbig_data, DEbig_data, MDbig_data, 
+                  VAbig_data, NCbig_data)
 
 Big_Data <- Big_Data %>% arrange(Big_Data$Nsim)
 #View(Big_Data)
@@ -2022,10 +2026,10 @@ inputdata$state <- as.factor(inputdata$state)
 
 #hierarchical without state as additional COV -> no longer using this
 g1.1 <- gam(tot_keep ~  s(SSB, state, bs = "fs", k = 3) + 
-              s(SeasonLen, state, bs = "fs", k = 3) + #9,5,7 partial effect of smooths look strange with k any higher 
-              s(Bag, state, bs = "fs", k = 3) + s(MinLen, state, bs = "fs", k = 3), 
+              s(SeasonLen,  state, bs = "fs", k = 3) + #9,5,7 partial effect of smooths look strange with k any higher 
+              s(Bag,  state, bs = "fs", k = 3) + s(MinLen,  state, bs = "fs", k = 3), 
             data = inputdata, #either isolated RDM runs or total 
-            family = Gamma(link = log), method = "REML") #random effect on spline for minlen that introduces  a sort of random effect by state 
+            family = Gamma(link = log), method = "REML") #random effect on spline for minlen that introduces a sort of random effect by state 
 
 summary(g1.1)
 draw(g1.1)
@@ -2057,6 +2061,14 @@ gam.check(g1.1state)
 g1.1pred <- predict(g1.1state, type = "response") #if not 
 plot(inputdata$tot_keep ~ g1.1pred, xlim = c(0,4e7), ylim = c(0,4e7)) + abline(b = 1, a = 0, col = "red")
 
+#global smoother <- same diagnostics and deviations from global function look small
+g1.1state_1 <- gam(tot_keep ~  state + s(SSB, k = 3) +  s(SSB, state, bs = "fs", k = 3) + 
+                     s(SeasonLen, k = 3) + s(SeasonLen, state, bs = "fs", k = 3) + #9,5,7 partial effect of smooths look strange with k any higher 
+                     s(Bag, k = 3) + s(Bag, state, bs = "fs", k = 3) +
+                     s(MinLen, k = 3) + s(MinLen, state, bs = "fs", k = 3), 
+                   data = inputdata, #either isolated RDM runs or total 
+                   family = Gamma(link = log), method = "REML") 
+
 #tensor product 
 g1.3 <- gam(tot_keep ~ t2(SSB, state, bs = c("tp", "re")) + 
               t2(SeasonLen, state, bs = c("tp", "re")) + #9,5,7 partial effect of smooths look strange with k any higher 
@@ -2069,7 +2081,7 @@ appraise(g1.3)
 g1.3pred <- predict(g1.3, type = "response") #if not 
 plot(inputdata$tot_keep ~ g1.3pred, xlim = c(0,3e7), ylim = c(0,3e7)) + abline(b = 1, a = 0, col = "red")
 
-#plot that shows each states' contribution
+#plot smooths in way that shows each states' contribution
 g1.3 <- g1.1state #only if you aren't plotting tensor product 
 
 sm <- smooth_estimates(g1.3)
@@ -2086,7 +2098,6 @@ ggplot(sm_fs, aes(x = SSB, y = .estimate, colour = state)) +
     axis.text.x = element_text(size = 18),     
     axis.text.y = element_text(size = 18)
   )
-
 
 sm <- smooth_estimates(g1.3)
 sm_fs <- sm[grep("SeasonLen", sm$.smooth), ]
