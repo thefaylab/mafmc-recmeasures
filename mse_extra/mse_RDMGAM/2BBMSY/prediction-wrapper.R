@@ -43,6 +43,13 @@ conflict_prefer("select", "dplyr")
 #year of the prediction
 iyr <- 2019
 iyr <- as.integer(args[1])
+
+#SET SEED FOR CATCH-AT-LENGTH CALCULATION 
+sim_number   <- as.numeric(args[2])
+seed <- (sim_number * 10000) + iyr
+set.seed(seed)
+print(seed)
+
 #hcr_output <- args[2]
 
 # Input the data set containing alternative regulations and directed trips (directed_trips_region - alternative regs test.xlsx)
