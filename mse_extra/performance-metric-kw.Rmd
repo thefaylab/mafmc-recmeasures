@@ -393,7 +393,7 @@ do_small_radar_plot <- function(metrics) {
                   alpha("#d95f02",0.9),
                   alpha("#56B4E9",0.9),
                   alpha("#dc14cf",0.9),
-                  #alpha("#009E73",0.9),
+                  alpha("#009E73",0.9),
                   alpha("#F0E442",0.9),
                   alpha("#E69F00",0.9),
                   alpha("#56B4E9",0.9),
@@ -436,7 +436,7 @@ do_small_radar_plot <- function(metrics) {
 
 Switch 
 ```{r}
-HCRtoplot <- "RDMBin1"
+HCRtoplot <- "RDMBin7"
 #change the folder names for the scenarios you want to summarize results for and give them a unique name
 ```
 
@@ -477,8 +477,7 @@ params <- if(HCRtoplot == "BASE2split"){list(
 }
 ```
 
-"BTable3", "LTable3",  "STable3", "ATable3",  "BTable3.1","LTable3.1", "STable3.1", "ATable3.1", "BTable3.2","LTable3.2", 
-"STable3.2","ATable3.2","BTable3.3","LTable3.3", "STable3.3", "ATable3.3"
+"BTable3", "LTable3",  "STable3", "ATable3",  "BTable3.1","LTable3.1", "STable3.1", "ATable3.1", "BTable3.2","LTable3.2", "STable3.2","ATable3.2","BTable3.3","LTable3.3", "STable3.3", "ATable3.3"
 
 BASE2 sinatra original "BASE2" - not in MS
 ```{r}
@@ -1842,8 +1841,8 @@ median_metrics3 <- metrics %>%
 #################################################
 
 #OR use this to read in a spreadsheet of scenario names and specs
-scen_lookup <- read.csv("~/Downloads/scentable2next.csv") %>%
-  janitor::clean_names() %>% rename(mp = run_number)
+#scen_lookup <- read.csv("~/Downloads/scentable2next.csv") %>%
+  #janitor::clean_names() %>% rename(mp = run_number)
 ```
 
 State Information - not in MS
@@ -2107,8 +2106,8 @@ Bin7_reg <- median_metrics2 %>% mutate(StartBBMSY = 0.3)
 startbbmsydata_hcr <- rbind(Bin1, Bin3, Bin7)
 startbbmsydata_reg <- rbind(Bin1_reg, Bin3_reg, Bin7_reg)
 
-#saveRDS(startbbmsydata_hcr, "~/Desktop/FlounderMSE/median_metrics_rdsfiles/version2_seed/startbbmsydata_hcr.rds")
-#saveRDS(startbbmsydata_reg, "~/Desktop/FlounderMSE/median_metrics_rdsfiles/version2_seed/startbbmsydata_reg.rds")
+#saveRDS(startbbmsydata_hcr, "~/Desktop/FlounderMSE/median_metrics_rdsfiles/version3_final/startbbmsydata_hcr.rds")
+#saveRDS(startbbmsydata_reg, "~/Desktop/FlounderMSE/median_metrics_rdsfiles/version3_final/startbbmsydata_reg.rds")
 ```
 
 Prepare table for plotting
@@ -2265,9 +2264,9 @@ p2 <- metrics2 %>%
        #subtitle = "Base scenario") +
   guides(fill = guide_legend(nrow = 1))
 # add table summaries
-#ggsave("~/Desktop/FlounderMSE/ManuscriptPrep/Draft3Figures_coast/boxplot-metrics1bmsy.png",p2,width=9,height=6)
-#ggsave("~/Desktop/FlounderMSE/ManuscriptPrep/Draft3Figures_coast/boxplot-metrics2bmsy.png",p2,width=9,height=6)
-#ggsave("~/Desktop/FlounderMSE/ManuscriptPrep/Draft3Figures_coast/boxplot-metrics03bmsy.png",p2,width=9,height=6)
+#ggsave("~/Desktop/FlounderMSE/ManuscriptPrep/Draft5Figures_final/boxplot-metrics1bmsy.png",p2,width=9,height=6)
+#ggsave("~/Desktop/FlounderMSE/ManuscriptPrep/Draft5Figures_final/boxplot-metrics2bmsy.png",p2,width=9,height=6)
+#ggsave("~/Desktop/FlounderMSE/ManuscriptPrep/Draft5Figures_final/boxplot-metrics03bmsy.png",p2,width=9,height=6)
 p2
 ```
 
@@ -2859,6 +2858,8 @@ all_results %>%
 
 Newer Runs Projection 
 ```{r}
+library(patchwork)
+
 #slightly modified projection plot from top of script <- both are pretty much interchangeable 
 projection.plot <- function(project.results) {
   project.results <- project.results %>% 
@@ -2964,6 +2965,248 @@ diag_ts %>%
 #  mutate(type = fct_relevel(type,c("spawning biomass", "total catch"))) %>% 
  filter(type == "exp_keep", mp3 == "All") %>% 
   projection.plot() 
+
+######## for MS ######## 
+
+lab_bag <- labs(subtitle = "Bag Limit") 
+lab_minlen <- labs(subtitle = "Minimum Size Limit") 
+lab_seaslen <- labs(subtitle = "Season Length") 
+lab_all <- labs(subtitle = "Any Regulations can Change")
+
+#minlen
+minlen_proj <- diag_ts %>% 
+  mutate(value = ifelse(type == "exp_keep",  1*value, value),
+        mp2 = fct_collapse(scenario,
+                    "No Change (RHL as target)" = "NCA", #c("BTable3.3","LTable3.3","STable3.3", "ATable3.3"),
+                    "Percent Change Approach" = "PCA", #c("BTable3.2","LTable3.2","STable3.2", "ATable3.2"), 
+                    "Biological Ref. Point" = "BRP", #c("BTable3.1","LTable3.1","STable3.1", "ATable3.1"),
+                    "Biomass Matrix" = "BBM"), #c("BTable3","LTable3","STable3", "ATable3")),
+         mp3 = fct_collapse(RegType, #scenario, 
+                            "Bag" = "Bag", #c("BTable3","BTable3.1","BTable3.2", "BTable3.3"),
+                            "Minlen" = "Length", #c("LTable3","LTable3.1","LTable3.2","LTable3.3"),
+                            "Season" = "Season", #c("STable3","STable3.1","STable3.2","STable3.3"),
+                            "All" = "All"#c("ATable3","ATable3.1","ATable3.2","ATable3.3")  
+                            )) %>% 
+  filter(year != 2019) %>% 
+#  mutate(type = fct_relevel(type,c("spawning biomass", "total catch"))) %>% 
+ filter(type == "exp_keep", mp3 == "Minlen") 
+
+  minlen_proj2 <- minlen_proj %>% 
+    #filter(type %in% c("biomass","catch")) %>%
+    I() %>%
+  #minlen_proj %>% 
+    #group_by(scenario, type, year) %>% 
+    #median_qi(value, .width = c(.5, .8, .95)) %>%
+    ggplot() +  
+    stat_lineribbon(aes(x = year, y = value, fill = mp2),
+                    #show.legend = FALSE,
+                    alpha = 0.35) +
+    # geom_lineribbon(aes(x = year, y = value, ymin = .lower, ymax = .upper, fill = scenario),
+    #                 show.legend = FALSE) +
+    scale_fill_brewer(type = "qual", palette = 2) +
+    facet_wrap(~mp2, scale = "fixed") + 
+    geom_line(aes(y=value,x=year,group=mp2),data = subset(minlen_proj, type != "index" & isim==1), lty=1,lwd=0.5,col=gray(0.7),alpha=0.75) +
+    geom_line(aes(y=value,x=year,group=mp2),data = subset(minlen_proj, type != "index" & isim==2), lty=1,lwd=0.5,col=gray(0.7),alpha=0.75) +
+    geom_line(aes(y=value,x=year,group=mp2),data = subset(minlen_proj, type != "index" & isim==3), lty=1,lwd=0.5,col=gray(0.7),alpha=0.75) +
+    geom_line(aes(y=value,x=year,group=mp2),data = subset(minlen_proj, type != "index" & isim==4), lty=1,lwd=0.5,col=gray(0.7),alpha=0.75) +
+    ylim(0,1e7) + #originally 3000
+    ylab("") + 
+    xlab("") +
+    theme_bw() +
+  theme(strip.placement = "outside") +
+    theme(legend.position= "none") + #,
+    #axis.text.y = element_blank()) +
+    labs(fill = "",
+         subtitle = "Expected Harvest from RDM Emulator") + 
+    lab_minlen + 
+    theme( plot.subtitle = element_text(hjust = 0.5)) + 
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+minlen_proj_clean <- minlen_proj2 + 
+  theme(axis.title.y = element_blank(), 
+        axis.text.y = element_blank(), 
+        axis.title.x = element_blank(),
+        axis.text.x = element_blank())
+
+#bag
+bag_proj <- diag_ts %>% 
+  mutate(value = ifelse(type == "exp_keep",  1*value, value),
+        mp2 = fct_collapse(scenario,
+                     "No Change (RHL as target)" = "NCA", #c("BTable3.3","LTable3.3","STable3.3", "ATable3.3"),
+                    "Percent Change Approach" = "PCA", #c("BTable3.2","LTable3.2","STable3.2", "ATable3.2"), 
+                    "Biological Ref. Point" = "BRP", #c("BTable3.1","LTable3.1","STable3.1", "ATable3.1"),
+                    "Biomass Matrix" = "BBM"), #c("BTable3","LTable3","STable3", "ATable3")),
+         mp3 = fct_collapse(RegType, #scenario, 
+                            "Bag" = "Bag", #c("BTable3","BTable3.1","BTable3.2", "BTable3.3"),
+                            "Minlen" = "Length", #c("LTable3","LTable3.1","LTable3.2","LTable3.3"),
+                            "Season" = "Season", #c("STable3","STable3.1","STable3.2","STable3.3"),
+                            "All" = "All"#c("ATable3","ATable3.1","ATable3.2","ATable3.3")  
+                            )) %>% 
+  filter(year != 2019) %>% 
+#  mutate(type = fct_relevel(type,c("spawning biomass", "total catch"))) %>% 
+ filter(type == "exp_keep", mp3 == "Bag")
+
+bag_proj2 <- bag_proj %>% 
+    #filter(type %in% c("biomass","catch")) %>%
+    I() %>%
+  #bag_proj %>% 
+    #group_by(scenario, type, year) %>% 
+    #median_qi(value, .width = c(.5, .8, .95)) %>%
+    ggplot() +  
+    stat_lineribbon(aes(x = year, y = value, fill = mp2),
+                    #show.legend = FALSE,
+                    alpha = 0.35) +
+    # geom_lineribbon(aes(x = year, y = value, ymin = .lower, ymax = .upper, fill = scenario),
+    #                 show.legend = FALSE) +
+    scale_fill_brewer(type = "qual", palette = 2) +
+    facet_wrap(~mp2, scale = "fixed") + 
+    geom_line(aes(y=value,x=year,group=mp2),data = subset(bag_proj, type != "index" & isim==1), lty=1,lwd=0.5,col=gray(0.7),alpha=0.75) +
+    geom_line(aes(y=value,x=year,group=mp2),data = subset(bag_proj, type != "index" & isim==2), lty=1,lwd=0.5,col=gray(0.7),alpha=0.75) +
+    geom_line(aes(y=value,x=year,group=mp2),data = subset(bag_proj, type != "index" & isim==3), lty=1,lwd=0.5,col=gray(0.7),alpha=0.75) +
+    geom_line(aes(y=value,x=year,group=mp2),data = subset(bag_proj, type != "index" & isim==4), lty=1,lwd=0.5,col=gray(0.7),alpha=0.75) +
+    ylim(0,1e7) + #originally 3000
+    ylab("") + 
+    xlab("") +
+    theme_bw() +
+  theme(strip.placement = "outside") +
+    theme(legend.position= "none") + #,
+    #axis.text.y = element_blank()) +
+    labs(fill = "",
+         subtitle = "Expected Harvest from RDM Emulator") + 
+  lab_bag + 
+    theme( plot.subtitle = element_text(hjust = 0.5)) + 
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+bag_proj_clean <- bag_proj2 + 
+  theme(#axis.title.y = element_blank(), 
+        #axis.text.y = element_blank(), 
+        axis.title.x = element_blank(),
+        axis.text.x = element_blank())
+
+#seaslen
+seaslen_proj <- diag_ts %>% 
+  mutate(value = ifelse(type == "exp_keep",  1*value, value),
+        mp2 = fct_collapse(scenario,
+                       "No Change (RHL as target)" = "NCA", #c("BTable3.3","LTable3.3","STable3.3", "ATable3.3"),
+                    "Percent Change Approach" = "PCA", #c("BTable3.2","LTable3.2","STable3.2", "ATable3.2"), 
+                    "Biological Ref. Point" = "BRP", #c("BTable3.1","LTable3.1","STable3.1", "ATable3.1"),
+                    "Biomass Matrix" = "BBM"), #c("BTable3","LTable3","STable3", "ATable3")),
+           mp3 = fct_collapse(RegType, #scenario, 
+                            "Bag" = "Bag", #c("BTable3","BTable3.1","BTable3.2", "BTable3.3"),
+                            "Minlen" = "Length", #c("LTable3","LTable3.1","LTable3.2","LTable3.3"),
+                            "Season" = "Season", #c("STable3","STable3.1","STable3.2","STable3.3"),
+                            "All" = "All"#c("ATable3","ATable3.1","ATable3.2","ATable3.3")  
+                            )) %>% 
+  filter(year != 2019) %>% 
+#  mutate(type = fct_relevel(type,c("spawning biomass", "total catch"))) %>% 
+ filter(type == "exp_keep", mp3 == "Season")
+
+seaslen_proj2 <- seaslen_proj %>% 
+    #filter(type %in% c("biomass","catch")) %>%
+    I() %>%
+  #bag_proj %>% 
+    #group_by(scenario, type, year) %>% 
+    #median_qi(value, .width = c(.5, .8, .95)) %>%
+    ggplot() +  
+    stat_lineribbon(aes(x = year, y = value, fill = mp2),
+                    #show.legend = FALSE,
+                    alpha = 0.35) +
+    # geom_lineribbon(aes(x = year, y = value, ymin = .lower, ymax = .upper, fill = scenario),
+    #                 show.legend = FALSE) +
+    scale_fill_brewer(type = "qual", palette = 2) +
+    facet_wrap(~mp2, scale = "fixed") + 
+    geom_line(aes(y=value,x=year,group=mp2),data = subset(seaslen_proj, type != "index" & isim==1), lty=1,lwd=0.5,col=gray(0.7),alpha=0.75) +
+    geom_line(aes(y=value,x=year,group=mp2),data = subset(seaslen_proj, type != "index" & isim==2), lty=1,lwd=0.5,col=gray(0.7),alpha=0.75) +
+    geom_line(aes(y=value,x=year,group=mp2),data = subset(seaslen_proj, type != "index" & isim==3), lty=1,lwd=0.5,col=gray(0.7),alpha=0.75) +
+    geom_line(aes(y=value,x=year,group=mp2),data = subset(seaslen_proj, type != "index" & isim==4), lty=1,lwd=0.5,col=gray(0.7),alpha=0.75) +
+    ylim(0,1e7) + #originally 3000
+    ylab("") + 
+    xlab("") +
+    theme_bw() +
+  theme(strip.placement = "outside") +
+    theme(legend.position= "none") + #,
+    #axis.text.y = element_blank()) +
+    labs(fill = "",
+         subtitle = "Expected Harvest from RDM Emulator") + 
+  lab_seaslen + 
+    theme( plot.subtitle = element_text(hjust = 0.5)) + 
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+seaslen_proj_clean <- seaslen_proj2 + 
+  theme(#axis.title.y = element_blank(), 
+        #axis.text.y = element_blank(), 
+        #axis.title.x = element_blank(),
+        #axis.text.x = element_blank()
+        )
+
+#all
+allregs_proj <- diag_ts %>% 
+  mutate(value = ifelse(type == "exp_keep",  1*value, value),
+        mp2 = fct_collapse(scenario,
+                    "No Change (RHL as target)" = "NCA", #c("BTable3.3","LTable3.3","STable3.3", "ATable3.3"),
+                    "Percent Change Approach" = "PCA", #c("BTable3.2","LTable3.2","STable3.2", "ATable3.2"), 
+                    "Biological Ref. Point" = "BRP", #c("BTable3.1","LTable3.1","STable3.1", "ATable3.1"),
+                    "Biomass Matrix" = "BBM"), #c("BTable3","LTable3","STable3", "ATable3")),
+          mp3 = fct_collapse(RegType, #scenario, 
+                            "Bag" = "Bag", #c("BTable3","BTable3.1","BTable3.2", "BTable3.3"),
+                            "Minlen" = "Length", #c("LTable3","LTable3.1","LTable3.2","LTable3.3"),
+                            "Season" = "Season", #c("STable3","STable3.1","STable3.2","STable3.3"),
+                            "All" = "All"#c("ATable3","ATable3.1","ATable3.2","ATable3.3")  
+                            )) %>% 
+  filter(year != 2019) %>% 
+#  mutate(type = fct_relevel(type,c("spawning biomass", "total catch"))) %>% 
+ filter(type == "exp_keep", mp3 == "All")
+
+allregs_proj2 <- allregs_proj %>% 
+    #filter(type %in% c("biomass","catch")) %>%
+    I() %>%
+  #bag_proj %>% 
+    #group_by(scenario, type, year) %>% 
+    #median_qi(value, .width = c(.5, .8, .95)) %>%
+    ggplot() +  
+    stat_lineribbon(aes(x = year, y = value, fill = mp2),
+                    #show.legend = FALSE,
+                    alpha = 0.35) +
+    # geom_lineribbon(aes(x = year, y = value, ymin = .lower, ymax = .upper, fill = scenario),
+    #                 show.legend = FALSE) +
+    scale_fill_brewer(type = "qual", palette = 2) +
+    facet_wrap(~mp2, scale = "fixed") + 
+    geom_line(aes(y=value,x=year,group=mp2),data = subset(allregs_proj, type != "index" & isim==1), lty=1,lwd=0.5,col=gray(0.7),alpha=0.75) +
+    geom_line(aes(y=value,x=year,group=mp2),data = subset(allregs_proj, type != "index" & isim==2), lty=1,lwd=0.5,col=gray(0.7),alpha=0.75) +
+    geom_line(aes(y=value,x=year,group=mp2),data = subset(allregs_proj, type != "index" & isim==3), lty=1,lwd=0.5,col=gray(0.7),alpha=0.75) +
+    geom_line(aes(y=value,x=year,group=mp2),data = subset(allregs_proj, type != "index" & isim==4), lty=1,lwd=0.5,col=gray(0.7),alpha=0.75) +
+    ylim(0,1e7) + #originally 3000
+    ylab("") + 
+    xlab("") +
+    theme_bw() +
+  theme(strip.placement = "outside") +
+    theme(legend.position= "none") + #,
+    #axis.text.y = element_blank()) +
+    labs(fill = "",
+         subtitle = "Expected Harvest from RDM Emulator") + 
+  lab_all + 
+    theme( plot.subtitle = element_text(hjust = 0.5)) + 
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+allregs_proj_clean <- allregs_proj2 + 
+  theme(axis.title.y = element_blank(), 
+        axis.text.y = element_blank(), 
+        #axis.title.x = element_blank(),
+        #axis.text.x = element_blank()
+        )
+
+#form plot
+final_projection_plot <- ((bag_proj_clean + minlen_proj_clean) /
+(seaslen_proj_clean + allregs_proj_clean)) + 
+  plot_layout(guides = "collect") +
+  plot_annotation() & 
+  labs(
+    y = "Expected Harvest (Numbers)", 
+    x = "Year"
+  )
+final_projection_plot
+#ggsave("~/Desktop/FlounderMSE/ManuscriptPrep/Draft5Figures_final/projectionplot2.png",final_projection_plot,width=9,height=6)
 ```
 
 Time Series of Regulation Changes Over Time - not in MS
@@ -3647,6 +3890,12 @@ metricperformance_all <- diag_ts %>%
   mutate(performance = case_when(
     type == "F/Fref" & value > median ~ "bad",
     type == "F/Fref" & value <= median ~ "good",
+    type == "prop_female" & value > median ~ "bad",
+    type == "prop_female" & value <= median ~ "good",
+    type == "rel per trip" & value > median ~ "bad",
+    type == "rel per trip" & value <= median ~ "good",
+    type == "rec_removals" & value > median ~ "bad",
+    type == "rec_removals" & value <= median ~ "good",
     value > median  ~ "good",
     value <= median ~ "bad",
     TRUE ~ NA_character_ 
@@ -3922,7 +4171,7 @@ performancemetrics <- bind_rows(relpertrip, spawbio, ntrips, trophy, notoverfish
 #same boxplots as above but have all the HCRs on either side 
 
 #bag limit 
-ggplot(performancemetrics, aes(x = performance, y = bag_value, fill = factor(mp2))) +
+baglimit_all <- ggplot(performancemetrics, aes(x = performance, y = bag_value, fill = factor(mp2))) +
   geom_vline(xintercept = 1.5, linetype = "dashed", color = "black", size = 0.8) +
   geom_boxplot(outlier.alpha = 0.5) +
   facet_wrap(~type, ncol = 4) + 
@@ -3938,9 +4187,11 @@ ggplot(performancemetrics, aes(x = performance, y = bag_value, fill = factor(mp2
   ) + 
   scale_fill_manual(values = c("Biomass Matrix" = "#1b9e77", "Biological Ref. Point" = "#d95f02",
                                "No Change (RHL as target)" = "#7570b3", "Percent Change Approach" = "#e7298a"))
+baglimit_all
+#ggsave("~/Desktop/FlounderMSE/ManuscriptPrep/Draft5Figures_final/goodbad_baglimit_all.png",baglimit_all,width=9,height=7)
 
 #min size limit 
-ggplot(performancemetrics, aes(x = performance, y = minlen_value, fill = factor(mp2))) +
+minlen_all <- ggplot(performancemetrics, aes(x = performance, y = minlen_value, fill = factor(mp2))) +
   geom_vline(xintercept = 1.5, linetype = "dashed", color = "black", size = 0.8) +
   geom_boxplot(outlier.alpha = 0.5) +
   facet_wrap(~type, ncol = 4) + 
@@ -3956,9 +4207,11 @@ ggplot(performancemetrics, aes(x = performance, y = minlen_value, fill = factor(
   ) + 
   scale_fill_manual(values = c("Biomass Matrix" = "#1b9e77", "Biological Ref. Point" = "#d95f02",
                                "No Change (RHL as target)" = "#7570b3", "Percent Change Approach" = "#e7298a"))
+minlen_all
+#ggsave("~/Desktop/FlounderMSE/ManuscriptPrep/Draft5Figures_final/goodbad_minlen_all.png",minlen_all,width=9,height=7)
 
 #season length limit 
-ggplot(performancemetrics, aes(x = performance, y = seas_value, fill = factor(mp2))) +
+seaslen_all <- ggplot(performancemetrics, aes(x = performance, y = seas_value, fill = factor(mp2))) +
   geom_vline(xintercept = 1.5, linetype = "dashed", color = "black", size = 0.8) +
   geom_boxplot(outlier.alpha = 0.5) +
   facet_wrap(~type, ncol = 4) + 
@@ -3974,6 +4227,8 @@ ggplot(performancemetrics, aes(x = performance, y = seas_value, fill = factor(mp
   ) + 
    scale_fill_manual(values = c("Biomass Matrix" = "#1b9e77", "Biological Ref. Point" = "#d95f02",
                                "No Change (RHL as target)" = "#7570b3", "Percent Change Approach" = "#e7298a"))
+seaslen_all
+#ggsave("~/Desktop/FlounderMSE/ManuscriptPrep/Draft5Figures_final/goodbad_seaslen_all.png",seaslen_all,width=9,height=7)
 
 ######### now each reg change at a time ######### 
 
@@ -4077,7 +4332,7 @@ performancemetrics_bag <- bind_rows(relpertrip_bag, spawbio_bag, ntrips_bag, tro
                                 keptpertrip_bag, keepone_bag, propfemale_bag, keptreleased_bag, cspertrip_bag, recremovals_bag)
 
 #bag limit boxplot
-ggplot(performancemetrics_bag, aes(x = performance, y = bag_value, fill = factor(mp2))) +
+baglimit_bag <- ggplot(performancemetrics_bag, aes(x = performance, y = bag_value, fill = factor(mp2))) +
   geom_vline(xintercept = 1.5, linetype = "dashed", color = "black", size = 0.8) +
   geom_boxplot(outlier.alpha = 0.5) +
   facet_wrap(~type, ncol = 4) + 
@@ -4093,6 +4348,8 @@ ggplot(performancemetrics_bag, aes(x = performance, y = bag_value, fill = factor
   ) + 
   scale_fill_manual(values = c("Biomass Matrix" = "#1b9e77", "Biological Ref. Point" = "#d95f02",
                                "No Change (RHL as target)" = "#7570b3", "Percent Change Approach" = "#e7298a"))
+baglimit_bag
+#ggsave("~/Desktop/FlounderMSE/ManuscriptPrep/Draft5Figures_final/goodbad_baglimit_bag.png",baglimit_bag,width=9,height=7)
 
 ####### minlen
 regulationvalues_minlen <- diag_ts %>% 
@@ -4193,7 +4450,7 @@ recremovals_minlen <- metricperformance_minlen %>% filter(type == "rec_removals"
 performancemetrics_minlen <- bind_rows(relpertrip_minlen, spawbio_minlen, ntrips_minlen, trophy_minlen, notoverfishing_minlen, notoverfished_minlen, keptpertrip_minlen, keepone_minlen, propfemale_minlen, keptreleased_minlen, cspertrip_minlen, recremovals_minlen)
 
 #minimum size limit boxplot
-ggplot(performancemetrics_minlen, aes(x = performance, y = minlen_value, fill = factor(mp2))) +
+minlen_min <- ggplot(performancemetrics_minlen, aes(x = performance, y = minlen_value, fill = factor(mp2))) +
   geom_vline(xintercept = 1.5, linetype = "dashed", color = "black", size = 0.8) +
   geom_boxplot(outlier.alpha = 0.5) +
   facet_wrap(~type, ncol = 4) + 
@@ -4209,6 +4466,8 @@ ggplot(performancemetrics_minlen, aes(x = performance, y = minlen_value, fill = 
   ) + 
   scale_fill_manual(values = c("Biomass Matrix" = "#1b9e77", "Biological Ref. Point" = "#d95f02",
                                "No Change (RHL as target)" = "#7570b3", "Percent Change Approach" = "#e7298a"))
+minlen_min
+#ggsave("~/Desktop/FlounderMSE/ManuscriptPrep/Draft5Figures_final/goodbad_minlen_min.png",minlen_min,width=9,height=7)
 
 ####### seaslen
 regulationvalues_seaslen <- diag_ts %>% 
@@ -4309,7 +4568,7 @@ recremovals_seaslen <- metricperformance_seaslen %>% filter(type == "rec_removal
 performancemetrics_seaslen <- bind_rows(relpertrip_seaslen, spawbio_seaslen, ntrips_seaslen, trophy_seaslen, notoverfishing_seaslen, notoverfished_seaslen, keptpertrip_seaslen, keepone_seaslen, propfemale_seaslen, keptreleased_seaslen, cspertrip_seaslen, recremovals_seaslen)
 
 #season length boxplot
-ggplot(performancemetrics_seaslen, aes(x = performance, y = seaslen_value, fill = factor(mp2))) +
+seaslen_seas <- ggplot(performancemetrics_seaslen, aes(x = performance, y = seaslen_value, fill = factor(mp2))) +
   geom_vline(xintercept = 1.5, linetype = "dashed", color = "black", size = 0.8) +
   geom_boxplot(outlier.alpha = 0.5) +
   facet_wrap(~type, ncol = 4) + 
@@ -4325,6 +4584,8 @@ ggplot(performancemetrics_seaslen, aes(x = performance, y = seaslen_value, fill 
   ) + 
   scale_fill_manual(values = c("Biomass Matrix" = "#1b9e77", "Biological Ref. Point" = "#d95f02",
                                "No Change (RHL as target)" = "#7570b3", "Percent Change Approach" = "#e7298a"))
+seaslen_seas
+#ggsave("~/Desktop/FlounderMSE/ManuscriptPrep/Draft5Figures_final/goodbad_seaslen_seas.png",seaslen_seas,width=9,height=7)
 
 ```
 
@@ -4642,7 +4903,7 @@ Line Plots for Starting B/BMSY Scenarios
 
 #HCR
 
-median_metrics22 <- readRDS("~/Desktop/FlounderMSE/median_metrics_rdsfiles/version2_seed/startbbmsydata_hcr.rds")
+median_metrics22 <- readRDS("~/Desktop/FlounderMSE/median_metrics_rdsfiles/version3_final/startbbmsydata_hcr.rds")
 
 median_metrics_1 <- median_metrics22 %>% filter(StartBBMSY == 1)
 
@@ -4669,7 +4930,7 @@ median_metrics_subset$metric <- factor(median_metrics_subset$metric, levels = c(
                     "not overfishing", "not overfished", "kept per trip",
                     "keep_one", "prop_female", "kept:released", "cs_per_trip", "rec_removals"))
 
-ggplot(median_metrics_subset, aes(mp, value, col = as.factor(StartBBMSY), 
+bmsy_hcr <- ggplot(median_metrics_subset, aes(mp, value, col = as.factor(StartBBMSY), 
                                   shape = as.factor(mp), group = StartBBMSY)) + 
   geom_line() + 
   geom_point() + 
@@ -4679,6 +4940,8 @@ ggplot(median_metrics_subset, aes(mp, value, col = as.factor(StartBBMSY),
                      labels = c("Start B/BMSY ~ 0.3", "Start B/BMSY ~ 1", "Start B/BMSY ~ 2")) +
   scale_shape_manual(values = c("BBM" = 16, "BRP" = 17, "NCA" = 15, "PCA" = 3),
                      labels = c("Biomass Matrix (BBM)", "Biological Ref. Point (BRP)", "No Change Approach (NCA)", "Percent Change Approach (PCA)"))
+bmsy_hcr
+#ggsave("~/Desktop/FlounderMSE/ManuscriptPrep/Draft5Figures_final/bmsy_hcr.png",bmsy_hcr,width=9,height=5.5)
 
 ###### LINE PLOT W/CI ###### not doing it like this since it makes the plot muddy; would need to edit code above to include CIs again 
 
@@ -4740,7 +5003,7 @@ ggplot(median_metrics_subset, aes(mp, value, group = StartBBMSY)) +
 
 #Reg
 
-median_metrics22 <- readRDS("~/Desktop/FlounderMSE/median_metrics_rdsfiles/version2_seed/startbbmsydata_reg.rds")
+median_metrics22 <- readRDS("~/Desktop/FlounderMSE/median_metrics_rdsfiles/version3_final/startbbmsydata_reg.rds")
 
 median_metrics_1 <- median_metrics22 %>% filter(StartBBMSY == 1)
 
@@ -4769,7 +5032,7 @@ median_metrics_subset$metric <- factor(median_metrics_subset$metric, levels = c(
                     "not overfishing", "not overfished", "kept per trip",
                     "keep_one", "prop_female", "kept:released", "cs_per_trip", "rec_removals"))
 
-ggplot(median_metrics_subset, aes(RegType, value, col = as.factor(StartBBMSY), 
+bmsy_reg <- ggplot(median_metrics_subset, aes(RegType, value, col = as.factor(StartBBMSY), 
                                   shape = as.factor(RegType), group = StartBBMSY)) + 
   geom_line() + 
   geom_point() + 
@@ -4778,7 +5041,10 @@ ggplot(median_metrics_subset, aes(RegType, value, col = as.factor(StartBBMSY),
   scale_color_manual(values = c( "0.3" = "#F8766D", "1" = "#00BA38", "2" = "#619CFF"),
                      labels = c("Start B/BMSY ~ 0.3", "Start B/BMSY ~ 1", "Start B/BMSY ~ 2")) +
   scale_shape_manual(values = c("Bag" = 17, "Length" = 15, "Season" = 3, "All" = 16),
-                     labels = c("Bag limit (Bag)", "Minimum size limit (Length)", "Season length (Season)", "Any regulations can change (All)"))
+                     labels = c("Bag limit (Bag)", "Minimum size limit (Length)", "Season length (Season)", "Any regulations can change (All)")) + guides( color = guide_legend(order = 1), shape = guide_legend(order = 2)) #I guess we need to manually order this one 
+bmsy_reg
+
+#ggsave("~/Desktop/FlounderMSE/ManuscriptPrep/Draft5Figures_final/bmsy_reg.png",bmsy_reg,width=9,height=5.5)
 
 ###### LINE PLOT W/CI ###### not doing it like this since it makes the plot muddy; would need to edit code above to include CIs again 
 
