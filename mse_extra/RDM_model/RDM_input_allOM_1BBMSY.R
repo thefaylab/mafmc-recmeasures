@@ -5,6 +5,9 @@ library(mgcv)
 library(gratia)
 library(ggplot2)
 
+#code for running RDM to form data to fit RDM emulator HGAM to, and code for HGAM fitting, diagnostics, plots, etc. 
+#length distributions and accompanying SSB values are pulled from a directory of MSE runs where the length distributions and SSBs from each simulation were saved
+
 #RDM_input_allOM_nostratify with updated sinatra_split2_savelengths for start BBMSY = 1
 
 setwd("~/Desktop/FlounderMSE")
@@ -1995,7 +1998,7 @@ error = function(e){
 RDMoutputbind_edit <- bind_rows(RDMoutput_edit)
 #View(RDMoutputbind_edit)
 
-#saveRDS(RDMoutputbind_edit, "~/Desktop/FlounderMSE/RDMgam/setseed/datafiles/RDMoutputbind_allOM_1BBMSY_setseed_final.rds") #trial 1 <- cut at 2036
+#saveRDS(RDMoutputbind_edit, "~/Desktop/FlounderMSE/RDMgam/setseed/datafiles/RDMoutputbind_allOM_1BBMSY_setseed_final2.rds") #trial 1 <- cut at 2036
 
 ############################# FIT MODEL ########################################
 library(mgcv)
@@ -2003,6 +2006,7 @@ library(gratia)
 
 #read RDS
 #RDMoutputbind_edit <- readRDS("~/Desktop/FlounderMSE/RDMgam/setseed/datafiles/RDMoutputbind_allOM_1BBMSY_setseed_final.rds")
+#RDMoutputbind_edit <- readRDS("~/Desktop/FlounderMSE/RDMgam/setseed/datafiles/RDMoutputbind_allOM_1BBMSY_setseed_final_2.rds")
 
 #hist(RDMoutputbind_edit$SSBcov)
 #View(RDMoutputbind_edit)
@@ -2059,6 +2063,7 @@ g1.1state <- gam(tot_keep ~  state + s(SSB, state, bs = "fs", k = 3) +
 #set seed adjust RI-NC period treatment
 #saveRDS(g1.1state, "~/Desktop/FlounderMSE/RDMgam/setseed/models/gam_RDMland_allOM_1BBMSY_state_setseed_final.rds")
 #g1.1state <- readRDS("~/Desktop/FlounderMSE/RDMgam/setseed/models/gam_RDMland_allOM_1BBMSY_state_setseed_final.rds")
+#g1.1state <- readRDS("~/Desktop/FlounderMSE/RDMgam/setseed/models/gam_RDMland_allOM_1BBMSY_state_setseed_final_2.rds")
 
 summary(g1.1state)
 draw(g1.1state)
@@ -2161,7 +2166,7 @@ inputdata %>%
   #geom_point() + 
   geom_abline(slope = 1, intercept = 0) + 
   #scale_color_viridis_c() + 
-  scale_color_viridis_c() + 
+  scale_color_viridis_c(breaks = c(25000, 50000, 75000, 100000, 125000)) + 
   labs(
     y = "Realized Harvest from RDM",
     x = "Expected harvest from GAM"

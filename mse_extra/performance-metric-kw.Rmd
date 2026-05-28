@@ -436,7 +436,7 @@ do_small_radar_plot <- function(metrics) {
 
 Switch 
 ```{r}
-HCRtoplot <- "RDMBin7"
+HCRtoplot <- "RDMBin3"
 #change the folder names for the scenarios you want to summarize results for and give them a unique name
 ```
 
@@ -1549,6 +1549,31 @@ params <- list(
                 "MP 12"
                 ),
   fsim = rep(1,12))
+
+#final paper version running from sheet 
+params <- list(
+  scendir = c( "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin3/50BBM2/sim1_bag/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin3/50BBM2/sim2_length/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin3/50BBM2/sim3_season/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin3/50BBM2/sim4_all/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin3/50BRP/sim1_bag/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin3/50BRP/sim2_length/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin3/50BRP/sim3_season/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin3/50BRP/sim4_all/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin3/50PCA/sim1_bag/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin3/50PCA/sim2_length/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin3/50PCA/sim3_season/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin3/50PCA/sim4_all/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin3/50NCA/sim1_bag/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin3/50NCA/sim2_length/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin3/50NCA/sim3_season/",
+                "~/Desktop/FlounderMSE/kw_sims_test/UnityOutput/RDMGAM/Bin3/50NCA/sim4_all/"
+   
+              ),
+  scen.name = c(c(1:16) #these need to be consistent with whatever "run number" is in the sheet 
+                ),
+  fsim = rep(1,16))
+
 ```
 
 MultiRegUpdate - not in MS
@@ -1708,6 +1733,8 @@ Summarize Output
 ```{r}
 #summarize the output files DONT RERUN THIS UNLESS NEEDED
 all_results <- purrr::pmap_dfr(params,read_results, om.name=5)
+
+#median(all_results$biomass, na.rm = TRUE)
 #View(all_results)
 ```
 
@@ -1822,7 +1849,7 @@ metrics <- diag_ts %>%
 
 #hcr
 median_metrics <- metrics %>% 
-  group_by(om, mp, metric) %>% 
+  group_by(om, mp, metric) %>% #if using sheet load the sheet in and run metrics2 below first, then substitute "mp" here for "hcr" before plotting 
   summarize(value = median(value, na.rm=TRUE))
 
 #test <- metrics %>% filter(mp == "BBM", metric == "trophy" )
@@ -1830,7 +1857,7 @@ median_metrics <- metrics %>%
 
 #reg
 median_metrics2 <- metrics %>% 
-  group_by(om, RegType, metric) %>% 
+  group_by(om, RegType, metric) %>% #if using sheet load the sheet in and run metrics2 below first, then substitute "RegType" here for "reg_to_change" before plotting 
   summarize(value = median(value, na.rm=TRUE))
 
 #both 
@@ -1841,8 +1868,7 @@ median_metrics3 <- metrics %>%
 #################################################
 
 #OR use this to read in a spreadsheet of scenario names and specs
-#scen_lookup <- read.csv("~/Downloads/scentable2next.csv") %>%
-  #janitor::clean_names() %>% rename(mp = run_number)
+#scen_lookup <- read.csv("~/Desktop/FlounderMSE/OldVersions/scentable2.csv") %>% janitor::clean_names() %>% rename(mp = run_number)
 ```
 
 State Information - not in MS
@@ -2106,15 +2132,15 @@ Bin7_reg <- median_metrics2 %>% mutate(StartBBMSY = 0.3)
 startbbmsydata_hcr <- rbind(Bin1, Bin3, Bin7)
 startbbmsydata_reg <- rbind(Bin1_reg, Bin3_reg, Bin7_reg)
 
-#saveRDS(startbbmsydata_hcr, "~/Desktop/FlounderMSE/median_metrics_rdsfiles/version3_final/startbbmsydata_hcr.rds")
-#saveRDS(startbbmsydata_reg, "~/Desktop/FlounderMSE/median_metrics_rdsfiles/version3_final/startbbmsydata_reg.rds")
+#saveRDS(startbbmsydata_hcr, "~/Desktop/FlounderMSE/median_metrics_rdsfiles/version3_final2/startbbmsydata_hcr.rds")
+#saveRDS(startbbmsydata_reg, "~/Desktop/FlounderMSE/median_metrics_rdsfiles/version3_final2/startbbmsydata_reg.rds")
 ```
 
 Prepare table for plotting
 ```{r}
 #prepare table for plotting 
 metrics2 <- metrics %>% 
- # left_join(scen_lookup) %>% #include this if using sheet
+  #left_join(scen_lookup) %>% #include this if using sheet
   mutate(om = factor(om),
       #   om = fct_recode(om, "Base" = "1","MRIP Bias" = "2","Shift" = "3"),
          mp2 = fct_recode(factor(mp), #put hcr if using sheet, mp if using code in here
@@ -2264,9 +2290,9 @@ p2 <- metrics2 %>%
        #subtitle = "Base scenario") +
   guides(fill = guide_legend(nrow = 1))
 # add table summaries
-#ggsave("~/Desktop/FlounderMSE/ManuscriptPrep/Draft5Figures_final/boxplot-metrics1bmsy.png",p2,width=9,height=6)
-#ggsave("~/Desktop/FlounderMSE/ManuscriptPrep/Draft5Figures_final/boxplot-metrics2bmsy.png",p2,width=9,height=6)
-#ggsave("~/Desktop/FlounderMSE/ManuscriptPrep/Draft5Figures_final/boxplot-metrics03bmsy.png",p2,width=9,height=6)
+#ggsave("~/Desktop/FlounderMSE/ManuscriptPrep/Draft5Figures_final2/boxplot-metrics1bmsy.png",p2,width=9,height=6)
+#ggsave("~/Desktop/FlounderMSE/ManuscriptPrep/Draft5Figures_final2/boxplot-metrics2bmsy.png",p2,width=9,height=6)
+#ggsave("~/Desktop/FlounderMSE/ManuscriptPrep/Draft5Figures_final2/boxplot-metrics03bmsy.png",p2,width=9,height=6)
 p2
 ```
 
@@ -2330,6 +2356,7 @@ All mp/reg on same plot:
 
 #HCR
 p3 <- median_metrics %>%  
+  #rename(mp = hcr) %>% #only use this if running from sheet 
    mutate(om = factor(om), 
         om = fct_recode(om, "Base" = "5")) %>%#,"MRIP Bias" = "2","Shift" = "3")) %>%
   filter(om == "Base") %>%
@@ -2345,7 +2372,9 @@ p3 <- median_metrics %>%
    do_small_radar_plot()
 
 #REG
-p3 <- median_metrics2 %>% rename(mp = RegType) %>% 
+p3 <- median_metrics2 %>% 
+   rename(mp = RegType) %>% 
+   #rename(mp = reg_to_change) %>% #only use this if running from sheet 
    mutate(om = factor(om), 
         om = fct_recode(om, "Base" = "5")) %>%#,"MRIP Bias" = "2","Shift" = "3")) %>%
   filter(om == "Base") %>%
@@ -2639,8 +2668,8 @@ predict_frame_gg %>%
     x = "expected harvest from GAM"
   ) +
   facet_wrap(~SeasonLen) +
-  xlim(0,1e+07) + #2e7
-  ylim(0,1e+07) +
+  xlim(0,3e+07) + #2e7
+  ylim(0,3e+07) +
   NULL
 
 #sum into coastwide
@@ -2889,6 +2918,8 @@ projection.plot <- function(project.results) {
     labs(fill = "",
          subtitle = "Expected Harvest from RDM Emulator")
 }
+
+#here's where I don't have things updated to support entering in the sheet of input conditions
 
 #minlen
 diag_ts %>% 
@@ -3206,7 +3237,7 @@ final_projection_plot <- ((bag_proj_clean + minlen_proj_clean) /
     x = "Year"
   )
 final_projection_plot
-#ggsave("~/Desktop/FlounderMSE/ManuscriptPrep/Draft5Figures_final/projectionplot2.png",final_projection_plot,width=9,height=6)
+#ggsave("~/Desktop/FlounderMSE/ManuscriptPrep/Draft5Figures_final2/projectionplot2.png",final_projection_plot,width=9,height=6)
 ```
 
 Time Series of Regulation Changes Over Time - not in MS
@@ -4188,7 +4219,7 @@ baglimit_all <- ggplot(performancemetrics, aes(x = performance, y = bag_value, f
   scale_fill_manual(values = c("Biomass Matrix" = "#1b9e77", "Biological Ref. Point" = "#d95f02",
                                "No Change (RHL as target)" = "#7570b3", "Percent Change Approach" = "#e7298a"))
 baglimit_all
-#ggsave("~/Desktop/FlounderMSE/ManuscriptPrep/Draft5Figures_final/goodbad_baglimit_all.png",baglimit_all,width=9,height=7)
+#ggsave("~/Desktop/FlounderMSE/ManuscriptPrep/Draft5Figures_final2/goodbad_baglimit_all.png",baglimit_all,width=9,height=7)
 
 #min size limit 
 minlen_all <- ggplot(performancemetrics, aes(x = performance, y = minlen_value, fill = factor(mp2))) +
@@ -4208,7 +4239,7 @@ minlen_all <- ggplot(performancemetrics, aes(x = performance, y = minlen_value, 
   scale_fill_manual(values = c("Biomass Matrix" = "#1b9e77", "Biological Ref. Point" = "#d95f02",
                                "No Change (RHL as target)" = "#7570b3", "Percent Change Approach" = "#e7298a"))
 minlen_all
-#ggsave("~/Desktop/FlounderMSE/ManuscriptPrep/Draft5Figures_final/goodbad_minlen_all.png",minlen_all,width=9,height=7)
+#ggsave("~/Desktop/FlounderMSE/ManuscriptPrep/Draft5Figures_final2/goodbad_minlen_all.png",minlen_all,width=9,height=7)
 
 #season length limit 
 seaslen_all <- ggplot(performancemetrics, aes(x = performance, y = seas_value, fill = factor(mp2))) +
@@ -4228,7 +4259,7 @@ seaslen_all <- ggplot(performancemetrics, aes(x = performance, y = seas_value, f
    scale_fill_manual(values = c("Biomass Matrix" = "#1b9e77", "Biological Ref. Point" = "#d95f02",
                                "No Change (RHL as target)" = "#7570b3", "Percent Change Approach" = "#e7298a"))
 seaslen_all
-#ggsave("~/Desktop/FlounderMSE/ManuscriptPrep/Draft5Figures_final/goodbad_seaslen_all.png",seaslen_all,width=9,height=7)
+#ggsave("~/Desktop/FlounderMSE/ManuscriptPrep/Draft5Figures_final2/goodbad_seaslen_all.png",seaslen_all,width=9,height=7)
 
 ######### now each reg change at a time ######### 
 
@@ -4349,7 +4380,7 @@ baglimit_bag <- ggplot(performancemetrics_bag, aes(x = performance, y = bag_valu
   scale_fill_manual(values = c("Biomass Matrix" = "#1b9e77", "Biological Ref. Point" = "#d95f02",
                                "No Change (RHL as target)" = "#7570b3", "Percent Change Approach" = "#e7298a"))
 baglimit_bag
-#ggsave("~/Desktop/FlounderMSE/ManuscriptPrep/Draft5Figures_final/goodbad_baglimit_bag.png",baglimit_bag,width=9,height=7)
+#ggsave("~/Desktop/FlounderMSE/ManuscriptPrep/Draft5Figures_final2/goodbad_baglimit_bag.png",baglimit_bag,width=9,height=7)
 
 ####### minlen
 regulationvalues_minlen <- diag_ts %>% 
@@ -4467,7 +4498,7 @@ minlen_min <- ggplot(performancemetrics_minlen, aes(x = performance, y = minlen_
   scale_fill_manual(values = c("Biomass Matrix" = "#1b9e77", "Biological Ref. Point" = "#d95f02",
                                "No Change (RHL as target)" = "#7570b3", "Percent Change Approach" = "#e7298a"))
 minlen_min
-#ggsave("~/Desktop/FlounderMSE/ManuscriptPrep/Draft5Figures_final/goodbad_minlen_min.png",minlen_min,width=9,height=7)
+#ggsave("~/Desktop/FlounderMSE/ManuscriptPrep/Draft5Figures_final2/goodbad_minlen_min.png",minlen_min,width=9,height=7)
 
 ####### seaslen
 regulationvalues_seaslen <- diag_ts %>% 
@@ -4585,7 +4616,7 @@ seaslen_seas <- ggplot(performancemetrics_seaslen, aes(x = performance, y = seas
   scale_fill_manual(values = c("Biomass Matrix" = "#1b9e77", "Biological Ref. Point" = "#d95f02",
                                "No Change (RHL as target)" = "#7570b3", "Percent Change Approach" = "#e7298a"))
 seaslen_seas
-#ggsave("~/Desktop/FlounderMSE/ManuscriptPrep/Draft5Figures_final/goodbad_seaslen_seas.png",seaslen_seas,width=9,height=7)
+#ggsave("~/Desktop/FlounderMSE/ManuscriptPrep/Draft5Figures_final2/goodbad_seaslen_seas.png",seaslen_seas,width=9,height=7)
 
 ```
 
@@ -4903,7 +4934,7 @@ Line Plots for Starting B/BMSY Scenarios
 
 #HCR
 
-median_metrics22 <- readRDS("~/Desktop/FlounderMSE/median_metrics_rdsfiles/version3_final/startbbmsydata_hcr.rds")
+median_metrics22 <- readRDS("~/Desktop/FlounderMSE/median_metrics_rdsfiles/version3_final2/startbbmsydata_hcr.rds")
 
 median_metrics_1 <- median_metrics22 %>% filter(StartBBMSY == 1)
 
@@ -4941,7 +4972,7 @@ bmsy_hcr <- ggplot(median_metrics_subset, aes(mp, value, col = as.factor(StartBB
   scale_shape_manual(values = c("BBM" = 16, "BRP" = 17, "NCA" = 15, "PCA" = 3),
                      labels = c("Biomass Matrix (BBM)", "Biological Ref. Point (BRP)", "No Change Approach (NCA)", "Percent Change Approach (PCA)"))
 bmsy_hcr
-#ggsave("~/Desktop/FlounderMSE/ManuscriptPrep/Draft5Figures_final/bmsy_hcr.png",bmsy_hcr,width=9,height=5.5)
+#ggsave("~/Desktop/FlounderMSE/ManuscriptPrep/Draft5Figures_final2/bmsy_hcr.png",bmsy_hcr,width=9,height=5.5)
 
 ###### LINE PLOT W/CI ###### not doing it like this since it makes the plot muddy; would need to edit code above to include CIs again 
 
@@ -5003,7 +5034,7 @@ ggplot(median_metrics_subset, aes(mp, value, group = StartBBMSY)) +
 
 #Reg
 
-median_metrics22 <- readRDS("~/Desktop/FlounderMSE/median_metrics_rdsfiles/version3_final/startbbmsydata_reg.rds")
+median_metrics22 <- readRDS("~/Desktop/FlounderMSE/median_metrics_rdsfiles/version3_final2/startbbmsydata_reg.rds")
 
 median_metrics_1 <- median_metrics22 %>% filter(StartBBMSY == 1)
 
@@ -5044,7 +5075,7 @@ bmsy_reg <- ggplot(median_metrics_subset, aes(RegType, value, col = as.factor(St
                      labels = c("Bag limit (Bag)", "Minimum size limit (Length)", "Season length (Season)", "Any regulations can change (All)")) + guides( color = guide_legend(order = 1), shape = guide_legend(order = 2)) #I guess we need to manually order this one 
 bmsy_reg
 
-#ggsave("~/Desktop/FlounderMSE/ManuscriptPrep/Draft5Figures_final/bmsy_reg.png",bmsy_reg,width=9,height=5.5)
+#ggsave("~/Desktop/FlounderMSE/ManuscriptPrep/Draft5Figures_final2/bmsy_reg.png",bmsy_reg,width=9,height=5.5)
 
 ###### LINE PLOT W/CI ###### not doing it like this since it makes the plot muddy; would need to edit code above to include CIs again 
 
